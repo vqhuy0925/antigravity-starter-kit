@@ -11,8 +11,14 @@ antigravity-starter-kit/
 ├── plugin.json                          # Plugin declaration manifest
 ├── install.sh                           # One-click installer (Global & Local)
 ├── rules/
-│   └── AGENTS.md                        # Core engineering standards & guidelines
+│   └── AGENTS.md                        # Core engineering standards & AI-Native SDLC rules
+├── templates/                           # Standardized SDLC stage markdown templates
+│   ├── intent_template.md               # Stage 1 (Plan): Intent proto-spec
+│   ├── spec_template.md                 # Stage 2 (Design): Technical & UX specification
+│   ├── plan_template.md                 # Stage 3 (Build): Implementation plan
+│   └── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 ├── skills/                              # Specialized on-demand workflows
+│   ├── ai-native-sdlc/SKILL.md          # 6-stage AI-Native SDLC artifact loop
 │   ├── token-optimization/SKILL.md      # Token economy & context budgeting
 │   ├── responsive-frontend-expert/SKILL.md # Cross-device UI (Mobile, iPad, Desktop)
 │   ├── plan/SKILL.md                    # Implementation planning & task breakdown
@@ -62,6 +68,7 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 
 | Command / Skill | Description |
 | :--- | :--- |
+| `ai-native-sdlc` | Encodes the 6-stage artifact loop (`intent.md` $\rightarrow$ `spec.md` $\rightarrow$ `plan.md` $\rightarrow$ code $\rightarrow$ PR gate $\rightarrow$ maintain). |
 | `/plan` | Analyzes requirements, checks dependencies, and generates `implementation_plan.md` and `task.md`. |
 | `/implement` | Executes implementation step-by-step according to the approved plan. |
 | `/review-code` | Runs tests, linters, type checks, and performs automated security and clean code checks. |

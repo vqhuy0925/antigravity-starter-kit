@@ -1,6 +1,15 @@
 # Global Agent Guidelines & Engineering Standards
 
-## 1. DEVELOPMENT WORKFLOW LIFECYCLE
+## 1. DEVELOPMENT WORKFLOW & AI-NATIVE SDLC LIFECYCLE
+- **6-Stage Artifact Loop**:
+  - **Stage 1 (Plan)**: Brainstorm intent $\rightarrow$ produce and commit `intent.md` (Problem, Desired Outcome, Constraints, Open Questions).
+  - **Stage 2 (Design)**: Produce `spec.md` with requirements, UI/UX specs, API contracts, and flagged policy concerns.
+  - **Stage 3 (Build)**: Plan mode as default $\rightarrow$ commit `plan.md` (changed files, execution order, risks, proof). Implement incrementally.
+  - **Stage 4 (Test)**: Continuous verification with automated tests, type checks, and linters. Add regression evals for tricky logic.
+  - **Stage 5 (Deploy)**: Tiered deployment. Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
+  - **Stage 6 (Maintain)**: Incident diagnosis $\rightarrow$ `bug_report.md` with RCA and fix plan. Close the loop by adding permanent regression tests.
+- **Institutional Memory (2-Mistake Rule)**:
+  - Whenever an AI assistant repeats a mistake twice, immediately update `AGENTS.md` or the corresponding project rule files with the corrective instruction.
 - **Plan Phase**:
   - Always research the codebase using grep and targeted view tools before writing code.
   - Create or update `implementation_plan.md` and `task.md` under the conversation artifacts directory and seek user confirmation on breaking decisions.

@@ -1,6 +1,6 @@
 {
   "name": "antigravity-starter-kit",
-  "description": "Production-grade starter kit for Antigravity AI agents featuring token economy, responsive frontend UX, structured planning, clean code audits, and conventional commits.",
-  "version": "1.0.0",
-  "author": "DentalCRM Core Team"
+  "description": "Production-grade starter kit for Antigravity AI agents featuring the AI-Native SDLC lifecycle, token economy, responsive frontend UX, structured planning, clean code audits, and conventional commits.",
+  "version": "1.1.0",
+  "author": "Huy Vu"
 }
