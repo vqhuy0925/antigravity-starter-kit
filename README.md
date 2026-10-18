@@ -41,9 +41,14 @@ Installs once on your machine. All current and future projects automatically inh
 curl -fsSL https://raw.githubusercontent.com/vqhuy0925/antigravity-starter-kit/main/install.sh | bash -s -- --global
 ```
 
-Or via direct git clone:
+Or via direct git clone (macOS / Linux / Git Bash):
 ```bash
 git clone https://github.com/vqhuy0925/antigravity-starter-kit.git ~/.gemini/config/plugins/antigravity-starter-kit
+```
+
+Or on **Windows PowerShell** (using `$HOME` instead of `~`):
+```powershell
+git clone https://github.com/vqhuy0925/antigravity-starter-kit.git "$HOME\.gemini\config\plugins\antigravity-starter-kit"
 ```
 
 ---
