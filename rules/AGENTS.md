@@ -3,10 +3,11 @@
 ## 1. DEVELOPMENT WORKFLOW & AI-NATIVE SDLC LIFECYCLE
 - **6-Stage Artifact Loop**:
   - **Stage 1 (Plan)**: Brainstorm intent $\rightarrow$ produce and commit `intent.md` (Problem, Desired Outcome, Constraints, Open Questions).
-  - **Stage 2 (Design)**: Produce `spec.md` with requirements, UI/UX specs, API contracts, and flagged policy concerns.
-  - **Stage 3 (Build)**: Plan mode as default $\rightarrow$ commit `plan.md` (changed files, execution order, risks, proof). Implement incrementally.
-  - **Stage 4 (Test)**: Continuous verification with automated tests, type checks, and linters. Add regression evals for tricky logic.
-  - **Stage 5 (Deploy)**: Tiered deployment. Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
+  - **Stage 2 (Design)**: Produce `spec.md` with requirements, UI/UX specs, API contracts, and flagged policy concerns (critiqued by `spec-critic`).
+  - **Stage 3 (Build/Plan)**: Plan mode as default $\rightarrow$ commit `plan.md` (changed files, execution order, risks, proof).
+  - **Stage 3.5 (Test Definition)**: Define test cases $\rightarrow$ produce `test_cases.md` (What: from ACs & risks; How: `auto:unit`, `auto:integration`, `manual`). 100% AC traceability, permanent `TC` IDs.
+  - **Stage 4 (Implement & Test)**: TDD discipline ("Red before Green" for fixes). Continuous verification with automated tests, type checks, and linters.
+  - **Stage 5 (Deploy)**: Tiered deployment (`deploy.md`). Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
   - **Stage 6 (Maintain)**: Incident diagnosis $\rightarrow$ `bug_report.md` with RCA and fix plan. Close the loop by adding permanent regression tests.
 - **Institutional Memory (2-Mistake Rule)**:
   - Whenever an AI assistant repeats a mistake twice, immediately update `AGENTS.md` or the corresponding project rule files with the corrective instruction.
@@ -14,7 +15,7 @@
   - Always research the codebase using grep and targeted view tools before writing code.
   - Create or update `implementation_plan.md` and `task.md` under the conversation artifacts directory and seek user confirmation on breaking decisions.
 - **Implement Phase**:
-  - Follow approved plans incrementally.
+  - Follow approved plans incrementally without scope creep (enforced by `plan-boundary` hook).
   - Update `task.md` with progress (`[/]` for in-progress, `[x]` for completed).
   - Verify syntax and run lightweight compilation commands frequently.
 - **Review & Verification Phase**:
@@ -22,7 +23,7 @@
   - Produce a `walkthrough.md` artifact summarizing changes and test evidence.
 - **Commit Phase**:
   - Split unrelated changes into logical, conventional commits.
-  - Never push or deploy without explicit user request.
+  - Never push or deploy without explicit user request (protected by `git-guardrail` hook).
 
 ## 2. TOKEN OPTIMIZATION & CONTEXT MANAGEMENT
 - **Lean File Reading**: Never dump whole directories or load massive files completely. Use `grep_search` to pinpoint line numbers and read specific line ranges (`StartLine` - `EndLine` <= 100 lines).
