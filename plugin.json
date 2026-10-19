@@ -1,6 +1,12 @@
 {
   "name": "antigravity-starter-kit",
-  "description": "Production-grade starter kit for Antigravity AI agents featuring the AI-Native SDLC lifecycle, token economy, responsive frontend UX, structured planning, clean code audits, and conventional commits.",
-  "version": "1.1.0",
-  "author": "Huy Vu"
+  "displayName": "Antigravity Enterprise Starter Kit",
+  "description": "Enterprise-grade toolkit for Antigravity AI agents featuring AI-Native SDLC, blackbox test definition, token economy, responsive mobile UX, programmatic hooks, and conventional commits.",
+  "version": "1.2.0",
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "/plan Thiết kế tính năng mới theo quy trình AI-Native SDLC",
+    "/define-tests Đặc tả ca kiểm thử black-box & tự động hóa từ yêu cầu",
+    "/review-code Kiểm tra bảo mật, rà soát diff và tối ưu chất lượng code"
+  ]
 }

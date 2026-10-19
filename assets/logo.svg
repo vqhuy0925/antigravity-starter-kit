@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="28" y1="28" x2="228" y2="228" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="60" y1="60" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="40" y1="128" x2="216" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#C084FC" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.8" />
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="256" height="256" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Rounded App Background -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#bgGrad)" stroke="#312E81" stroke-width="2" />
+
+  <!-- Outer Antigravity Orbital Ring -->
+  <ellipse cx="128" cy="128" rx="80" ry="32" transform="rotate(-28 128 128)" stroke="url(#ringGrad)" stroke-width="4" stroke-dasharray="8 6" />
+
+  <!-- Core Levitation Node -->
+  <circle cx="128" cy="128" r="42" fill="url(#accentGrad)" filter="url(#glow)" />
+
+  <!-- Upward Lift / Antigravity Arrows -->
+  <path d="M128 92L146 114H134V154H122V114H110L128 92Z" fill="#FFFFFF" />
+  
+  <!-- Orbiting Satellite Electrons / Micro Particles -->
+  <circle cx="68" cy="100" r="5" fill="#38BDF8" filter="url(#glow)" />
+  <circle cx="188" cy="156" r="6" fill="#C084FC" filter="url(#glow)" />
+  <circle cx="128" cy="52" r="3" fill="#F472B6" />
+</svg>
