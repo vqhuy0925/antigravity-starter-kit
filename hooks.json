@@ -1,0 +1,26 @@
+{
+  "antigravity-guardrails": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"hooks/git-guardrail.js\"",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "node \"hooks/secret-scan.js\"",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "node \"hooks/plan-boundary.js\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
