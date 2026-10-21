@@ -1,6 +1,6 @@
 ---
 name: ai-native-sdlc
-description: Universal AI-Native Software Development Lifecycle (SDLC) framework. Encodes the 6-stage artifact loop (intent.md -> spec.md -> plan.md -> diff/test -> deploy gate -> maintain).
+description: Universal AI-Native Software Development Lifecycle (SDLC) framework. Encodes the 6-stage artifact loop (intent.md -> spec.md -> test_cases.md -> plan.md -> diff/test -> deploy gate -> maintain).
 ---
 
 # AI-Native SDLC Framework
@@ -14,17 +14,17 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 [Idea / Alert] 
      │
      ▼
-┌──────────────┐     PO Review     ┌──────────────┐     Arch Sign-off     ┌──────────────┐
-│ Stage 1:     │ ───────────────►  │ Stage 2:     │ ────────────────────► │ Stage 3:     │
-│ intent.md    │                   │ spec.md      │                       │ plan.md      │
-└──────────────┘                   └──────────────┘                       └──────────────┘
-                                                                                 │
-                                                                                 ▼
-┌──────────────┐    PR Gate       ┌──────────────┐     Continuous Evals   ┌──────────────┐
-│ Stage 6:     │ ◄───────────────  │ Stage 5:     │ ◄──────────────────── │ Stage 3.5/4: │
-│ maintain.md  │   (Human Sign)   │ deploy.md    │     (Tests/Linters)    │ test_cases & │
-└──────────────┘                  └──────────────┘                        │ implement    │
-     │                                                                    └──────────────┘
+┌──────────────┐     PO Review     ┌──────────────┐    QA Independence     ┌────────────────┐
+│ Stage 1:     │ ───────────────►  │ Stage 2:     │ ─────────────────────► │ Stage 2b (QA): │
+│ intent.md    │                   │ spec.md      │    (Zero-Dev Bias)     │ test_cases.md  │
+└──────────────┘                   └──────────────┘                        └────────────────┘
+                                                                                   │
+                                                                                   ▼
+┌──────────────┐    PR Gate       ┌──────────────┐    Cross-Verification   ┌────────────────┐
+│ Stage 6:     │ ◄───────────────  │ Stage 5:     │ ◄───────────────────── │ Stage 3 & 4:   │
+│ maintain.md  │   (Human Sign)   │ deploy.md    │  (Dev vs test_cases)   │ plan.md & Code │
+└──────────────┘                  └──────────────┘                         └────────────────┘
+     │
      └─── Loop closes (breach/incident/bug -> fix-bug -> new intent.md)
 ```
 
@@ -43,25 +43,27 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 - **Flagged Concerns:** AI explicitly highlights policy conflicts, architectural trade-offs, and compliance concerns before coding begins.
 - **Approval Gate:** Tech Lead / Architect approves `spec.md`.
 
+### Stage 2b: QA Verification Contract (`define-tests`)
+- **Artifact:** `test_cases.md` (Acceptance criteria, boundary conditions, cross-layer assertions: DB vs API DTO vs UI matrix).
+- **Agent Role:** Independent **QA Agent** (executed in an isolated subagent context with zero dev implementation bias).
+- **Process:** QA derives pure black-box test scenarios from `intent.md`/`spec.md` before developer implementation starts.
+- **Approval Gate:** Test cases established as the ground truth contract for Dev and Code Review.
+
 ### Stage 3: Build (Plan Mode Default)
 - **Artifact:** `plan.md` (Files to touch, step-by-step order of work, regression risks, proof/verification tests).
-- **Rule:** Never implement code without an approved plan. Enforced by `plan-boundary` hook.
+- **Rule:** Never implement code without an approved plan and cross-checking `test_cases.md`. Enforced by `plan-boundary` hook.
+- **Process:** AI operates incrementally, adhering to project conventions, coding standards, and QA acceptance criteria.
 
-### Stage 3.5: Define Test Cases (Pre-Implementation Gate)
-- **Artifact:** `test_cases_<feature>.md` (derived via `/define-tests`).
-- **Principles:**
-  - 100% Traceability to ACs and identified risks.
-  - Test levels clearly segmented (`auto:unit`, `auto:integration`, `manual`).
-  - Permanent `TC` identifiers (`TC01`, `TC02`...) for lifecycle tracking.
-
-### Stage 4: Implement & Test (Continuous Evals & Self-Verification)
+### Stage 4: Implement & Test (Continuous Evals & Cross-Verification)
 - **Execution:** Automated tests, type checkers, and linters run continuously during implementation.
+- **Cross-Check:** Developer must verify each scenario in `test_cases.md` with passing automated unit/integration tests (`auto:unit`, `auto:integration`).
 - **Bug Remediation:** Strictly follow **Red Before Green** TDD workflow (`/fix-bug`).
-- **Eval Hardening:** Tricky domain edge-cases are captured as permanent regression tests.
+- **Eval Hardening:** Tricky domain edge-cases are captured as regression tests in the codebase test suite.
 
-### Stage 5: Deploy (Multi-Tier Governance)
+### Stage 5: Deploy (Multi-Tier Governance & Audit)
 - **Artifact:** `deploy.md`
 - **Development/Local:** Agents can run formatters, linters, and unit tests freely.
+- **Review Gate (`review-code`):** Reviewer strictly audits the implementation and test results against `test_cases.md`. If any QA scenario is missed or unverified, review fails.
 - **Staging/Production:** Strictly gated. Agents prepare PRs, release notes, and migration scripts; execution requires explicit human authorization (`/deploy`).
 
 ### Stage 6: Maintain (Closing the Loop)
