@@ -1,0 +1,33 @@
+{
+  "name": "antigravity-starter-kit",
+  "version": "1.2.0",
+  "description": "Enterprise-grade guardrails, AI-native SDLC, and workflow plugins for Antigravity & Gemini Code Assist agents.",
+  "main": "bin/cli.js",
+  "bin": {
+    "antigravity-starter-kit": "bin/cli.js",
+    "agy-kit": "bin/cli.js"
+  },
+  "scripts": {
+    "test": "node test/verify-hooks.test.js"
+  },
+  "keywords": [
+    "antigravity",
+    "gemini",
+    "gemini-code-assist",
+    "ai-agents",
+    "ai-sdlc",
+    "guardrails",
+    "tdd",
+    "developer-tools"
+  ],
+  "author": "vqhuy0925",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vqhuy0925/antigravity-starter-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vqhuy0925/antigravity-starter-kit/issues"
+  },
+  "homepage": "https://github.com/vqhuy0925/antigravity-starter-kit#readme"
+}
