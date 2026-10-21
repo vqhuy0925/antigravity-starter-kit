@@ -21,13 +21,13 @@
 
 ## 💡 Why Antigravity Starter Kit?
 
-Autonomous AI coding agents are incredibly capable, but in real-world production repositories they frequently cause severe issues:
+Autonomous AI coding agents are extraordinarily powerful, but in real-world production repositories they frequently cause severe issues:
 1. **Scope Creep & Hallucination:** Agents modify unrelated files, refactor working logic out of the blue, or delete critical dependencies.
-2. **Context Token Exhaustion:** Agents dump multi-thousand-line terminal outputs and load entire codebases, bloating context and degrading intelligence.
+2. **Context Token Exhaustion:** Agents dump multi-thousand-line terminal outputs and load entire codebases, bloating context and degrading LLM intelligence.
 3. **Catastrophic Commands:** Accidental `git push --force`, commits directly to `main`, or leaking private API keys directly into commit messages.
-4. **Vague Requirements:** Writing hundreds of lines of code based on ambiguous PO specifications without clarifying edge cases first.
+4. **Dev Confirmation Bias:** Developers writing their own test cases assume what they just coded works, missing presentation traps and database column default bugs.
 
-**Antigravity Starter Kit** transforms your AI agent from an erratic "code monkey" into a disciplined **Staff/Lead Software Engineer** governed by strict runtime guardrails, adversarial requirements validation, and automated TDD gates.
+**Antigravity Starter Kit** transforms your AI agent from an erratic "code monkey" into a disciplined **Staff/Lead Software Engineer** governed by strict runtime guardrails, adversarial requirements validation, independent QA subagents, and automated TDD gates.
 
 ---
 
@@ -39,6 +39,7 @@ Autonomous AI coding agents are incredibly capable, but in real-world production
 | **Secret Protection** | Can inadvertently leak API keys or AWS credentials | **Scanned & blocked** in real-time by `secret-scan.js` |
 | **Scope Boundary** | Edits random files beyond original user request | **Halted** by `plan-boundary.js` if file is not in approved plan |
 | **Requirements** | Makes assumptions and codes immediately | **Interrogated** by adversarial `spec-critic` subagent |
+| **QA & Verification** | Dev tests own code with confirmation bias | **Isolated QA Agent** derives 3-layer test matrix with zero dev bias |
 | **Quality Gate** | Code written without automated tests | **Strict TDD** ("Red Before Green") enforced by `define-tests` & `fix-bug` |
 | **Context Window** | Reads entire 1,000+ line files, burning token quota | **Lean slicing** ($\le 100$ lines), silenced noisy outputs (`-q`) |
 
@@ -51,7 +52,7 @@ Autonomous AI coding agents are incredibly capable, but in real-world production
 $ git push origin feature-auth --force
 🚨 BLOCKED by Antigravity Guardrail: Force push (--force / -f) destroys remote commit history.
 
-# Scenario 2: Agent attempts to commit a file with a hardcoded token
+# Scenario 2: Agent attempts to run a command with a hardcoded token
 $ curl -H "Authorization: token ghp_39charHexToken..."
 🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string.
 
@@ -70,7 +71,7 @@ Antigravity Starter Kit guides both developer and agent through a systematic eng
 flowchart TD
     A["Stage 1: Intent<br/>(intent.md)"] --> B["Stage 2: Design<br/>(spec.md)"]
     B --> C["Adversarial Critic<br/>(spec-critic Agent)"]
-    C -->|Ownership Test Passed| D["Stage 2b: Test Definition<br/>(define-tests QA Agent)"]
+    C -->|Ownership Test Passed| D["Stage 2b: Independent QA<br/>(define-tests QA Agent)"]
     D --> E["Stage 3: Plan & Task<br/>(plan.md & task.md)"]
     E --> F["Stage 4: TDD Implement<br/>(Red Before Green)"]
     F --> G["Stage 5: Review & Audit<br/>(code-reviewer Agent)"]
@@ -83,6 +84,22 @@ flowchart TD
 4. **Stage 3 (Plan):** Execution order, change boundaries, risks, and proof verification plan.
 5. **Stage 4 (Implement & TDD):** Incremental code changes verified by automated tests.
 6. **Stage 5 (Review & Deploy):** Independent code audit against OWASP Top 10, clean architecture, and staging gate.
+
+---
+
+## 🧪 Independent QA Agent & Zero-Dev-Bias
+
+Developers writing their own test cases suffer from **confirmation bias**—they test against implementation assumptions rather than actual requirements, often missing presentation traps (e.g. database column defaults overriding calculated values in calendar/matrix views).
+
+Antigravity Starter Kit introduces an **Independent QA Subagent Pattern**:
+1. **Isolated Execution:** QA runs as a dedicated subagent (`invoke_subagent` with `Role: 'QA Engineer'` executing `define-tests`) with a clean context, evaluating purely `intent.md` / `spec.md` or the ticket report without seeing dev implementation hacks.
+2. **The 3-Layer Rule:** QA defines test assertions across 3 layers:
+   - **Data / Entity Layer:** Database row values, foreign keys, and default columns.
+   - **API / Service Layer:** Response DTOs, calculated ratios, penalty waivers, and audit comments.
+   - **UI / Presentation Layer:** Calendar matrix, table cells, display codes, and badges.
+3. **Dual Verification Gate:**
+   - **Dev (`implement`):** Guides code and automated test construction to satisfy every `TC-xx` scenario in `test_cases.md`.
+   - **Reviewer (`review-code`):** Strictly audits test results against `test_cases.md` before approval.
 
 ---
 
@@ -107,29 +124,31 @@ antigravity-starter-kit/
 │   ├── spec-critic.md                   # Adversarial requirements lens & PO questions filter
 │   └── code-reviewer.md                 # Independent diff, DTO boundary & OWASP security auditor
 ├── rules/
-│   └── AGENTS.md                        # Core engineering standards & AI-Native SDLC rules
+│   └── AGENTS.md                        # Core engineering standards, QA independence & AI-Native SDLC rules
 ├── templates/                           # Standardized SDLC markdown templates
-│   ├── intent_template.md               # Stage 1: Intent proto-spec
-│   ├── spec_template.md                 # Stage 2: Technical & UX specification
-│   ├── plan_template.md                 # Stage 3: Implementation plan
-│   ├── test_cases_template.md           # Stage 3.5: Traceable test case matrix
-│   ├── deploy_template.md               # Stage 5: Staging/Prod release checklist
-│   ├── bug_report_template.md           # Stage 6: Incident & RCA report
+│   ├── intent_template.md               # Stage 1 (Plan): Intent proto-spec
+│   ├── spec_template.md                 # Stage 2 (Design): Technical & UX specification
+│   ├── test_cases_template.md           # Stage 2b (QA): Independent test specification & 3-layer matrix
+│   ├── plan_template.md                 # Stage 3 (Build): Implementation plan
+│   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
+│   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Portable tech stack & domain glossary profile
 ├── skills/                              # 11 Specialized On-Demand Skills
-│   ├── ai-native-sdlc/                  # 6-stage AI-Native SDLC artifact loop
-│   ├── define-tests/                    # Black-box & automated test derivation
+│   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
+│   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
-│   ├── token-optimization/              # Context budgeting & lean file reading
+│   ├── token-optimization/              # Context budgeting & lean file reading (≤ 100 lines)
 │   ├── responsive-frontend-expert/      # Cross-device UI (Mobile 100dvh, iPad, Desktop)
 │   ├── plan/                            # Implementation planning & task breakdown
-│   ├── implement/                       # Structured task execution
-│   ├── review-code/                     # Clean code & security audit
+│   ├── implement/                       # Structured task execution cross-checked with QA tests
+│   ├── review-code/                     # Code audit & QA test matrix cross-verification
 │   ├── commit-code/                     # Conventional commit generator & splitter
 │   ├── backend-development/             # REST API, DTOs & transactional standards
 │   └── smart-researcher/                # Token-lean codebase research
-└── test/
-    └── verify-hooks.test.js             # Automated test suite for safety guardrails
+├── test/
+│   └── verify-hooks.test.js             # Automated test suite for safety guardrails
+├── mcp_config.json                      # MCP Server integration template
+└── package.json                         # npm package declaration & test scripts
 ```
 
 ---
@@ -161,6 +180,11 @@ Installs once on your machine. All current and future Antigravity / Gemini proje
 curl -fsSL https://raw.githubusercontent.com/vqhuy0925/antigravity-starter-kit/main/install.sh | bash -s -- --global
 ```
 
+Or via direct git clone on Windows PowerShell:
+```powershell
+git clone https://github.com/vqhuy0925/antigravity-starter-kit.git "$HOME\.gemini\config\plugins\antigravity-starter-kit"
+```
+
 ---
 
 ### Method 3: Project-Level Installation (For Teams & Git Submodules)
@@ -185,19 +209,35 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 
 ## 🎯 Command & Skill Reference
 
-| Command / Skill | When to Use | Output / Action |
+| Command / Skill | Description | Output / Action |
 | :--- | :--- | :--- |
-| `ai-native-sdlc` | Starting any non-trivial feature | Orchestrates the full 6-stage artifact loop |
-| `/plan` | Before writing code | Analyzes dependencies and produces `implementation_plan.md` |
-| `/define-tests` | Before writing implementation | Generates black-box & automated test matrices (`test_cases.md`) |
-| `/fix-bug` | Investigating & fixing defects | Enforces "Red Before Green" reproduction test first |
-| `/implement` | Executing an approved plan | Incremental code modification checked against `task.md` |
-| `/review-code` | Before committing / submitting PR | Audits code against OWASP, clean architecture, and test suites |
-| `/commit-code` | Ready to commit | Groups changes by domain and formats Conventional Commits |
-| `token-optimization` | Always active | Enforces $\le 100$-line reads and suppresses noisy CLI outputs |
-| `responsive-frontend-expert` | Frontend UI work | Enforces 3-zone mobile dialogs (`100dvh`) and 44px touch targets |
-| `backend-development` | Backend API work | Enforces DTO boundaries and parameterized ORM queries |
-| `smart-researcher` | Exploring large codebases | Researches in isolated subagents without polluting main chat |
+| `ai-native-sdlc` | AI-Native SDLC artifact loop with QA Gate | Orchestrates the full 6-stage artifact loop |
+| `/define-tests` | Independent QA Engineer workflow | Derives acceptance criteria & 3-layer test matrices (`test_cases.md`) |
+| `/plan` | Implementation planning | Analyzes dependencies and produces `implementation_plan.md` |
+| `/fix-bug` | Bug remediation | Enforces TDD "Red Before Green" reproduction test first |
+| `/implement` | Structured task execution | Incremental changes cross-checked against QA test cases |
+| `/review-code` | Code & QA audit | Audits code against OWASP, clean architecture, and test suites |
+| `/commit-code` | Git commit generator | Groups changes by domain and formats Conventional Commits |
+| `token-optimization` | Context budgeting | Enforces $\le 100$-line reads and suppresses noisy CLI outputs |
+| `responsive-frontend-expert` | Frontend UI standards | Enforces 3-zone mobile dialogs (`100dvh`) and 44px touch targets |
+| `backend-development` | Backend architecture | Enforces DTO boundaries and parameterized ORM queries |
+| `smart-researcher` | Codebase investigation | Researches in isolated subagents without polluting main chat |
+
+---
+
+## 🛡️ Programmatic Guardrails (Hooks)
+
+The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`:
+- **`git-guardrail`**: Hard-blocks `git push --force`, direct pushes to `main`/`master`, and catastrophic `rm -rf /` commands.
+- **`plan-boundary`**: Halts commits containing files not listed in the approved `implementation_plan.md` Changes list to prevent silent scope creep.
+- **`secret-scan`**: Automatically scans command arguments for raw private keys, GitHub tokens, AWS credentials, and Slack keys.
+
+---
+
+## 🤖 Specialized Subagents
+
+- **`agents/spec-critic.md`**: Interrogates specifications for mathematical ambiguities, undefined terms, and unwritten edge cases. Filters questions using the **Ownership Test** (max 5 blocking questions).
+- **`agents/code-reviewer.md`**: Audits staged diffs against OWASP Top 10, DTO boundaries, and mobile frontend standards.
 
 ---
 
@@ -232,6 +272,23 @@ Output:
 Test Results: 9/9 passed (100%)
 ========================================
 ```
+
+---
+
+## 🛠️ Customization & Extensions
+
+To add project-specific skills:
+1. Create a new folder under `skills/<your-skill-name>/`.
+2. Add a `SKILL.md` file with standard YAML frontmatter:
+   ```yaml
+   ---
+   name: your-skill-name
+   description: When and how the agent should use this skill.
+   ---
+
+   # Instructions here...
+   ```
+3. Push changes to your repository to share across all projects.
 
 ---
 

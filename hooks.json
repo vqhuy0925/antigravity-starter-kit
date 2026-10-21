@@ -6,17 +6,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"hooks/git-guardrail.js\"",
+            "command": "node hooks/git-guardrail.js",
             "timeout": 15
           },
           {
             "type": "command",
-            "command": "node \"hooks/secret-scan.js\"",
+            "command": "node hooks/secret-scan.js",
             "timeout": 15
           },
           {
             "type": "command",
-            "command": "node \"hooks/plan-boundary.js\"",
+            "command": "node hooks/plan-boundary.js",
             "timeout": 15
           }
         ]
