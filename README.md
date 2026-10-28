@@ -134,7 +134,7 @@ antigravity-starter-kit/
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Portable tech stack & domain glossary profile
-├── skills/                              # 13 Specialized On-Demand Skills
+├── skills/                              # 27 Specialized On-Demand Skills
 │   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
 │   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
@@ -147,7 +147,22 @@ antigravity-starter-kit/
 │   ├── backend-development/             # REST API, DTOs & transactional standards
 │   ├── smart-researcher/                # Token-lean codebase research
 │   ├── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
-│   └── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
+│   ├── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
+│   │   # --- 5 Core Engineering & Productivity Pillars ---
+│   ├── grill-me/                        # Adversarial interview stress-testing plans & decisions
+│   ├── grilling/                        # Recursive design tree & frontier round interview engine
+│   ├── grill-with-docs/                 # Grilling coupled with live GLOSSARY.md & ADR generation
+│   ├── domain-modeling/                 # Active domain modeling, term sharpening & ADR maintenance
+│   ├── wait-what/                       # Plain-English translation using canonical domain vocabulary
+│   ├── tdd/                             # Red-green-refactor loop verifying through public interface seams
+│   ├── diagnosing-bugs/                 # 10-tier feedback loop ladder & hypothesis-driven debugging
+│   ├── codebase-design/                 # Deep module architecture (small interface, large implementation)
+│   ├── to-spec/                         # Context synthesis into structured specifications
+│   ├── to-tickets/                      # Tracer-bullet decomposition with dependency blocking edges
+│   ├── improve-codebase-architecture/   # Automated survey scanning for shallow modules & deepening opportunities
+│   ├── wayfinder/                       # Multi-session roadmap planning through decision tickets
+│   ├── pr/                              # Evidence-first PRs with blast radius & one-way/two-way doors
+│   └── writing-for-agents/              # High-leverage drafting guidelines for agent steering docs & skills
 ├── test/
 │   └── verify-hooks.test.js             # Automated test suite for safety guardrails
 ├── mcp_config.json                      # MCP Server integration template
@@ -226,6 +241,20 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 | `backend-development` | Backend architecture | Enforces DTO boundaries and parameterized ORM queries |
 | `smart-researcher` | Codebase investigation | Researches in isolated subagents without polluting main chat |
 | `/seo` | SEO & GEO Audit Suite | Live technical audits, Schema JSON-LD, E-E-A-T & llms.txt generation |
+| `landing-page-design` | Landing Page Strategy | Conversion copywriting, responsive visual design & intake questions |
+| `/grill-me` | Adversarial Interview | Relentlessly stress-tests assumptions & designs via frontier question rounds |
+| `grill-with-docs` | Alignment & Live Docs | Grills design while updating ADRs and domain `GLOSSARY.md` in real-time |
+| `domain-modeling` | Ubiquitous Language | Actively challenges fuzzy terms and detects contradictions with code |
+| `/wait-what` | Plain-English Re-pitch | Translates complex agent explanations into canonical domain language |
+| `/tdd` | Test-Driven Development | Red-Green-Refactor loop testing public seams with vertical tracer bullets |
+| `diagnosing-bugs` | Deterministic Bug Diagnosis | 10-tier feedback loop ladder for isolating hard bugs before hypothesizing |
+| `codebase-design` | Deep Module Architecture | Principles for small interfaces, deep implementations, seams & locality |
+| `/to-spec` | Conversation Synthesis | Synthesizes discussion into formal specifications without extra interviews |
+| `/to-tickets` | Tracer-Bullet Slicing | Decomposes specs into dependency-linked tickets with blocking edges |
+| `/improve-codebase-architecture` | Architecture Survey | Scans codebase for shallow modules and generates visual deepening reports |
+| `/wayfinder` | Complex Epic Roadmapping | Plans multi-session epics as a shared map of decision tickets |
+| `/pr` | Evidence-First PR | Generates high-signal PR bodies with blast-radius scoping & proof |
+| `writing-for-agents` | Agent Documentation Guide | Best practices for drafting prompt steering files, rules, and skills |
 
 ---
 
