@@ -2,12 +2,13 @@
   "name": "antigravity-starter-kit",
   "displayName": "Antigravity Enterprise Starter Kit",
   "description": "Enterprise-grade toolkit for Antigravity AI agents featuring AI-Native SDLC, independent QA Agent testing, 3-layer verification, token economy, responsive mobile UX, programmatic hooks, and conventional commits.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "Huy Vu",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "/plan Thiết kế tính năng mới theo quy trình AI-Native SDLC",
     "/define-tests Đặc tả ca kiểm thử black-box & ma trận 3 lớp từ yêu cầu",
-    "/review-code Kiểm tra bảo mật, rà soát diff và đối chiếu test cases QA"
+    "/review-code Kiểm tra bảo mật, rà soát diff và đối chiếu test cases QA",
+    "/seo audit Phân tích Technical, Schema JSON-LD và tối ưu AI Search (GEO)"
   ]
 }

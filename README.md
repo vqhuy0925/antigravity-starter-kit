@@ -122,7 +122,8 @@ antigravity-starter-kit/
 │   └── lib.js                           # Shared hook utilities
 ├── agents/                              # Specialized Independent Subagents
 │   ├── spec-critic.md                   # Adversarial requirements lens & PO questions filter
-│   └── code-reviewer.md                 # Independent diff, DTO boundary & OWASP security auditor
+│   ├── code-reviewer.md                 # Independent diff, DTO boundary & OWASP security auditor
+│   └── seo-auditor.md                   # Technical & GEO audit lens (Schema, E-E-A-T, llms.txt)
 ├── rules/
 │   └── AGENTS.md                        # Core engineering standards, QA independence & AI-Native SDLC rules
 ├── templates/                           # Standardized SDLC markdown templates
@@ -133,7 +134,7 @@ antigravity-starter-kit/
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Portable tech stack & domain glossary profile
-├── skills/                              # 11 Specialized On-Demand Skills
+├── skills/                              # 13 Specialized On-Demand Skills
 │   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
 │   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
@@ -144,7 +145,9 @@ antigravity-starter-kit/
 │   ├── review-code/                     # Code audit & QA test matrix cross-verification
 │   ├── commit-code/                     # Conventional commit generator & splitter
 │   ├── backend-development/             # REST API, DTOs & transactional standards
-│   └── smart-researcher/                # Token-lean codebase research
+│   ├── smart-researcher/                # Token-lean codebase research
+│   ├── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
+│   └── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
 ├── test/
 │   └── verify-hooks.test.js             # Automated test suite for safety guardrails
 ├── mcp_config.json                      # MCP Server integration template
@@ -222,6 +225,7 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 | `responsive-frontend-expert` | Frontend UI standards | Enforces 3-zone mobile dialogs (`100dvh`) and 44px touch targets |
 | `backend-development` | Backend architecture | Enforces DTO boundaries and parameterized ORM queries |
 | `smart-researcher` | Codebase investigation | Researches in isolated subagents without polluting main chat |
+| `/seo` | SEO & GEO Audit Suite | Live technical audits, Schema JSON-LD, E-E-A-T & llms.txt generation |
 
 ---
 
@@ -238,6 +242,7 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`:
 
 - **`agents/spec-critic.md`**: Interrogates specifications for mathematical ambiguities, undefined terms, and unwritten edge cases. Filters questions using the **Ownership Test** (max 5 blocking questions).
 - **`agents/code-reviewer.md`**: Audits staged diffs against OWASP Top 10, DTO boundaries, and mobile frontend standards.
+- **`agents/seo-auditor.md`**: Audits live website crawl data, DOM hierarchy, Schema.org JSON-LD, and GEO/llms.txt readiness.
 
 ---
 

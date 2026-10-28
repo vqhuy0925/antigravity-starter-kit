@@ -1,6 +1,6 @@
 {
   "name": "antigravity-starter-kit",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Enterprise-grade guardrails, AI-native SDLC, and workflow plugins for Antigravity & Gemini Code Assist agents.",
   "main": "bin/cli.js",
   "bin": {
