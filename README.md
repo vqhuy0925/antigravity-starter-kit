@@ -134,7 +134,7 @@ antigravity-starter-kit/
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Portable tech stack & domain glossary profile
-├── skills/                              # 12 Specialized On-Demand Skills
+├── skills/                              # 13 Specialized On-Demand Skills
 │   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
 │   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
@@ -146,7 +146,8 @@ antigravity-starter-kit/
 │   ├── commit-code/                     # Conventional commit generator & splitter
 │   ├── backend-development/             # REST API, DTOs & transactional standards
 │   ├── smart-researcher/                # Token-lean codebase research
-│   └── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
+│   ├── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
+│   └── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
 ├── test/
 │   └── verify-hooks.test.js             # Automated test suite for safety guardrails
 ├── mcp_config.json                      # MCP Server integration template
