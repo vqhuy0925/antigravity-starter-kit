@@ -45,3 +45,8 @@ description: Frontend UI/UX responsive engineering standards for Mobile (iOS/And
 - Prevent modal elastic scroll leaks: `overscroll-behavior-y: contain`.
 - Smooth state transitions: `transition-colors duration-150` with active tap feedback (`active:bg-slate-100`).
 - Avoid layout-shifting hover `scale()` effects in dense data grids.
+
+## 7. Companion Skills
+- **Color Hierarchy & Contrast:** Defer color token naming, 60–30–10 weight, and WCAG AA/AAA contrast to [`color-system-design`](../color-system-design/SKILL.md).
+- **Landing Pages & Marketing:** For CRO funnels, sales copy structure, and section wireframes, see [`landing-page-design`](../landing-page-design/SKILL.md).
+- **SEO & Performance:** For Core Web Vitals, Schema.org markup, and search crawlability, see [`seo`](../seo/SKILL.md).

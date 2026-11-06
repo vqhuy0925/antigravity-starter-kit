@@ -253,6 +253,7 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 | `/to-tickets` | Tracer-Bullet Slicing | Decomposes specs into dependency-linked tickets with blocking edges |
 | `/improve-codebase-architecture` | Architecture Survey | Scans codebase for shallow modules and generates visual deepening reports |
 | `/wayfinder` | Complex Epic Roadmapping | Plans multi-session epics as a shared map of decision tickets |
+| `color-system-design` | UI/UX Color System & Harmony | Enforces 60-30-10 rule, semantic tokens, WCAG AA/AAA contrast & OKLCH scales |
 | `/pr` | Evidence-First PR | Generates high-signal PR bodies with blast-radius scoping & proof |
 | `writing-for-agents` | Agent Documentation Guide | Best practices for drafting prompt steering files, rules, and skills |
 

@@ -15,7 +15,11 @@ This skill has two halves. **Part A** decides what the page says and how it is s
 
 Apply to all web UI work: landing pages, marketing sites, components, dashboards, prototypes, and design reviews. When a rule here conflicts with a framework default, this file wins. When the user's explicit prompt conflicts with a rule, the user wins.
 
-**Companion skill.** For upgrading an *existing* site rather than building a new one, use `redesign-existing-projects` ([github.com/elayadesign/redesign-skill](https://github.com/elayadesign/redesign-skill)). It diagnoses generic patterns and defers to this file for every concrete value.
+**Companion skills:**
+- **Color System & Tokens:** Defer all color weight (60-30-10 rule), semantic tokens (`color-primary`, `color-accent`), and WCAG 2.1 contrast ratios to [`color-system-design`](../color-system-design/SKILL.md).
+- **Responsive & Touch Ergonomics:** Defer viewport rules (`100dvh`), 3-zone mobile dialogs, iOS safe-area insets, and $44 \times 44\text{px}$ touch targets to [`responsive-frontend-expert`](../responsive-frontend-expert/SKILL.md).
+- **Technical SEO & GEO:** For structured data (JSON-LD), crawl diagnostics, and AI search readiness (`/llms.txt`), use [`seo`](../seo/SKILL.md).
+- **Redesign Audits:** For upgrading an *existing* site rather than building a new one, use `redesign-existing-projects` ([github.com/elayadesign/redesign-skill](https://github.com/elayadesign/redesign-skill)). It diagnoses generic patterns and defers to this file for every concrete value.
 
 ---
 
@@ -130,7 +134,7 @@ Never rebuild the whole page on each iteration. Section by section keeps control
 
 **Do not index** ad only campaign pages or highly time bound offers. Use `noindex` or keep them behind a non indexed path.
 
-**Do index** evergreen offers and pages where search intent matches the promise. Add a clear title and meta description, internal links from the homepage and feature pages, and the FAQ in plain question and answer form for AEO. Add FAQ schema if appropriate.
+**Do index** evergreen offers and pages where search intent matches the promise. Add a clear title and meta description, internal links from the homepage and feature pages, and the FAQ in plain question and answer form for AEO. Use the [`seo`](../seo/SKILL.md) skill (`/seo schema`, `/seo audit`) to validate JSON-LD structured data and check GEO search readiness.
 
 ## A8. Pitfalls
 
@@ -236,6 +240,7 @@ Example: an outer card at `rounded-2xl` (16px) with 8px of internal padding give
 
 - **Never apply a border to only one side of a card.** Borders go all the way around or not at all.
 - **Never use gradients in backgrounds.** Backgrounds are flat.
+- **Color tokens & contrast:** Apply the 60–30–10 distribution rule and semantic token architecture from [`color-system-design`](../color-system-design/SKILL.md). All interactive elements and text pairings must meet WCAG 2.1 AA contrast ($4.5:1$ minimum).
 
 ### Dark mode background colors
 
@@ -280,7 +285,7 @@ Respect `prefers-reduced-motion`: replace movement with a plain opacity change.
 
 **Menu toggle.** The open and close icon transforms between its two states instead of swapping instantly. Use an icon from B6 or draw the lines yourself; either way the change is animated with the base curve.
 
-**Mobile menu.** Opens as a full height panel, not a small dropdown. The panel background uses the theme's base surface at high opacity with a strong blur.
+**Mobile menu.** Opens as a full height panel, not a small dropdown. The panel background uses the theme's base surface at high opacity with a strong blur. Enforce the 3-zone flex architecture (`100dvh`, iOS `safe-area-inset-bottom` padding, $\ge 44 \times 44\text{px}$ touch targets) per [`responsive-frontend-expert`](../responsive-frontend-expert/SKILL.md).
 
 **Link entrance.** Links inside the open menu arrive one after another in reading order, each moving up a short distance (Spacing-300, 24px) while fading in. Step each item 60ms after the previous one and cap the total sequence at 400ms so long menus never feel slow.
 
