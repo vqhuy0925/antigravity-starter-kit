@@ -48,5 +48,6 @@ description: Frontend UI/UX responsive engineering standards for Mobile (iOS/And
 
 ## 7. Companion Skills
 - **Color Hierarchy & Contrast:** Defer color token naming, 60–30–10 weight, and WCAG AA/AAA contrast to [`color-system-design`](../color-system-design/SKILL.md).
+- **Native Web Standards & Top Layer:** Defer native `<dialog>`, Popover API, and CSS Anchor Positioning to [`modern-web-guidance`](../modern-web-guidance/SKILL.md).
 - **Landing Pages & Marketing:** For CRO funnels, sales copy structure, and section wireframes, see [`landing-page-design`](../landing-page-design/SKILL.md).
 - **SEO & Performance:** For Core Web Vitals, Schema.org markup, and search crawlability, see [`seo`](../seo/SKILL.md).
