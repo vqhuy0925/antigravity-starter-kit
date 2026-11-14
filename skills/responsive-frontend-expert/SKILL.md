@@ -98,6 +98,7 @@ Before writing CSS or choosing a layout grid, answer these 5 framing questions:
 - **Auto-Zoom Prevention (iOS Safari):** Set text input `font-size: 16px` on mobile (`input`, `select`, `textarea`) to prevent iOS Safari from zooming in on focus.
 - **No Hover-Only Triggers:** Never hide primary actions behind `:hover` states without an explicit tap/click fallback for touch devices.
 - **Micro-Feedback:** Interactive elements must provide immediate tactile feedback (`active:scale-95` or `active:bg-slate-100`).
+- **Debounced Dual-Interface Search:** When building search inputs with separate Desktop and Mobile dialog interfaces, bind search queries directly to the `input` event (debounce) rather than desktop menu-open events.
 
 ---
 
@@ -124,3 +125,12 @@ Before presenting any interface to the user, evaluate the design across 5 dimens
 3. **Detail Execution:** Do padding and margins adhere strictly to a 4px/8px grid? Are icon stroke weights uniform? Do border-radii nest proportionally?
 4. **Functionality & Accessibility:** Does contrast satisfy WCAG AA (minimum 4.5:1)? Is typography readable (no body copy < 12px)? Are tap targets comfortable on mobile?
 5. **Innovation & Signature:** What makes this design memorable and distinctive, rather than just another generic AI template?
+
+---
+
+## 10. Companion Skills
+
+- **Color Hierarchy & Contrast:** Defer color token naming, 60–30–10 weight, and WCAG AA/AAA contrast to [`color-system-design`](../color-system-design/SKILL.md).
+- **Native Web Standards & Top Layer:** Defer native `<dialog>`, Popover API, and CSS Anchor Positioning to [`modern-web-guidance`](../modern-web-guidance/SKILL.md).
+- **Landing Pages & Marketing:** For CRO funnels, sales copy structure, and section wireframes, see [`landing-page-design`](../landing-page-design/SKILL.md).
+- **SEO & Performance:** For Core Web Vitals, Schema.org markup, and search crawlability, see [`seo`](../seo/SKILL.md).

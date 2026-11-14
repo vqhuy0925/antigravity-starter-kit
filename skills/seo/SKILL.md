@@ -66,3 +66,10 @@ When optimizing for AI engines or running `/seo geo`:
    python skills/seo/scripts/generate_llmstxt.py --name "Project Name" --url "https://example.com" --dir "./docs"
    ```
 2. Verify robots.txt permits search citation bots (`OAI-SearchBot`, `PerplexityBot`).
+
+---
+
+## 4. Companion Skills
+- **Landing Page Architecture & Copy:** For structured conversion sections, value proposition headlines, and FAQ placement, see [`landing-page-design`](../landing-page-design/SKILL.md).
+- **Mobile Usability & Viewport:** For mobile accessibility, touch targets, and responsive layouts, see [`responsive-frontend-expert`](../responsive-frontend-expert/SKILL.md).
+- **Color & Accessibility:** For WCAG 2.1 contrast compliance and semantic tokens, see [`color-system-design`](../color-system-design/SKILL.md).
