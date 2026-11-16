@@ -6,12 +6,13 @@
   "author": "Huy Vu",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
-    "/plan Thiết kế tính năng mới theo quy trình AI-Native SDLC",
-    "/grill-me Phỏng vấn phản biện kế hoạch & giải quyết các nhánh quyết định",
-    "/define-tests Đặc tả ca kiểm thử black-box & ma trận 3 lớp từ yêu cầu",
-    "/tdd Phát triển theo vòng lặp Red-Green-Refactor tại các seam công khai",
-    "/improve-codebase-architecture Rà soát module nông và đề xuất cơ hội làm sâu (deep modules)",
-    "/review-code Kiểm tra bảo mật, rà soát diff và đối chiếu test cases QA",
-    "/seo audit Phân tích Technical, Schema JSON-LD và tối ưu AI Search (GEO)"
+    "/start-day Resume in-flight work or route by intent (feature, bug, brainstorm, docs)",
+    "/plan Design a new feature following the AI-Native SDLC workflow",
+    "/grill-me Stress-test a plan and resolve open design decisions",
+    "/define-tests Define black-box test cases and a 3-layer verification matrix from requirements",
+    "/tdd Develop with the Red-Green-Refactor loop at public seams",
+    "/improve-codebase-architecture Audit shallow modules and propose deepening opportunities",
+    "/review-code Audit security, inspect diffs, and verify against QA test cases",
+    "/seo audit Run a Technical SEO, Schema JSON-LD, and AI Search (GEO) audit"
   ]
 }

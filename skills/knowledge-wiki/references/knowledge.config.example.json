@@ -1,0 +1,11 @@
+{
+  "sourceDirs": [
+    "../src",
+    "../services"
+  ],
+  "filePatterns": [
+    "Controller.",
+    "Service.",
+    "Resource."
+  ]
+}
