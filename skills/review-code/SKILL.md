@@ -26,6 +26,7 @@ description: Run automated tests, linters, type checks, and audit code against Q
 - **XSS Sanitization:** Check user-rendered inputs for potential injection vectors.
 - **Exception Safety:** Confirm no empty catch blocks (`catch (e) {}`).
 - **DRY & SRP:** Ensure functions and components have single responsibility.
+- **Modern Web Standards Audit:** For frontend changes, flag redundant dependencies (e.g. Popper.js, floating-ui, custom modal JS) where native Web Baseline APIs (`<dialog>`, Popover API, CSS Anchor Positioning) should be used (see [`modern-web-guidance`](../modern-web-guidance/SKILL.md)).
 
 ## 4. Walkthrough Documentation
 - Create or update `walkthrough.md` with a summary of changes, verified behaviors, QA test case coverage matrix, and test execution evidence.

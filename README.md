@@ -134,12 +134,14 @@ antigravity-starter-kit/
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Portable tech stack & domain glossary profile
-├── skills/                              # 27 Specialized On-Demand Skills
+├── skills/                              # 29 Specialized On-Demand Skills
 │   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
 │   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
 │   ├── token-optimization/              # Context budgeting & lean file reading (≤ 100 lines)
 │   ├── responsive-frontend-expert/      # Cross-device UI (Mobile 100dvh, iPad, Desktop)
+│   ├── modern-web-guidance/             # Modern Web & Baseline standards by Google Chrome & MDN
+│   ├── color-system-design/             # UI/UX color harmony, semantic tokens & OKLCH scales
 │   ├── plan/                            # Implementation planning & task breakdown
 │   ├── implement/                       # Structured task execution cross-checked with QA tests
 │   ├── review-code/                     # Code audit & QA test matrix cross-verification
@@ -253,6 +255,8 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 | `/to-tickets` | Tracer-Bullet Slicing | Decomposes specs into dependency-linked tickets with blocking edges |
 | `/improve-codebase-architecture` | Architecture Survey | Scans codebase for shallow modules and generates visual deepening reports |
 | `/wayfinder` | Complex Epic Roadmapping | Plans multi-session epics as a shared map of decision tickets |
+| `color-system-design` | UI/UX Color System & Harmony | Enforces 60-30-10 rule, semantic tokens, WCAG AA/AAA contrast & OKLCH scales |
+| `/modern-web` | Modern Web & Baseline Standards | Google Chrome & MDN native web APIs (dialog, popover, anchor positioning, container queries) |
 | `/pr` | Evidence-First PR | Generates high-signal PR bodies with blast-radius scoping & proof |
 | `writing-for-agents` | Agent Documentation Guide | Best practices for drafting prompt steering files, rules, and skills |
 
