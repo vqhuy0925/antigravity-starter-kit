@@ -30,11 +30,16 @@
 - **Commit Phase**:
   - Split unrelated changes into logical, conventional commits.
   - Never push or deploy without explicit user request (protected by `git-guardrail` hook).
+- **Batch Questions & Gate Discipline**:
+  - Gather non-blocking questions during a workflow and ask them in **one batch** at the natural stopping point—each with a **recommended answer and a 1-line rationale** so the user can approve all or override by number.
+  - *Immediate stops*: **Irreversible external writes** (`git push`, deploy, external API/issue mutations) and **genuine blockers** (failing build, missing required file, unresolvable conflict) still stop immediately on their own.
+  - **Gates Never Move Into Subagents**: Present previews and obtain user confirmation in the **main conversation thread**. Subagents only execute already-approved writes or perform read-only analysis; a subagent never asks the user for approval.
 
 ## 2. TOKEN OPTIMIZATION & CONTEXT MANAGEMENT
 - **Lean File Reading**: Never dump whole directories or load massive files completely. Use `grep_search` to pinpoint line numbers and read specific line ranges (`StartLine` - `EndLine` <= 100 lines).
 - **Quiet Terminal Output**: Always append quiet/silent flags (`-q`, `--silent`) to avoid dumping thousands of build lines into the context.
 - **Subagent Lifecycle**: Delegate heavy exploration or QA definition tasks to subagents (`research` or `qa-engineer`) and terminate them (`manage_subagents` with `Action='kill'`) immediately when finished.
+- **Knowledge Wiki & Traceability-First**: When a project contains a knowledge wiki (`*-knowledge/tools/ksearch.mjs` or `docs/knowledge/tools/ksearch.mjs`), run `ksearch` first before broad grep scans, read directly from the returned `traceability` paths, and sync domain specs + `indexer.mjs` before finalizing feature changes.
 
 ## 3. CODE QUALITY & ARCHITECTURAL SAFETY
 - **Layered Architecture**: Controller -> Service -> Repository -> Entity/Data Model.

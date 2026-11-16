@@ -72,3 +72,12 @@ Generate or update `test_cases.md` in the active artifact directory using the te
 ### Dual Verification Gates
 - **For Dev (`implement`):** Dev must read `test_cases.md` and write automated unit/integration tests covering all `TC-xx` scenarios before claiming work is complete.
 - **For Reviewer (`review-code`):** Reviewer must inspect automated test results against `test_cases.md`. If any scenario is missing coverage or fails, code review must be rejected.
+
+---
+
+## 6. Independent Draft Review Protocol
+
+When auditing a drafted `test_cases.md` (as a second-opinion subagent or self-audit before finalizing):
+1. **Re-derive First, Read Draft Second:** From `intent.md`/`spec.md` alone, derive decision variables, boundary values, state transitions, and expected case counts *before* opening `test_cases.md`. Reading the draft first anchors you to the drafter's blind spots.
+2. **Diff Coverage & Splits:** Flag untested ACs/boundaries, cases that must split (variants touching different fields/navigation, sharing mutable lockout/rate-limit state, or mixing functional logic with cross-cutting checklists), and weak assertions (e.g., "shows an error" instead of literal expected copy/state).
+3. **Never Invent Requirements:** If the specification leaves a rule unstated, report it as a **spec gap**, never as a missing test.

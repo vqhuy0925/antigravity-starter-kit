@@ -58,6 +58,11 @@ Splitting one document into two spends one of the two loads, so split only when 
 - **By sequence**: split a run of steps where the post-completion steps tempt the agent to rush the one in front of it. Keeping them out of view drives more legwork on the current task. Beware the reverse: merging sequences exposes each step's later steps to what follows, inviting premature completion.
 - **By invocation**, skill-specific: see [`SKILL-MECHANICS.md`](SKILL-MECHANICS.md).
 
+## Skill Invocation vs. Subagent Dispatch
+
+- **Skills compose guidance in-context:** Invoking a skill loads its `SKILL.md` into the *same* conversation. Write skill instructions as sequential/composed steps ("follow X, then do Y"), not as function calls with isolated return values ("call X to return Y").
+- **Subagents create a real call/return boundary:** Dispatch a subagent (`invoke_subagent`) only when you need (a) context isolation to prevent anchoring or bias (e.g., QA review, independent draft critique), or (b) N-proportional mechanical work whose raw payloads should stay out of the main thread. Confirmation gates stay in the main thread; subagents only execute approved writes or return read-only reports.
+
 ## Leading words
 
 A **leading word** is a compact concept already living in the model's pretraining that the agent thinks with while running the document (_lesson_, _fog of war_, _tracer bullets_). Repeated as a token, never as a sentence, it accumulates a distributed definition and anchors a whole region of behaviour in the fewest tokens, by recruiting priors the model already holds. Coining your own works if you define it clearly, but a made-up word recruits no priors: you pay in definition tokens what a pretrained word gives free; reach for an existing word first.
