@@ -134,7 +134,11 @@ antigravity-starter-kit/
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Portable tech stack & domain glossary profile
-├── skills/                              # 29 Specialized On-Demand Skills
+├── skills/                              # 33 Specialized On-Demand Skills
+│   ├── start-day/                       # Single entry-point router (orient, resume, route, close loop)
+│   ├── story-review/                    # Shift-left 10-lens refinement QA review
+│   ├── retro/                           # Closed-loop AI retrospective (capture & synthesize)
+│   ├── knowledge-wiki/                  # OKF Knowledge Wiki with <10ms BM25 search & drift scan
 │   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
 │   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
@@ -231,6 +235,10 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 
 | Command / Skill | Description | Output / Action |
 | :--- | :--- | :--- |
+| `/start-day` | Single entry-point workflow router | Resumes in-flight work, routes by intent, syncs wiki & closes loop |
+| `/story-review` | Shift-left 10-lens QA review | Surfaces PO questions & dev risks before planning/testing |
+| `/retro` | Closed-loop AI retrospective | Captures developer-first feedback & tracks cross-sprint themes |
+| `/knowledge-wiki` | Project Knowledge Wiki (OKF) | Bootstraps, BM25-searches (`ksearch`), and drift-checks (`scan-drift`) docs |
 | `ai-native-sdlc` | AI-Native SDLC artifact loop with QA Gate | Orchestrates the full 6-stage artifact loop |
 | `/define-tests` | Independent QA Engineer workflow | Derives acceptance criteria & 3-layer test matrices (`test_cases.md`) |
 | `/plan` | Implementation planning | Analyzes dependencies and produces `implementation_plan.md` |
