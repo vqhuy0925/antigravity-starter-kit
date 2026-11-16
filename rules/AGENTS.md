@@ -43,10 +43,12 @@
 ## 2. 3-TIER GOVERNANCE & APPROVAL GATES (STRICT)
 - **GATE A — Strict Per-Action Gate (Always prompt individually, approve each action)**:
   - **Trello Writes**: Create card, edit description, move column, add label, add comment via Trello API.
-  - **Git Commit**: `git commit` (must present diff summary & commit message, proceed only after user approval).
-  - **Git Push**: `git push` to remote repository.
+  - **Git Commit & Push**:
+    - If the user explicitly commands "commit and push" (or similar paired intent), or confirms "yes" to a proposed commit & push flow, execute both actions seamlessly without splitting into multiple consecutive confirmation prompts.
+    - If git guardrail blocks pushing directly to `main`/`master` and redirects to a feature branch, create the branch and push immediately — NEVER ask again when the user has already approved pushing.
+    - If the user only requests `git commit`, ask for approval on commit only; ask for `git push` only when push is subsequently requested.
   - **Deploy**: Staging/Production deployments (`deploy.sh`, docker build/push).
-  - *Rule*: Never execute autonomously, never bundle; ask separately for each individual action.
+  - *Rule*: Prompt once per user intent. Never prompt repeatedly for paired or already-confirmed actions ("không hỏi nhiều lần").
 - **GATE B — Single-Confirmation Gate (Prompt once and finalize, never interrupt mid-run)**:
   - **Clarification Questions**: Batch all domain, logic, and edge-case questions into a single structured prompt; do not ask piecemeal questions while working.
   - **Plan Approval**: Present `plan.md` / `implementation_plan.md` (architecture, changed files, risks). When the user clicks "Proceed" or confirms, the AI must autonomously execute end-to-end from code $\rightarrow$ type-check $\rightarrow$ bug fix $\rightarrow$ test without stopping to ask in between.
