@@ -7,11 +7,11 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed
 - `git-guardrail`: force push is denied on any branch (`--force`, `-f`, short clusters such as `-fu`, `+refspec`); `--force-with-lease` is allowed except to `main`/`master`.
 - `git-guardrail`: pushes to `main`/`master` are denied via any remote, `HEAD:main`, `--all`/`--mirror`, or a bare `git push` while on main.
-- `git-guardrail`: every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newline, `$(...)`, backticks), plus a second pass with quotes stripped. Wrappers are seen through (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`).
+- `git-guardrail`: every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newline, `$(...)`, backticks), plus a second pass with quotes stripped. Common wrappers are seen through, without value-taking flags such as `sudo -u x` or `env -u X` (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`).
 - `git-guardrail`: root-delete guard covers `/`, `/*`, `//`, `/.`, `~`, `$HOME`, and PowerShell `Remove-Item -Recurse` of a drive root.
 - `secret-scan`: also blocks `sk-` keys (including `sk-ant-`, `sk-proj-`), Google `AIza` keys, `github_pat_` tokens, and literal `Bearer <token>` values. `Bearer $ENV_VAR` stays allowed.
 - `plan-boundary`: finds the plan at `docs/plans/<branch>.md`, then `implementation_plan.md`; matches files by repo-relative path (a trailing `/` covers a directory); catches `git add` in the same chain, `commit -a`, commit pathspecs, and `git -C <dir>`.
-- Installers: `hooks.json` gets absolute hook paths at install, so the hooks run from any workspace. The install fails loudly if hook linking fails or links nothing.
+- Installers: `hooks.json` gets absolute hook paths at install, so the hooks run from any workspace. The CLI and `install.ps1` fail loudly if hook linking fails or links nothing; the shell installers only warn when Node is missing.
 
 ### Changed
 - `plan-boundary` asks when no plan exists for the branch, instead of allowing the commit silently.

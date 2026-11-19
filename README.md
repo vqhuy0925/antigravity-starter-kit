@@ -72,7 +72,7 @@ flowchart TD
     A["Stage 1: Intent<br/>(intent.md)"] --> B["Stage 2: Design<br/>(spec.md)"]
     B --> C["Adversarial Critic<br/>(spec-critic Agent)"]
     C -->|Ownership Test Passed| D["Stage 2b: Independent QA<br/>(define-tests QA Agent)"]
-    D --> E["Stage 3: Plan & Task<br/>(plan.md & task.md)"]
+    D --> E["Stage 3: Plan & Task<br/>(docs/plans/&lt;branch&gt;.md)"]
     E --> F["Stage 4: TDD Implement<br/>(Red Before Green)"]
     F --> G["Stage 5: Review & Audit<br/>(code-reviewer Agent)"]
     G --> H["Stage 6: Deploy Gate<br/>(deploy.md Checklist)"]
@@ -117,7 +117,7 @@ antigravity-starter-kit/
 │   └── logo.svg                         # Vector icon for Antigravity UI
 ├── hooks/                               # Programmatic Runtime Guardrails (Node.js)
 │   ├── git-guardrail.js                 # Blocks force push, catastrophic deletes & main push
-│   ├── plan-boundary.js                 # Enforces plan boundaries and halts scope creep
+│   ├── plan-boundary.js                 # Enforces plan boundaries; asks before committing out-of-plan files
 │   ├── secret-scan.js                   # Scans and blocks inline secrets & private keys
 │   └── lib.js                           # Shared hook utilities
 ├── agents/                              # Specialized Independent Subagents
@@ -280,14 +280,19 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`.
   - Force push (`--force`, `-f`, clusters like `-fu`, `+refspec`) is denied on any branch. `--force-with-lease` is allowed, except to `main`/`master`.
   - Pushes to `main`/`master` are denied via any remote, `HEAD:main`, `--all`/`--mirror`, or a bare `git push` while on main.
   - Root deletion is denied: `rm -rf /`, `/*`, `~`, `$HOME`, and PowerShell `Remove-Item -Recurse` of a drive root. `git reset --hard` asks first.
-  - Every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newlines, `$(...)`, backticks). Wrappers and prefixes are seen through (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`).
+  - Every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newlines, `$(...)`, backticks). Common wrappers and prefixes are seen through, for flag-less use (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`).
 - **`plan-boundary`**:
-  - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md`. **No plan found means it asks** before the commit proceeds.
+  - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md` (looked up in the conversation artifact folder, then the working directory and up to 4 directories above it). **No plan found means it asks** before the commit proceeds.
   - Staged files are matched by repo-relative path against the plan's backticked paths; a trailing `/` covers a directory. Uncovered files make it ask.
   - It also catches `git add` in the same chain, `commit -a`, commit pathspecs, and `git -C <dir>`.
 - **`secret-scan`**: Blocks raw private keys, GitHub tokens (`ghp_`, `github_pat_`), AWS credentials, Slack keys, `sk-` keys (including `sk-ant-` and `sk-proj-`), Google `AIza` keys, and literal `Bearer <token>` values. `Bearer $ENV_VAR` is allowed.
 
-**Scope caveat:** the hooks inspect `run_command` tool calls only (the `hooks.json` matcher). A secret written through a file-edit tool is not scanned, and file edits are not checked against the plan. The hooks guard the shell, not every way an agent can change files.
+**Known limits:**
+- Only `run_command` tool calls are inspected (the `hooks.json` matcher). A secret written through a file-edit tool is not scanned, and file edits are not checked against the plan. The hooks guard the shell, not every way an agent can change files.
+- Wrapper flags that take a value are not skipped correctly: `sudo -u x git push origin main` and `env -u FOO git push -f` are allowed.
+- `rm -rf /./` is not caught by the root-delete guard.
+- `git commit --pathspec-from-file` is not read by `plan-boundary`.
+- Secret patterns are case-sensitive, have minimum lengths, and do not catch a lowercase `bearer` token.
 
 ---
 
