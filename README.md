@@ -54,7 +54,7 @@ $ git push origin feature-auth --force
 
 # Scenario 2: Agent attempts to run a command with a hardcoded token
 $ curl -H "Authorization: token ghp_39charHexToken..."
-🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string.
+🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string (GitHub token).
 
 # Scenario 3: Agent attempts to modify an unapproved file
 $ git commit -m "fix: update db schema"
