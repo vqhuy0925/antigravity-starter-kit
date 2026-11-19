@@ -102,3 +102,7 @@ test('multi-word commit message words are not pathspecs', () => {
   write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts'); write(dir, 'lib/x.ts', '1');
   assert.strictEqual(run(dir, 'git commit -m "update lib stuff"').decision, 'allow');
 });
+test('commit behind an unknown prefix (timeout) is still checked', () => {
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  assert.strictEqual(run(dir, 'timeout 30 git commit -am x').decision, 'ask');
+});

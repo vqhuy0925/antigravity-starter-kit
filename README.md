@@ -280,7 +280,7 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`.
   - Force push (`--force`, `-f`, clusters like `-fu`, `+refspec`) is denied on any branch. `--force-with-lease` is allowed, except to `main`/`master`.
   - Pushes to `main`/`master` are denied via any remote, `HEAD:main`, `--all`/`--mirror`, or a bare `git push` while on main.
   - Root deletion is denied: `rm -rf /`, `/*`, `~`, `$HOME`, and PowerShell `Remove-Item -Recurse` of a drive root. `git reset --hard` asks first.
-  - Every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newlines, `$(...)`, backticks). Common wrappers and prefixes are seen through, for flag-less use (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`).
+  - Every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newlines, `$(...)`, backticks). Common wrappers and prefixes are seen through (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, `eval`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`). Behind any other prefix command (`timeout 60`, `nice`, `doas`, `sudo -u x`, `env -u X`, ...) the first `git`, shell or delete command in the segment is checked as if it came first.
 - **`plan-boundary`**:
   - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md` (looked up in the conversation artifact folder, then the working directory and up to 4 directories above it). **No plan found means it asks** before the commit proceeds.
   - Staged files are matched by repo-relative path against the plan's backticked paths; a trailing `/` covers a directory. Uncovered files make it ask.
@@ -289,7 +289,7 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`.
 
 **Known limits:**
 - Only `run_command` tool calls are inspected (the `hooks.json` matcher). A secret written through a file-edit tool is not scanned, and file edits are not checked against the plan. The hooks guard the shell, not every way an agent can change files.
-- Wrapper flags that take a value are not skipped correctly: `sudo -u x git push origin main` and `env -u FOO git push -f` are allowed.
+- A quoted command passed to an unknown prefix command (for example `ssh host "git push origin main"`) is not checked.
 - `rm -rf /./` is not caught by the root-delete guard.
 - `git commit --pathspec-from-file` is not read by `plan-boundary`.
 - Secret patterns are case-sensitive, have minimum lengths, and do not catch a lowercase `bearer` token.

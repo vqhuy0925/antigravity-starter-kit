@@ -80,3 +80,13 @@ test('denies push -o value on main', () => assert.strictEqual(d('git push -o ci.
 test('push -o value does not become remote', () => assert.strictEqual(d('git push -o ci.skip origin feat/x'), 'allow'));
 for (const c of ['sudo apt install git', 'env NODE_ENV=test npm test', 'bash -c "git status"'])
   test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));
+
+// --- Final review: unknown command prefixes fall back to the first git/delete token ---
+for (const c of [
+  'timeout 60 git push origin main', 'nice git push origin main', 'doas git push origin main',
+  'eval "git push origin main"', "eval 'git push origin main'", 'sudo -u x git push origin main',
+  'env -u FOO git push origin main', 'timeout 5 rm -rf /', 'timeout 60 bash -c "git push origin main"',
+  "echo it's && timeout 60 git push -f origin x"
+]) test(`denies prefixed ${c}`, () => assert.strictEqual(d(c), 'deny'));
+for (const c of ['timeout 60 npm test', 'nice make', 'echo "git push origin main"', 'grep -rn "git push origin main" docs', 'echo git push origin main'])
+  test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));

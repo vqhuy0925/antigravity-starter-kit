@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { readInput, outputDecision, getCommand, getCwd, git, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, git, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced } = require('./lib');
 
 const IGNORED_BASENAMES = new Set([
   'implementation_plan.md', 'task.md', 'walkthrough.md', 'test_cases.md',
@@ -108,12 +108,16 @@ function analyze(cmdLine, baseDir, depth = 0) {
   const res = { commit: false, includeWorktree: false, pathspecs: [], dir: baseDir };
   if (depth > 3) return res;
   const exact = new Set(splitCommands(cmdLine));
+  const balanced = quotesBalanced(cmdLine);
   const segments = new Set([...exact, ...splitCommands(cmdLine.replace(/["'`]/g, ' '))]);
   for (const seg of segments) {
     // The quote-stripped pass only detects commits; pathspecs come from exact tokenization.
     const usePaths = exact.has(seg);
-    const tokens = normalizeHead(tokenize(seg));
+    let tokens = normalizeHead(tokenize(seg));
     if (!tokens.length) continue;
+    // Unknown prefix (timeout, nice, doas, ...): evaluate from the first git/shell/eval token.
+    // Stripped-only segments use it only when the line has an unclosed quote.
+    if (usePaths || !balanced) tokens = fallbackTokens(tokens) || tokens;
     const inner = shellInner(tokens);
     if (inner !== null) {
       const r = analyze(inner, baseDir, depth + 1);

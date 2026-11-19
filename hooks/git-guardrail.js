@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced } = require('./lib');
 
 const PROTECTED = ['main', 'master'];
 const SEVERITY = { allow: 0, ask: 1, deny: 2 };
@@ -61,11 +61,17 @@ function checkPush(args, branch) {
  * Evaluate one command segment. Returns { decision, reason } or null.
  * @param {string[]} tokens
  * @param {string|null} branch current branch (null when detached/unknown)
+ * @param {boolean} [fallback] when the head is an unknown prefix command (timeout,
+ *   nice, doas, ...), evaluate from the first git / shell / eval / delete token
  */
-function checkSegment(rawTokens, branch) {
+function checkSegment(rawTokens, branch, fallback = true) {
   if (!rawTokens || rawTokens.length === 0) return null;
   const tokens = normalizeHead(rawTokens);
   if (tokens.length === 0) return null;
+  if (fallback) {
+    const rest = fallbackTokens(tokens);
+    if (rest) return checkSegment(rest, branch, false);
+  }
   const head = tokens[0];
 
   const inner = shellInner(tokens);
@@ -105,15 +111,18 @@ function checkSegment(rawTokens, branch) {
   return null;
 }
 
-/** Evaluate a whole command line over both segmentation passes; most severe wins. */
+/**
+ * Evaluate a whole command line over both segmentation passes; most severe wins.
+ * The prefix fallback runs on exact segments, and on quote-stripped ones only when
+ * the line has an unclosed quote (so `grep "git push origin main"` stays allowed).
+ */
 function evaluate(cmd, branch) {
-  const segments = new Set([
-    ...splitCommands(cmd),
-    ...splitCommands(cmd.replace(/["'`]/g, ' '))
-  ]);
+  const exact = new Set(splitCommands(cmd));
+  const strippedFallback = !quotesBalanced(cmd);
+  const segments = new Set([...exact, ...splitCommands(cmd.replace(/["'`]/g, ' '))]);
   let worst = { decision: 'allow' };
   for (const seg of segments) {
-    const r = checkSegment(tokenize(seg), branch);
+    const r = checkSegment(tokenize(seg), branch, exact.has(seg) || strippedFallback);
     if (r && SEVERITY[r.decision] > SEVERITY[worst.decision]) worst = r;
   }
   return worst;

@@ -220,8 +220,40 @@ function normalizeHead(tokens) {
   return rest;
 }
 
-/** If tokens are `<shell> -c "<cmd>"`, return the inner command string, else null. */
+const DELETES = new Set(['rm', 'remove-item', 'ri', 'rmdir', 'rd', 'del', 'erase']);
+const NON_EXEC = new Set(['echo', 'printf']);
+
+/**
+ * For a normalized segment whose head is an unknown prefix command (timeout, nice,
+ * doas, sudo -u x, ...), return the tokens from the first git / shell / eval / delete
+ * token onward (normalized), or null when the head is already known or nothing matches.
+ */
+function fallbackTokens(tokens) {
+  const known = t => t === 'git' || t === 'eval' || SHELLS.has(t) || DELETES.has(t);
+  if (!tokens.length || known(tokens[0]) || NON_EXEC.has(tokens[0])) return null;
+  for (let i = 1; i < tokens.length; i++) {
+    if (known(baseName(tokens[i]))) return normalizeHead(tokens.slice(i));
+  }
+  return null;
+}
+
+/** True when every quote in s is closed (same quote rules as tokenize). */
+function quotesBalanced(s) {
+  let quote = null;
+  const t = String(s || '');
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (quote) {
+      if (quote === '"' && c === '\\') i++;
+      else if (c === quote) quote = null;
+    } else if (c === '"' || c === "'") quote = c;
+  }
+  return quote === null;
+}
+
+/** If tokens are `<shell> -c "<cmd>"` or `eval <cmd>`, return the inner command string, else null. */
 function shellInner(tokens) {
+  if (tokens[0] === 'eval') return tokens.length > 1 ? tokens.slice(1).join(' ') : null;
   if (!SHELLS.has(tokens[0])) return null;
   for (let i = 1; i < tokens.length; i++) {
     if (/^(-[a-z]*c|-command|\/[ck])$/i.test(tokens[i]) && i + 1 < tokens.length) {
@@ -251,6 +283,9 @@ function parseGit(tokens) {
 
 module.exports = {
   normalizeHead,
+  fallbackTokens,
+  quotesBalanced,
+  DELETES,
   shellInner,
   parseGit,
   readInput,
