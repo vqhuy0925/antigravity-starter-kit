@@ -30,3 +30,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - Move plans to `docs/plans/<branch>.md` (each `/` in the branch name becomes `-`).
 - Commits with no plan now prompt for approval instead of passing silently, but only in repos that have a `docs/plans/` directory. Create `docs/plans/` (for example with a `.gitkeep`) to opt a repo in.
 - `--force-with-lease` is now allowed on feature branches; plain force push stays denied.
+- Updating an existing install (re-running the CLI, `install.sh` or `install.ps1` over a git clone) runs `git checkout -- hooks.json` before pulling, which discards any custom hooks your team added to the installed `hooks.json`. Back them up before updating and add them back afterwards.
