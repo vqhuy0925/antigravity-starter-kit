@@ -17,4 +17,4 @@ description: Execute code changes step-by-step based on the approved plan (`docs
 - **No Self-Serving Shortcuts:** Developer cannot skip edge cases or boundary validations defined by QA. All automated tests must pass before marking tasks complete.
 
 ## 3. Handling Plan Deviations
-- If unexpected bugs or breaking architectural requirements arise during implementation, pause and update `docs/plans/<branch>.md` rather than making unreviewed sweeping changes.
+- A deviation that changes the plan's file list or approach (an unexpected bug, a breaking architectural requirement) is a genuine blocker per `rules/AGENTS.md` §2: stop, update `docs/plans/<branch>.md`, and present it for approval before continuing. Never make unreviewed sweeping changes.
