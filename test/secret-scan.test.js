@@ -29,3 +29,9 @@ test('blocks github_pat_ tokens', () => deny(`git clone https://${'github_pat_' 
 test('blocks literal Bearer tokens', () => deny(`curl -H "Authorization: Bearer ${'e'.repeat(40)}"`));
 test('allows bearer env var', () => allow('curl -H "Authorization: Bearer $GITHUB_TOKEN"'));
 test('allows long hyphenated branch names', () => allow('git checkout -b task-add-login-for-users-and-admins-xyz-0123456789'));
+test('allows sk- inside a branch name', () => allow('git checkout -b feature/sk-1234-add-login-validation-for-users'));
+test('allows task-sk- words', () => allow('echo task-sk-addition-of-a-long-thing-here-to-test'));
+test('blocks lowercase bearer tokens', () => deny(`curl -H "authorization: bearer ${'e'.repeat(40)}"`));
+test('blocks Google API key ending in -', () => deny(`curl "https://x?key=${'AIza' + 'c'.repeat(34) + '-'}"`));
+test('blocks legacy sk- keys', () => deny(`export OPENAI_API_KEY=${'sk-' + 'A1b2'.repeat(12)}`));
+test('blocks sk-svcacct- and sk-admin- keys', () => { deny(`K=${'sk-svcacct-' + 'x'.repeat(40)}`); deny(`K=${'sk-admin-' + 'x_-'.repeat(14)}`); });

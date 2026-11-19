@@ -9,10 +9,11 @@ const SECRET_PATTERNS = [
   { label: 'GitHub token', re: /\bgh[pousr]_[A-Za-z0-9_]{36,255}\b/ },
   { label: 'GitHub PAT', re: /\bgithub_pat_[A-Za-z0-9_]{82}\b/ },
   { label: 'AWS key', re: /\bAKIA[0-9A-Z]{16}\b/ },
-  { label: 'Anthropic/OpenAI key', re: /\bsk-[A-Za-z0-9_-]{32,}/ },   // sk-ant-, sk-proj-, legacy sk-
-  { label: 'Google API key', re: /\bAIza[0-9A-Za-z_-]{35}\b/ },
+  { label: 'Anthropic/OpenAI key', re: /(?<![\w-])sk-(?:ant|proj|svcacct|admin)-[A-Za-z0-9_-]{32,}/ },
+  { label: 'Anthropic/OpenAI key', re: /(?<![\w-])sk-[A-Za-z0-9]{32,}(?![\w-])/ },   // legacy sk-, no hyphens
+  { label: 'Google API key', re: /\bAIza[0-9A-Za-z_-]{35}(?![\w-])/ },
   { label: 'Slack token', re: /\bxox[baprs]-[0-9A-Za-z]{10,48}\b/ },
-  { label: 'bearer token', re: /\bBearer\s+[A-Za-z0-9._~+\/-]{30,}=*/ }
+  { label: 'bearer token', re: /\bBearer\s+[A-Za-z0-9._~+\/-]{30,}=*/i }
 ];
 
 /** Return the label of the first secret pattern found in cmd, or null. */

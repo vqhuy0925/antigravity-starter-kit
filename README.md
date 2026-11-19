@@ -285,14 +285,14 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`.
   - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md` (looked up in the conversation artifact folder, then the working directory and up to 4 directories above it). **No plan found means it asks** before the commit proceeds.
   - Staged files are matched by repo-relative path against the plan's backticked paths; a trailing `/` covers a directory. Uncovered files make it ask.
   - It also catches `git add` in the same chain, `commit -a`, commit pathspecs, and `git -C <dir>`.
-- **`secret-scan`**: Blocks raw private keys, GitHub tokens (`ghp_`, `github_pat_`), AWS credentials, Slack keys, `sk-` keys (including `sk-ant-` and `sk-proj-`), Google `AIza` keys, and literal `Bearer <token>` values. `Bearer $ENV_VAR` is allowed.
+- **`secret-scan`**: Blocks raw private keys, GitHub tokens (`ghp_`, `github_pat_`), AWS credentials, Slack keys, `sk-ant-`, `sk-proj-`, `sk-svcacct-` and `sk-admin-` keys plus legacy hyphen-free `sk-` keys, Google `AIza` keys, and literal `Bearer <token>` values in any case. `Bearer $ENV_VAR` is allowed, and so are ordinary names that contain `sk-` (such as `feature/sk-1234-login`).
 
 **Known limits:**
 - Only `run_command` tool calls are inspected (the `hooks.json` matcher). A secret written through a file-edit tool is not scanned, and file edits are not checked against the plan. The hooks guard the shell, not every way an agent can change files.
 - A quoted command passed to an unknown prefix command (for example `ssh host "git push origin main"`) is not checked.
 - `rm -rf /./` is not caught by the root-delete guard.
 - `git commit --pathspec-from-file` is not read by `plan-boundary`.
-- Secret patterns are case-sensitive, have minimum lengths, and do not catch a lowercase `bearer` token.
+- Secret patterns have minimum lengths; apart from `bearer`, they are case-sensitive.
 
 ---
 
