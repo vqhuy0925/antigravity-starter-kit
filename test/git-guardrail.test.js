@@ -36,3 +36,33 @@ test('Allows safe git commands like git status or git add', () => {
   const res = runHook('git-guardrail.js', cmd('git status'));
   assert.strictEqual(res.decision, 'allow');
 });
+
+// --- Task 3: push rules and root-delete ---
+const { execFileSync } = require('node:child_process');
+const { makeRepo } = require('./helpers');
+const d = (c, cwd) => runHook('git-guardrail.js', cmd(c, cwd)).decision;
+test('denies push to HEAD:main', () => assert.strictEqual(d('git push origin HEAD:main'), 'deny'));
+test('denies push to main with flags between', () => assert.strictEqual(d('git push -u origin main'), 'deny'));
+test('denies push to main on any remote', () => assert.strictEqual(d('git push fork main'), 'deny'));
+test('denies bare push while on main', () => assert.strictEqual(d('git push', makeRepo({ branch: 'main' })), 'deny'));
+test('allows bare push on feature branch', () => assert.strictEqual(d('git push', makeRepo({ branch: 'feat/x' })), 'allow'));
+test('allows bare push on detached HEAD', () => {
+  const dir = makeRepo();
+  execFileSync('git', ['checkout', '--detach'], { cwd: dir, stdio: 'ignore' });
+  assert.strictEqual(d('git push', dir), 'allow');
+});
+test('allows force-with-lease on feature branch', () => assert.strictEqual(d('git push --force-with-lease origin feat/x'), 'allow'));
+test('denies force-with-lease to main', () => assert.strictEqual(d('git push --force-with-lease origin main'), 'deny'));
+test('denies +refspec force push', () => assert.strictEqual(d('git push origin +feat/x'), 'deny'));
+test('denies -fu cluster', () => assert.strictEqual(d('git push -fu origin feat/x'), 'deny'));
+test('denies force push inside a chain', () => assert.strictEqual(d('git add -A && git push --force origin x'), 'deny'));
+test('denies push to main after a semicolon', () => assert.strictEqual(d('npm test; git push origin main'), 'deny'));
+test('denies push with -C and -c global options', () => assert.strictEqual(d('git -C . -c core.x=1 push origin main'), 'deny'));
+test('denies push --all', () => assert.strictEqual(d('git push --all origin'), 'deny'));
+test('denies push hidden by unbalanced apostrophe', () => assert.strictEqual(d("echo it's && git push -f origin x"), 'deny'));
+test('denies push hidden by stray double quote', () => assert.strictEqual(d('echo \\" && git push origin main'), 'deny'));
+test('allows commit message mentioning git status', () => assert.strictEqual(d('git commit -m "docs: mention git status"'), 'allow'));
+for (const c of ['rm -rf /*', 'rm -rf ~', 'rm -rf ~/', 'rm -rf $HOME', 'rm -rf ${HOME}', 'Remove-Item -Recurse -Force C:\\', 'Remove-Item -Recurse -Force C:/'])
+  test(`denies ${c}`, () => assert.strictEqual(d(c), 'deny'));
+for (const c of ['rm -rf ./build', 'rm -rf /tmp/foo', 'git push origin feat/x', 'git log --follow-tags'])
+  test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));

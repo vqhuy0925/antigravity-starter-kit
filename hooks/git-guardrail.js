@@ -1,34 +1,134 @@
 #!/usr/bin/env node
 'use strict';
 
-const { readInput, outputDecision } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize } = require('./lib');
 
-const payload = readInput();
-if (!payload || !payload.toolCall || payload.toolCall.name !== 'run_command') {
-  outputDecision('allow');
+const PROTECTED = ['main', 'master'];
+const SEVERITY = { allow: 0, ask: 1, deny: 2 };
+
+const DENY_FORCE = '🚨 BLOCKED by Antigravity Guardrail: Force push (--force / -f) destroys remote commit history.';
+const DENY_PROTECTED = '🚨 BLOCKED by Antigravity Guardrail: Direct git push to main/master is strictly protected. Please create a feature branch and pull request.';
+const DENY_ROOT = '🚨 BLOCKED by Antigravity Guardrail: Catastrophic root directory deletion detected.';
+const ASK_RESET = '⚠️ Antigravity Safety Guard: git reset --hard will discard all uncommitted work permanently. Do you wish to proceed?';
+
+const ROOT_TARGETS = new Set(['/', '/*', '~', '~/', '~/*', '$HOME', '${HOME}', '$HOME/', '${HOME}/', '$HOME/*', '${HOME}/*']);
+const DRIVE_ROOT = /^[a-zA-Z]:[\\/]*\*?$/;
+
+/** Strip a leading `git` plus global options; returns [subcommand, restTokens] or null. */
+function parseGit(tokens) {
+  if (tokens[0] !== 'git') return null;
+  let i = 1;
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (t === '-C' || t === '-c' || t === '--git-dir' || t === '--work-tree' || t === '--namespace') {
+      i += 2;
+    } else if (t.startsWith('-') && t !== '-') {
+      i += 1; // other global flag (--no-pager, --git-dir=..., -p, ...)
+    } else {
+      break;
+    }
+  }
+  if (i >= tokens.length) return null;
+  return [tokens[i], tokens.slice(i + 1)];
 }
 
-const cmd = (payload.toolCall.args && payload.toolCall.args.CommandLine) || '';
+function checkPush(args, branch) {
+  let force = false;
+  const positional = [];
+  let all = false;
+  for (const a of args) {
+    if (a === '--force') force = true;
+    else if (a === '--all' || a === '--mirror') all = true;
+    else if (a.startsWith('--')) continue; // --force-with-lease[=..], --force-if-includes, --tags, ...
+    else if (/^-[A-Za-z]+$/.test(a)) { if (a.includes('f')) force = true; }
+    else if (a.startsWith('-')) continue;
+    else positional.push(a);
+  }
+  const refspecs = positional.slice(1); // first positional is the remote
+  if (refspecs.some(r => r.startsWith('+'))) force = true;
+  if (force) return { decision: 'deny', reason: DENY_FORCE };
 
-// 1. Catastrophic Delete Guards
-if (/\brm\s+(-[rfRF]+\s+)?[\/\\](?:\s|$)/.test(cmd) || /rmdir\s+\/s\s+\/q\s+[c-zC-Z]:\\/i.test(cmd)) {
-  outputDecision('deny', '🚨 BLOCKED by Antigravity Guardrail: Catastrophic root directory deletion detected.');
+  const targets = [];
+  if (all) targets.push('main');
+  if (refspecs.length === 0) {
+    if (branch) targets.push(branch);
+  } else {
+    for (let r of refspecs) {
+      r = r.replace(/^\+/, '');
+      if (r.includes(':')) r = r.slice(r.indexOf(':') + 1);
+      r = r.replace(/^refs\/heads\//, '');
+      if (r === 'HEAD') { if (branch) targets.push(branch); }
+      else targets.push(r);
+    }
+  }
+  if (targets.some(t => PROTECTED.includes(t))) return { decision: 'deny', reason: DENY_PROTECTED };
+  return { decision: 'allow' };
 }
 
-// 2. Git Force Push Guard
-if (/\bgit\s+push\b.*(--force\b|-f\b|--force-with-lease\b)/.test(cmd)) {
-  outputDecision('deny', '🚨 BLOCKED by Antigravity Guardrail: Force push (--force / -f) destroys remote commit history.');
+/**
+ * Evaluate one command segment. Returns { decision, reason } or null.
+ * @param {string[]} tokens
+ * @param {string|null} branch current branch (null when detached/unknown)
+ */
+function checkSegment(tokens, branch) {
+  if (!tokens || tokens.length === 0) return null;
+  const head = tokens[0];
+
+  if (head === 'rm') {
+    const flags = tokens.slice(1).filter(t => t.startsWith('-'));
+    const recursive = flags.some(f => /^--recursive$/.test(f) || /^-[A-Za-z]*[rR][A-Za-z]*$/.test(f));
+    if (recursive && tokens.slice(1).some(t => !t.startsWith('-') && ROOT_TARGETS.has(t))) {
+      return { decision: 'deny', reason: DENY_ROOT };
+    }
+    return null;
+  }
+  if (/^remove-item$/i.test(head) || head === 'ri') {
+    const recursive = tokens.slice(1).some(t => /^-r(e(c(u(r(se?)?)?)?)?)?$/i.test(t));
+    if (recursive && tokens.slice(1).some(t => !t.startsWith('-') && DRIVE_ROOT.test(t))) {
+      return { decision: 'deny', reason: DENY_ROOT };
+    }
+    return null;
+  }
+  if (/^rmdir$/i.test(head)) {
+    const rest = tokens.slice(1);
+    if (rest.some(t => /^\/s$/i.test(t)) && rest.some(t => /^[a-zA-Z]:\\/.test(t))) {
+      return { decision: 'deny', reason: DENY_ROOT };
+    }
+    return null;
+  }
+
+  const g = parseGit(tokens);
+  if (!g) return null;
+  const [sub, args] = g;
+  if (sub === 'push') return checkPush(args, branch);
+  if (sub === 'reset' && args.includes('--hard')) return { decision: 'ask', reason: ASK_RESET };
+  return null;
 }
 
-// 3. Direct Push to Protected Branches Guard
-if (/\bgit\s+push\b.*(\b(origin|upstream)\s+(main|master)\b)/.test(cmd)) {
-  outputDecision('deny', '🚨 BLOCKED by Antigravity Guardrail: Direct git push to main/master is strictly protected. Please create a feature branch and pull request.');
+/** Evaluate a whole command line over both segmentation passes; most severe wins. */
+function evaluate(cmd, branch) {
+  const segments = new Set([
+    ...splitCommands(cmd),
+    ...splitCommands(cmd.replace(/["'`]/g, ' '))
+  ]);
+  let worst = { decision: 'allow' };
+  for (const seg of segments) {
+    const r = checkSegment(tokenize(seg), branch);
+    if (r && SEVERITY[r.decision] > SEVERITY[worst.decision]) worst = r;
+  }
+  return worst;
 }
 
-// 4. Git Reset Hard Confirmation
-if (/\bgit\s+reset\s+--hard\b/.test(cmd)) {
-  outputDecision('ask', '⚠️ Antigravity Safety Guard: git reset --hard will discard all uncommitted work permanently. Do you wish to proceed?');
+if (require.main === module) {
+  const payload = readInput();
+  if (!payload || !payload.toolCall || payload.toolCall.name !== 'run_command') {
+    outputDecision('allow');
+  }
+  const cmd = getCommand(payload);
+  // Branch is only needed for bare/HEAD pushes; resolve lazily-ish but once.
+  const branch = /\bpush\b/.test(cmd) ? currentBranch(getCwd(payload)) : null;
+  const res = evaluate(cmd, branch);
+  outputDecision(res.decision, res.reason);
 }
 
-// Default: Allow
-outputDecision('allow');
+module.exports = { checkSegment };
