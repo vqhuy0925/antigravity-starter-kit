@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit } = require('./lib');
 
 const PROTECTED = ['main', 'master'];
 const SEVERITY = { allow: 0, ask: 1, deny: 2 };
@@ -14,63 +14,12 @@ const ASK_RESET = '⚠️ Antigravity Safety Guard: git reset --hard will discar
 const ROOT_TARGETS = new Set(['/', '/*', '~', '~/', '~/*', '$HOME', '${HOME}', '$HOME/', '${HOME}/', '$HOME/*', '${HOME}/*']);
 const DRIVE_ROOT = /^[a-zA-Z]:[\\/]*\*?$/;
 
-const WRAPPERS = new Set(['sudo', 'env', 'command', 'time', 'nohup', 'xargs', 'exec']);
-const SHELLS = new Set(['bash', 'sh', 'zsh', 'pwsh', 'powershell', 'cmd']);
 const PUSH_VALUE_OPTS = new Set(['-o', '--push-option', '--repo', '--receive-pack', '--exec']);
-
-const baseName = t => t.replace(/^.*[\\/]/, '').toLowerCase().replace(/\.exe$/, '');
-
-/** Drop VAR=val prefixes and wrappers (with their flags); normalise the head token. */
-function normalizeHead(tokens) {
-  let i = 0;
-  while (i < tokens.length) {
-    const t = tokens[i];
-    if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(t)) { i++; continue; }
-    if (WRAPPERS.has(baseName(t))) {
-      i++;
-      while (i < tokens.length && tokens[i].startsWith('-')) i++;
-      continue;
-    }
-    break;
-  }
-  const rest = tokens.slice(i);
-  if (rest.length) rest[0] = baseName(rest[0]);
-  return rest;
-}
-
-/** If tokens are `<shell> -c "<cmd>"`, return the inner command string, else null. */
-function shellInner(tokens) {
-  if (!SHELLS.has(tokens[0])) return null;
-  for (let i = 1; i < tokens.length; i++) {
-    if (/^(-[a-z]*c|-command|\/[ck])$/i.test(tokens[i]) && i + 1 < tokens.length) {
-      return tokens.slice(i + 1).join(' ');
-    }
-  }
-  return null;
-}
 
 function normRoot(t) {
   let n = t.replace(/\/{2,}/g, '/').replace(/(\/\.)+$/, '');
   if (n === '' && t.startsWith('/')) n = '/';
   return n;
-}
-
-/** Strip a leading `git` plus global options; returns [subcommand, restTokens] or null. */
-function parseGit(tokens) {
-  if (tokens[0] !== 'git') return null;
-  let i = 1;
-  while (i < tokens.length) {
-    const t = tokens[i];
-    if (t === '-C' || t === '-c' || t === '--git-dir' || t === '--work-tree' || t === '--namespace') {
-      i += 2;
-    } else if (t.startsWith('-') && t !== '-') {
-      i += 1; // other global flag (--no-pager, --git-dir=..., -p, ...)
-    } else {
-      break;
-    }
-  }
-  if (i >= tokens.length) return null;
-  return [tokens[i], tokens.slice(i + 1)];
 }
 
 function checkPush(args, branch) {
@@ -182,4 +131,4 @@ if (require.main === module) {
   outputDecision(res.decision, res.reason);
 }
 
-module.exports = { checkSegment, normalizeHead };
+module.exports = { checkSegment, normalizeHead }; // normalizeHead re-exported from lib

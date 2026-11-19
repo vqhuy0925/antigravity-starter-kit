@@ -86,3 +86,14 @@ test('exports helpers', () => {
   assert.deepStrictEqual([...pb.extractPlanPaths('- `./src\\a.ts`\n- docs/x.md foo\n')].sort(), ['docs/x.md', 'src/a.ts']);
   assert.strictEqual(pb.isCovered('a/b.ts', new Set(['a/']), { stagedFiles: [], trackedFiles: [] }), true);
 });
+test('commit with a pathspec checks unstaged named paths', () => {
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'src/unplanned.ts': '0' } });
+  write(dir, 'src/unplanned.ts', '1');
+  assert.strictEqual(run(dir, 'git commit -m x src/unplanned.ts').decision, 'ask');
+  assert.strictEqual(run(dir, 'git commit -m x -- src/unplanned.ts').decision, 'ask');
+});
+test('git -C <dir> commit resolves the repo from <dir>', () => {
+  const dir = makeRepo({ branch: 'feat/login' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  const r = runHook('plan-boundary.js', cmd(`git -C ${path.basename(dir)} commit -m x`, path.dirname(dir)));
+  assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
+});
