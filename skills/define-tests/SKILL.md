@@ -35,13 +35,13 @@ A bug often lives in the disconnect between data layers. Never define test cases
   - Specify clear Preconditions, Test Steps, and Expected Results across all 3 layers.
 
 ### Mode B: Developer Test Planning Mode (Code & Plan Aware)
-- **Context:** The developer maps QA test cases to `implementation_plan.md` and codebase test suites.
+- **Context:** The developer maps QA test cases to the plan (`docs/plans/<branch>.md`) and codebase test suites.
 - **Focus:**
   - Classify each test case into an execution level:
     - `auto:unit`: In-memory fast test for a single class/function (mock dependencies).
     - `auto:integration`: Requires database, real HTTP endpoints, or container.
     - `manual`: Requires physical mobile device, real browser session, or 3rd-party webhook.
-  - Assign each automated test case to a specific implementation task in `implementation_plan.md`.
+  - Assign each automated test case to a specific implementation task in the plan (`docs/plans/<branch>.md`).
   - Check existing test files (`Existing test: ...`) to extend existing coverage and avoid duplicate tests.
 
 ---

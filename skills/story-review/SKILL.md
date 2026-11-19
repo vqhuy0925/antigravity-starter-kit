@@ -5,7 +5,7 @@ description: Shift-left refinement QA review of a raw story, ticket, or feature 
 
 # Shift-Left 10-Lens Story Review (`story-review`)
 
-Reviews a raw story, ticket, or feature request at refinement—**before** `spec.md`, `test_cases.md`, or `plan.md` are written—to surface what the story *doesn't* say.
+Reviews a raw story, ticket, or feature request at refinement—**before** `spec.md`, `test_cases.md`, or the plan (`docs/plans/<branch>.md`) are written—to surface what the story *doesn't* say.
 
 ---
 

@@ -1,7 +1,7 @@
 # Test Specification & Verification Matrix: [Title of Feature / Module]
 
 **Source Spec / Story:** [Link to spec.md, intent.md, or Issue ID]  
-**Source Plan:** [Link to implementation_plan.md or plan.md]  
+**Source Plan:** [Link to docs/plans/<branch>.md]  
 **QA Lead / Agent:** QA Engineer (Independent Context)  
 **Status:** [Draft | Approved | Ready to Implement | Verified]  
 **Last Updated:** YYYY-MM-DD  

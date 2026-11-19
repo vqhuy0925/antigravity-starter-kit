@@ -1,5 +1,7 @@
 # Implementation Plan: [Title of Work]
 
+> Save as `docs/plans/<branch>.md` (each `/` in the branch name becomes `-`) and commit it with the work. List every changed file below as a backticked repo-relative path (a trailing `/` covers a directory); the `plan-boundary` hook matches staged files against these.
+
 **Source Spec:** [Link to spec.md or intent.md]  
 **Status:** [Pending Approval | In Progress | Completed]  
 **Author:** [Engineer / Agent]  
@@ -8,7 +10,7 @@
 ---
 
 ## 1. Files That Change
-<!-- List files with basenames and expected changes -->
+<!-- List files as backticked repo-relative paths and expected changes -->
 - `[MODIFY]` `path/to/modified_file.ext`
 - `[NEW]` `path/to/new_file.ext`
 - `[DELETE]` `path/to/deleted_file.ext`

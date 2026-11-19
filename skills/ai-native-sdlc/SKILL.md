@@ -1,6 +1,6 @@
 ---
 name: ai-native-sdlc
-description: Universal AI-Native Software Development Lifecycle (SDLC) framework. Encodes the 6-stage artifact loop (intent.md -> spec.md -> test_cases.md -> plan.md -> diff/test -> deploy gate -> maintain).
+description: Universal AI-Native Software Development Lifecycle (SDLC) framework. Encodes the 6-stage artifact loop (intent.md -> spec.md -> test_cases.md -> docs/plans/<branch>.md -> diff/test -> deploy gate -> bug_report).
 ---
 
 # AI-Native SDLC Framework
@@ -22,7 +22,7 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
                                                                                    ▼
 ┌──────────────┐    PR Gate       ┌──────────────┐    Cross-Verification   ┌────────────────┐
 │ Stage 6:     │ ◄───────────────  │ Stage 5:     │ ◄───────────────────── │ Stage 3 & 4:   │
-│ maintain.md  │   (Human Sign)   │ deploy.md    │  (Dev vs test_cases)   │ plan.md & Code │
+│ bug_report.md│   (Human Sign)   │ deploy.md    │  (Dev vs test_cases)   │ Plan & Code    │
 └──────────────┘                  └──────────────┘                         └────────────────┘
      │
      └─── Loop closes (breach/incident/bug -> fix-bug -> new intent.md)
@@ -45,12 +45,14 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 
 ### Stage 2b: QA Verification Contract (`define-tests`)
 - **Artifact:** `test_cases.md` (Acceptance criteria, boundary conditions, cross-layer assertions: DB vs API DTO vs UI matrix).
+- **Owner:** `define-tests` is triggered here, once; `plan` only reads `test_cases.md`.
 - **Agent Role:** Independent **QA Agent** (executed in an isolated subagent context with zero dev implementation bias).
 - **Process:** QA derives pure black-box test scenarios from `intent.md`/`spec.md` before developer implementation starts.
 - **Approval Gate:** Test cases established as the ground truth contract for Dev and Code Review.
 
 ### Stage 3: Build (Plan Mode Default)
-- **Artifact:** `plan.md` (Files to touch, step-by-step order of work, regression risks, proof/verification tests).
+- **Artifact:** `docs/plans/<branch>.md` (branch `/` → `-`; committed with the work; optionally mirrored as `implementation_plan.md`). Lists files to touch as backticked repo-relative paths, step-by-step order of work, regression risks, proof/verification tests.
+- **Approval:** One plan approval per `rules/AGENTS.md` §2.
 - **Rule:** Never implement code without an approved plan and cross-checking `test_cases.md`. Enforced by `plan-boundary` hook.
 - **Process:** AI operates incrementally, adhering to project conventions, coding standards, and QA acceptance criteria.
 

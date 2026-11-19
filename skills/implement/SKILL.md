@@ -1,12 +1,13 @@
 ---
 name: implement
-description: Execute code changes step-by-step based on the approved implementation_plan.md, task.md checklist, and QA test_cases.md.
+description: Execute code changes step-by-step based on the approved plan (`docs/plans/<branch>.md`), task.md checklist, and QA test_cases.md.
 ---
 
 # Structured Implementation Workflow
 
 ## 1. Execution Discipline
-- Follow the approved `implementation_plan.md` faithfully.
+- Follow the approved plan (`docs/plans/<branch>.md`) faithfully.
+- After plan approval, run end-to-end per `rules/AGENTS.md` §2: fix failing tests yourself, make no mid-run commits, and hand off to `commit-code` at the end.
 - Check off completed tasks in `task.md` (`[/]` in progress, `[x]` done) as work progresses.
 - Run lightweight compilation/build commands frequently after modifying each component.
 
@@ -16,4 +17,4 @@ description: Execute code changes step-by-step based on the approved implementat
 - **No Self-Serving Shortcuts:** Developer cannot skip edge cases or boundary validations defined by QA. All automated tests must pass before marking tasks complete.
 
 ## 3. Handling Plan Deviations
-- If unexpected bugs or breaking architectural requirements arise during implementation, pause and update `implementation_plan.md` rather than making unreviewed sweeping changes.
+- If unexpected bugs or breaking architectural requirements arise during implementation, pause and update `docs/plans/<branch>.md` rather than making unreviewed sweeping changes.
