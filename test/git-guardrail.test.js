@@ -66,3 +66,17 @@ for (const c of ['rm -rf /*', 'rm -rf ~', 'rm -rf ~/', 'rm -rf $HOME', 'rm -rf $
   test(`denies ${c}`, () => assert.strictEqual(d(c), 'deny'));
 for (const c of ['rm -rf ./build', 'rm -rf /tmp/foo', 'git push origin feat/x', 'git log --follow-tags'])
   test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));
+
+// --- Fix round 1: prefix/wrapper bypasses ---
+for (const c of [
+  'sudo git push origin main', 'FOO=1 git push origin main', 'env git push -f origin x',
+  'command git push origin main', 'nohup git push origin main', 'time git push origin main',
+  '/usr/bin/git push origin main', 'git.exe push origin main',
+  'bash -c "git push origin main"', "sh -c 'git push -f origin x'", 'pwsh -c "git push origin main"',
+  'xargs git push -f', 'sudo rm -rf /', 'env -i FOO=1 git push origin main',
+  'rm -rf //', 'rm -rf /.'
+]) test(`denies ${c}`, () => assert.strictEqual(d(c), 'deny'));
+test('denies push -o value on main', () => assert.strictEqual(d('git push -o ci.skip origin', makeRepo({ branch: 'main' })), 'deny'));
+test('push -o value does not become remote', () => assert.strictEqual(d('git push -o ci.skip origin feat/x'), 'allow'));
+for (const c of ['sudo apt install git', 'env NODE_ENV=test npm test', 'bash -c "git status"'])
+  test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));

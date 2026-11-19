@@ -14,6 +14,47 @@ const ASK_RESET = '⚠️ Antigravity Safety Guard: git reset --hard will discar
 const ROOT_TARGETS = new Set(['/', '/*', '~', '~/', '~/*', '$HOME', '${HOME}', '$HOME/', '${HOME}/', '$HOME/*', '${HOME}/*']);
 const DRIVE_ROOT = /^[a-zA-Z]:[\\/]*\*?$/;
 
+const WRAPPERS = new Set(['sudo', 'env', 'command', 'time', 'nohup', 'xargs', 'exec']);
+const SHELLS = new Set(['bash', 'sh', 'zsh', 'pwsh', 'powershell', 'cmd']);
+const PUSH_VALUE_OPTS = new Set(['-o', '--push-option', '--repo', '--receive-pack', '--exec']);
+
+const baseName = t => t.replace(/^.*[\\/]/, '').toLowerCase().replace(/\.exe$/, '');
+
+/** Drop VAR=val prefixes and wrappers (with their flags); normalise the head token. */
+function normalizeHead(tokens) {
+  let i = 0;
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(t)) { i++; continue; }
+    if (WRAPPERS.has(baseName(t))) {
+      i++;
+      while (i < tokens.length && tokens[i].startsWith('-')) i++;
+      continue;
+    }
+    break;
+  }
+  const rest = tokens.slice(i);
+  if (rest.length) rest[0] = baseName(rest[0]);
+  return rest;
+}
+
+/** If tokens are `<shell> -c "<cmd>"`, return the inner command string, else null. */
+function shellInner(tokens) {
+  if (!SHELLS.has(tokens[0])) return null;
+  for (let i = 1; i < tokens.length; i++) {
+    if (/^(-[a-z]*c|-command|\/[ck])$/i.test(tokens[i]) && i + 1 < tokens.length) {
+      return tokens.slice(i + 1).join(' ');
+    }
+  }
+  return null;
+}
+
+function normRoot(t) {
+  let n = t.replace(/\/{2,}/g, '/').replace(/(\/\.)+$/, '');
+  if (n === '' && t.startsWith('/')) n = '/';
+  return n;
+}
+
 /** Strip a leading `git` plus global options; returns [subcommand, restTokens] or null. */
 function parseGit(tokens) {
   if (tokens[0] !== 'git') return null;
@@ -36,7 +77,9 @@ function checkPush(args, branch) {
   let force = false;
   const positional = [];
   let all = false;
-  for (const a of args) {
+  for (let k = 0; k < args.length; k++) {
+    const a = args[k];
+    if (PUSH_VALUE_OPTS.has(a)) { k++; continue; }
     if (a === '--force') force = true;
     else if (a === '--all' || a === '--mirror') all = true;
     else if (a.startsWith('--')) continue; // --force-with-lease[=..], --force-if-includes, --tags, ...
@@ -70,14 +113,22 @@ function checkPush(args, branch) {
  * @param {string[]} tokens
  * @param {string|null} branch current branch (null when detached/unknown)
  */
-function checkSegment(tokens, branch) {
-  if (!tokens || tokens.length === 0) return null;
+function checkSegment(rawTokens, branch) {
+  if (!rawTokens || rawTokens.length === 0) return null;
+  const tokens = normalizeHead(rawTokens);
+  if (tokens.length === 0) return null;
   const head = tokens[0];
+
+  const inner = shellInner(tokens);
+  if (inner !== null) {
+    const r = evaluate(inner, branch);
+    return r.decision === 'allow' ? null : r;
+  }
 
   if (head === 'rm') {
     const flags = tokens.slice(1).filter(t => t.startsWith('-'));
     const recursive = flags.some(f => /^--recursive$/.test(f) || /^-[A-Za-z]*[rR][A-Za-z]*$/.test(f));
-    if (recursive && tokens.slice(1).some(t => !t.startsWith('-') && ROOT_TARGETS.has(t))) {
+    if (recursive && tokens.slice(1).some(t => !t.startsWith('-') && ROOT_TARGETS.has(normRoot(t)))) {
       return { decision: 'deny', reason: DENY_ROOT };
     }
     return null;
@@ -131,4 +182,4 @@ if (require.main === module) {
   outputDecision(res.decision, res.reason);
 }
 
-module.exports = { checkSegment };
+module.exports = { checkSegment, normalizeHead };
