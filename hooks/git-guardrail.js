@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced, DELETES } = require('./lib');
 
 const PROTECTED = ['main', 'master'];
 const SEVERITY = { allow: 0, ask: 1, deny: 2 };
@@ -16,10 +16,24 @@ const DRIVE_ROOT = /^[a-zA-Z]:[\\/]*\*?$/;
 
 const PUSH_VALUE_OPTS = new Set(['-o', '--push-option', '--repo', '--receive-pack', '--exec']);
 
+const HOME_PS = new Set(['$env:userprofile', '${env:userprofile}'].flatMap(h => [h, `${h}/`, `${h}/*`]));
+
 function normRoot(t) {
   let n = t.replace(/\/{2,}/g, '/').replace(/(\/\.)+$/, '');
   if (n === '' && t.startsWith('/')) n = '/';
   return n;
+}
+
+/** Root, drive-root or home target (`/`, `~`, `$HOME`, `$env:USERPROFILE`, `C:\`, `C:\*`, ...). */
+function isRootTarget(t) {
+  const n = normRoot(t.replace(/\\/g, '/'));
+  return ROOT_TARGETS.has(n) || HOME_PS.has(n.toLowerCase()) || DRIVE_ROOT.test(n);
+}
+
+/** Recursive flag of rm (-r, -rf, --recursive), PowerShell (-Recurse and prefixes) or cmd (/s). */
+function isRecursiveFlag(f) {
+  return f === '--recursive' || /^-r(e(c(u(r(se?)?)?)?)?)?$/i.test(f) ||
+    (/^-[A-Za-z]*[rR][A-Za-z]*$/.test(f) && !/^-fo(r(ce?)?)?$/i.test(f)) || /^\/s$/i.test(f);
 }
 
 function checkPush(args, branch) {
@@ -49,7 +63,7 @@ function checkPush(args, branch) {
       r = r.replace(/^\+/, '');
       if (r.includes(':')) r = r.slice(r.indexOf(':') + 1);
       r = r.replace(/^refs\/heads\//, '');
-      if (r === 'HEAD') { if (branch) targets.push(branch); }
+      if (r === 'HEAD' || r === '@') { if (branch) targets.push(branch); }
       else targets.push(r);
     }
   }
@@ -80,24 +94,9 @@ function checkSegment(rawTokens, branch, fallback = true) {
     return r.decision === 'allow' ? null : r;
   }
 
-  if (head === 'rm') {
-    const flags = tokens.slice(1).filter(t => t.startsWith('-'));
-    const recursive = flags.some(f => /^--recursive$/.test(f) || /^-[A-Za-z]*[rR][A-Za-z]*$/.test(f));
-    if (recursive && tokens.slice(1).some(t => !t.startsWith('-') && ROOT_TARGETS.has(normRoot(t)))) {
-      return { decision: 'deny', reason: DENY_ROOT };
-    }
-    return null;
-  }
-  if (/^remove-item$/i.test(head) || head === 'ri') {
-    const recursive = tokens.slice(1).some(t => /^-r(e(c(u(r(se?)?)?)?)?)?$/i.test(t));
-    if (recursive && tokens.slice(1).some(t => !t.startsWith('-') && DRIVE_ROOT.test(t))) {
-      return { decision: 'deny', reason: DENY_ROOT };
-    }
-    return null;
-  }
-  if (/^rmdir$/i.test(head)) {
+  if (DELETES.has(head)) {
     const rest = tokens.slice(1);
-    if (rest.some(t => /^\/s$/i.test(t)) && rest.some(t => /^[a-zA-Z]:\\/.test(t))) {
+    if (rest.some(isRecursiveFlag) && rest.some(t => !t.startsWith('-') && isRootTarget(t))) {
       return { decision: 'deny', reason: DENY_ROOT };
     }
     return null;

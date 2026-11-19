@@ -90,3 +90,16 @@ for (const c of [
 ]) test(`denies prefixed ${c}`, () => assert.strictEqual(d(c), 'deny'));
 for (const c of ['timeout 60 npm test', 'nice make', 'echo "git push origin main"', 'grep -rn "git push origin main" docs', 'echo git push origin main'])
   test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));
+
+// --- Final review: one delete check for rm / Remove-Item / ri / rd / rmdir / del / erase ---
+for (const c of [
+  'rm -Recurse -Force C:\\', 'Remove-Item -Recurse -Force ~', 'Remove-Item -Recurse -Force $env:USERPROFILE',
+  'Remove-Item -Recurse -Force $HOME', 'rd /s /q C:\\', 'del /s /q C:\\*', 'erase /s /q D:\\', 'rmdir /s /q C:\\',
+  'ri -r -fo ~\\'
+]) test(`denies ${c}`, () => assert.strictEqual(d(c), 'deny'));
+for (const c of ['Remove-Item -Recurse -Force .\\build', 'rd /s /q build', 'rm -Force C:\\temp\\x.txt', 'del C:\\*'])
+  test(`allows ${c}`, () => assert.strictEqual(d(c), 'allow'));
+
+// --- Final review: @ is HEAD ---
+test('denies push origin @ while on main', () => assert.strictEqual(d('git push origin @', makeRepo({ branch: 'main' })), 'deny'));
+test('allows push origin @ on a feature branch', () => assert.strictEqual(d('git push origin @', makeRepo({ branch: 'feat/x' })), 'allow'));

@@ -291,8 +291,8 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`.
 
 - **`git-guardrail`**:
   - Force push (`--force`, `-f`, clusters like `-fu`, `+refspec`) is denied on any branch. `--force-with-lease` is allowed, except to `main`/`master`.
-  - Pushes to `main`/`master` are denied via any remote, `HEAD:main`, `--all`/`--mirror`, or a bare `git push` while on main.
-  - Root deletion is denied: `rm -rf /`, `/*`, `~`, `$HOME`, and PowerShell `Remove-Item -Recurse` of a drive root. `git reset --hard` asks first.
+  - Pushes to `main`/`master` are denied via any remote, `HEAD:main`, `--all`/`--mirror`, or a bare `git push` (or `git push origin HEAD` / `@`) while on main.
+  - Root deletion is denied: a recursive `rm`, `Remove-Item`/`ri`, `rd`/`rmdir`, `del`/`erase` (`-r`, `-Recurse`, `/s`) of `/`, `/*`, `~`, `$HOME`, `$env:USERPROFILE`, or a drive root such as `C:\` or `C:\*`. `git reset --hard` asks first.
   - Every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newlines, `$(...)`, backticks). Common wrappers and prefixes are seen through (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, `eval`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`). Behind any other prefix command (`timeout 60`, `nice`, `doas`, `sudo -u x`, `env -u X`, ...) the first `git`, shell or delete command in the segment is checked as if it came first.
 - **`plan-boundary`**:
   - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md` (looked up in the conversation artifact folder, then the working directory and up to 4 directories above it). When no plan is found, it asks before the commit proceeds **only in repos that opt in** by having a `docs/plans/` directory at the repo root; in other repos the commit is allowed. When a plan is found, files are always matched against it.
