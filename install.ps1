@@ -9,7 +9,29 @@ param (
 )
 
 $ErrorActionPreference = "Stop"
-$RepoUrl = "https://github.com/vqhuy0925/antigravity-starter-kit.git"
+$RepoUrl = if ($env:AGY_KIT_REPO) { $env:AGY_KIT_REPO } else { "https://github.com/vqhuy0925/antigravity-starter-kit.git" }
+
+# Clone or update $Dest, then rewrite hook commands to absolute paths.
+function Install-Kit([string]$Dest, [string]$Label) {
+    if (Test-Path (Join-Path $Dest ".git")) {
+        Write-Host "Updating existing $Label plugin..." -ForegroundColor Yellow
+        # hooks.json holds install-time absolute paths; restore it so pull never conflicts
+        git -C "$Dest" checkout -- hooks.json
+        if ($LASTEXITCODE -ne 0) { throw "git checkout failed" }
+        git -C "$Dest" pull
+        if ($LASTEXITCODE -ne 0) { throw "git pull failed" }
+    } else {
+        git clone --depth=1 "$RepoUrl" "$Dest"
+        if ($LASTEXITCODE -ne 0) { throw "git clone failed" }
+    }
+    if (Get-Command node -ErrorAction SilentlyContinue) {
+        node (Join-Path $Dest "bin/link-hooks.js") "$Dest"
+    } else {
+        Write-Host "WARNING: Node.js was not found. The safety guardrail hooks stay inactive until Node.js (>= 18) is installed." -ForegroundColor Yellow
+        Write-Host "  Then run: node `"$Dest/bin/link-hooks.js`" `"$Dest`""
+        Write-Host "  Skills and rules still work without it."
+    }
+}
 
 # Verify Git is available
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
@@ -26,12 +48,7 @@ if ($Global) {
         New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
     }
 
-    if (Test-Path (Join-Path $destDir ".git")) {
-        Write-Host "Updating existing global plugin..." -ForegroundColor Yellow
-        git -C "$destDir" pull
-    } else {
-        git clone --depth=1 "$RepoUrl" "$destDir"
-    }
+    Install-Kit $destDir "global"
 
     Write-Host "`n✅ Global installation complete! All Antigravity projects will now inherit these skills, rules, hooks, and agents." -ForegroundColor Green
 } else {
@@ -43,12 +60,7 @@ if ($Global) {
         New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
     }
 
-    if (Test-Path (Join-Path $destDir ".git")) {
-        Write-Host "Updating existing local plugin..." -ForegroundColor Yellow
-        git -C "$destDir" pull
-    } else {
-        git clone --depth=1 "$RepoUrl" "$destDir"
-    }
+    Install-Kit $destDir "local"
 
     Write-Host "`n✅ Local installation complete! Your current repository is now equipped with Antigravity starter kit." -ForegroundColor Green
 }

@@ -6,6 +6,8 @@ const path = require('path');
 const os = require('os');
 const { execSync, spawnSync } = require('child_process');
 
+const { linkHooks } = require('./link-hooks');
+
 const REPO_URL = 'https://github.com/vqhuy0925/antigravity-starter-kit.git';
 
 const BANNER = `
@@ -73,13 +75,17 @@ function install(isGlobal) {
   if (hasLocalAssets && path.resolve(sourceRoot) !== path.resolve(targetDir)) {
     console.log('🔄 Copying plugin files directly from package...');
     copyRecursiveSync(sourceRoot, targetDir);
+    linkHooks(targetDir);
     console.log('\n✅ Installation successful!');
   } else {
     // Clone via Git
     if (fs.existsSync(path.join(targetDir, '.git'))) {
       console.log('🔄 Updating existing installation...');
       try {
+        // hooks.json was rewritten with absolute paths at install time; restore it so pull never conflicts
+        execSync(`git -C "${targetDir}" checkout -- hooks.json`, { stdio: 'inherit' });
         execSync(`git -C "${targetDir}" pull`, { stdio: 'inherit' });
+        linkHooks(targetDir);
         console.log('\n✅ Successfully updated to latest version!');
       } catch (err) {
         console.error('❌ Failed to update repository via git:', err.message);
@@ -89,6 +95,7 @@ function install(isGlobal) {
       console.log('📥 Cloning repository from GitHub...');
       try {
         execSync(`git clone --depth=1 "${REPO_URL}" "${targetDir}"`, { stdio: 'inherit' });
+        linkHooks(targetDir);
         console.log('\n✅ Installation complete!');
       } catch (err) {
         console.error('❌ Failed to clone repository:', err.message);
