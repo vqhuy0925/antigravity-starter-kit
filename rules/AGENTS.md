@@ -43,13 +43,14 @@
   |---|---|
   | Read, search, git inspect (`fetch`, `pull`, `status`, `diff`, `log`), run tests/lint/build | Silent; report results |
   | Edit files, Tier 1 trivial change | Do it, report in chat |
-  | Edit files, Tier 2 after plan approved | Run end-to-end without stopping, except on a genuine blocker |
-  | `git commit` | Ask once per commit with diff summary + message (Tier 1 included). In a Tier 2 run, no commits mid-run: at the end, `commit-code` groups the changes and asks once per grouped commit |
+  | Edit files, Tier 2 before plan approved | Stop: present the plan once for approval |
+  | Edit files, Tier 2 after plan approved | Run end-to-end without stopping, except on a genuine blocker. Fix failing tests, type errors and lint yourself and keep going |
+  | `git commit` | Ask once per commit with diff summary + message (Tier 1 included). In a Tier 2 run, no commits mid-run: at the end, `commit-code` groups the changes and asks once per grouped commit. For a commit with no plan (Tier 1, or a detached HEAD), the scope hook's "No approved plan found" prompt is that commit's single ask: answer it, do not ask a second time |
   | `git push`, deploy, any external tracker or API write (Jira, GitHub Issues, Linear, Trello, …) | Ask individually, every time, never bundled |
 
 - **Plan Approval (Tier 2)**: Present the plan once; after the user approves, the Tier 2 edit row applies.
-- **Genuine Blockers**: Failing build, missing required file, unresolvable conflict. Stop and ask.
-- **Batch Questions**: Gather all other questions (domain, logic, edge cases) and ask them in **one batch** at the natural stopping point (before plan approval), each with a **recommended answer and a 1-line rationale** so the user can approve all or override by number. Do not ask piecemeal while working.
+- **Genuine Blockers**: Failing build, missing required file, unresolvable conflict, or a test you cannot make pass after a reasonable attempt. Stop and ask.
+- **Batch Questions**: Gather all other questions (domain, logic, edge cases) and ask them in **one batch** together with the plan, each with a **recommended answer and a 1-line rationale** so the user can approve all or override by number. Do not ask piecemeal while working. A non-blocking question that comes up after approval is not asked: take a stated default and list it in the end-of-run report as a decision taken.
 - **Gates Never Move Into Subagents**: Present previews and obtain user confirmation in the **main conversation thread**. Subagents only execute already-approved writes or perform read-only analysis; a subagent never asks the user for approval.
 
 ## 3. TOKEN OPTIMIZATION & CONTEXT MANAGEMENT
