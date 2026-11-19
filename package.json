@@ -8,7 +8,7 @@
     "agy-kit": "bin/cli.js"
   },
   "scripts": {
-    "test": "node test/verify-hooks.test.js"
+    "test": "node --test"
   },
   "keywords": [
     "antigravity",

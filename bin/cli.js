@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 const REPO_URL = 'https://github.com/vqhuy0925/antigravity-starter-kit.git';
 
@@ -110,12 +110,13 @@ function install(isGlobal) {
 function verifyHooks() {
   console.log(BANNER);
   console.log('🔍 Verifying Antigravity Safety Guardrails & Hooks...\n');
-  const testScript = path.join(__dirname, '..', 'test', 'verify-hooks.test.js');
-  if (fs.existsSync(testScript)) {
-    require(testScript);
+  const root = path.join(__dirname, '..');
+  if (fs.existsSync(path.join(root, 'test'))) {
+    const res = spawnSync(process.execPath, ['--test'], { cwd: root, stdio: 'inherit' });
+    process.exit(res.status === null ? 1 : res.status);
   } else {
     console.log('✅ Hook definitions present in hooks.json:');
-    const hooksJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'hooks.json'), 'utf8'));
+    const hooksJson = JSON.parse(fs.readFileSync(path.join(root, 'hooks.json'), 'utf8'));
     console.dir(hooksJson, { depth: null });
   }
 }
