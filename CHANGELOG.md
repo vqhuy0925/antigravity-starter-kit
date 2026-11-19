@@ -25,7 +25,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - `docs/checklists/antigravity-live-check.md`, a manual check against a real Antigravity install.
 
 ### Migration
-- Re-run the installer to get absolute hook paths in `hooks.json`. Git submodule users run `node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js` once.
+- Re-run the installer to get absolute hook paths in `hooks.json`. Git submodule and committed local installs: every developer must run `node <install-dir>/bin/link-hooks.js` (for example `node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js`) after each clone, pull, submodule update or move of the install folder.
+- A committed `hooks.json` with absolute paths will not work on other machines: the hook files it names do not exist there. Add the link step to your project's own workflow (a `postinstall` script or a setup note). `bin/cli.js --verify` now warns, prints the fix command and exits 1 when a hook path in `hooks.json` does not exist.
 - Move plans to `docs/plans/<branch>.md` (each `/` in the branch name becomes `-`).
 - Commits with no plan now prompt for approval instead of passing silently, but only in repos that have a `docs/plans/` directory. Create `docs/plans/` (for example with a `.gitkeep`) to opt a repo in.
 - `--force-with-lease` is now allowed on feature branches; plain force push stays denied.

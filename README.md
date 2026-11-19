@@ -188,6 +188,7 @@ Or install only into the current repository:
 ```bash
 npx antigravity-starter-kit --local
 ```
+A `--local` install writes absolute paths for this machine into `.agents/plugins/antigravity-starter-kit/hooks.json`. If you commit that folder, every other developer must re-link it after clone, pull or move (see [Re-linking hooks](#re-linking-hooks-after-clone-pull-or-move)).
 
 ---
 
@@ -207,6 +208,7 @@ curl -fsSL https://raw.githubusercontent.com/vqhuy0925/antigravity-starter-kit/m
 Or via direct git clone on Windows PowerShell:
 ```powershell
 git clone https://github.com/vqhuy0925/antigravity-starter-kit.git "$HOME\.gemini\config\plugins\antigravity-starter-kit"
+node "$HOME\.gemini\config\plugins\antigravity-starter-kit\bin\link-hooks.js"
 ```
 
 ---
@@ -229,7 +231,18 @@ mkdir -p .agents/plugins
 git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agents/plugins/antigravity-starter-kit
 node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js
 ```
-A submodule install bypasses the installers, so run `link-hooks.js` once. It writes absolute hook paths into `hooks.json` so the guardrails run from any workspace, and fails loudly if nothing is linked. The shell installers honour an `AGY_KIT_REPO` environment variable to override the clone URL.
+A submodule install bypasses the installers, so run `link-hooks.js`. It writes absolute hook paths into `hooks.json` so the guardrails run from any workspace, and fails loudly if nothing is linked. Every developer runs it on their own machine, after every clone, submodule update or move (see below). The shell installers honour an `AGY_KIT_REPO` environment variable to override the clone URL.
+
+#### Re-linking hooks after clone, pull or move
+
+`hooks.json` holds **absolute** paths for the machine and folder it was linked on. A committed `hooks.json` with absolute paths will not work on other machines, and moving the install folder breaks it on yours: the hook files it names do not exist there, so the guardrails do not run. After every clone, pull, submodule update or move, each developer runs:
+
+```bash
+node <install-dir>/bin/link-hooks.js
+# e.g. node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js
+```
+
+Put this step in your project's own workflow so nobody has to remember it, for example as a `postinstall` script in your `package.json` (`"postinstall": "node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js"`) or in your setup / onboarding notes. `node <install-dir>/bin/cli.js --verify` warns, with this exact command, when any hook path in `hooks.json` does not exist.
 
 ---
 

@@ -124,14 +124,45 @@ function install(isGlobal) {
   }
 }
 
+/** Hook script paths in <root>/hooks.json that do not exist (relative paths resolve against root). */
+function missingHookPaths(root) {
+  const missing = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (!node || typeof node !== 'object') return;
+    if (typeof node.command === 'string') {
+      const m = /^node\s+(?:"([^"]+)"|(\S+))\s*$/.exec(node.command.trim());
+      if (m) {
+        const file = m[1] || m[2];
+        if (!fs.existsSync(path.resolve(root, file))) missing.push(file);
+      }
+    }
+    Object.values(node).forEach(walk);
+  };
+  try {
+    walk(JSON.parse(fs.readFileSync(path.join(root, 'hooks.json'), 'utf8')));
+  } catch (err) {
+    missing.push(`hooks.json (${err.message})`);
+  }
+  return missing;
+}
+
 function verifyHooks() {
   console.log(BANNER);
   console.log('🔍 Verifying Antigravity Safety Guardrails & Hooks...\n');
-  const root = path.join(__dirname, '..');
+  const root = path.resolve(__dirname, '..');
+  const missing = missingHookPaths(root);
+  if (missing.length) {
+    console.error('⚠️  WARNING: hooks.json points at hook files that do not exist, so these guardrails will not run:');
+    missing.forEach((f) => console.error(`   - ${f}`));
+    console.error(`   Fix it by re-linking the hooks to this install:\n   node "${path.join(root, 'bin', 'link-hooks.js')}"\n`);
+  }
+  const failed = missing.length > 0;
   if (fs.existsSync(path.join(root, 'test'))) {
     const res = spawnSync(process.execPath, ['--test'], { cwd: root, stdio: 'inherit' });
-    process.exit(res.status === null ? 1 : res.status);
+    process.exit(res.status === null || failed ? 1 : res.status);
   } else {
+    if (failed) process.exit(1);
     console.log('✅ Hook definitions present in hooks.json:');
     const hooksJson = JSON.parse(fs.readFileSync(path.join(root, 'hooks.json'), 'utf8'));
     console.dir(hooksJson, { depth: null });
