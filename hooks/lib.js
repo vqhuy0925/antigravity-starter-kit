@@ -61,46 +61,124 @@ function currentBranch(cwd) {
   return out ? out : null;
 }
 
-/** Split a command line on && || ; | and newlines, ignoring quoted separators. */
-function splitCommands(cmd) {
-  const segments = [];
-  let cur = '';
+/** Index of the ")" closing a "$(" whose body starts at i (quote-aware); -1 if unclosed. */
+function findParenEnd(s, i) {
+  let depth = 1;
   let quote = null;
-  const s = String(cmd || '');
-  for (let i = 0; i < s.length; i++) {
+  for (; i < s.length; i++) {
     const c = s[i];
     if (quote) {
+      if (c === '\\' && quote === '"') i++;
+      else if (c === quote) quote = null;
+    } else if (c === '"' || c === "'") quote = c;
+    else if (c === '(') depth++;
+    else if (c === ')' && --depth === 0) return i;
+  }
+  return -1;
+}
+
+/** Index of the closing backtick for a body starting at i; -1 if unclosed. */
+function findBacktickEnd(s, i) {
+  for (; i < s.length; i++) {
+    if (s[i] === '\\') i++;
+    else if (s[i] === '`') return i;
+  }
+  return -1;
+}
+
+/**
+ * Split a command line into simple-command segments.
+ * Separators: && || ; | |& & and newline; ignored inside quotes, `>&`, `2>&1`, `&>`.
+ * Inside double quotes, \" and \ are escapes. The bodies of $( ... ) and `...`
+ * stay inside their outer segment (separators in them do not split it) and are
+ * ALSO returned as additional segments, recursively, after the top-level ones.
+ * Known limits: no alias expansion, no eval, no variable expansion.
+ * @param {string} cmd
+ * @returns {string[]}
+ */
+function splitCommands(cmd) {
+  const s = String(cmd || '');
+  const segments = [];
+  const subs = [];
+  let cur = '';
+  let quote = null;
+  const flush = () => { segments.push(cur); cur = ''; };
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (quote === "'") {
       cur += c;
-      if (c === quote) quote = null;
+      if (c === "'") quote = null;
+      continue;
+    }
+    if (quote === '"' && c === '\\' && i + 1 < s.length) {
+      cur += c + s[i + 1];
+      i++;
+      continue;
+    }
+    if (quote === '"' && c === '"') {
+      quote = null;
+      cur += c;
+      continue;
+    }
+    if (c === '$' && s[i + 1] === '(') {
+      const end = findParenEnd(s, i + 2);
+      const stop = end === -1 ? s.length : end;
+      subs.push(...splitCommands(s.slice(i + 2, stop)));
+      cur += s.slice(i, stop + 1);
+      i = stop;
+      continue;
+    }
+    if (c === '`') {
+      const end = findBacktickEnd(s, i + 1);
+      const stop = end === -1 ? s.length : end;
+      subs.push(...splitCommands(s.slice(i + 1, stop)));
+      cur += s.slice(i, stop + 1);
+      i = stop;
+      continue;
+    }
+    if (quote === '"') {
+      cur += c;
       continue;
     }
     if (c === '"' || c === "'") {
       quote = c;
       cur += c;
     } else if ((c === '&' && s[i + 1] === '&') || (c === '|' && s[i + 1] === '|')) {
-      segments.push(cur);
-      cur = '';
+      flush();
       i++;
-    } else if (c === ';' || c === '|' || c === '\n') {
-      segments.push(cur);
-      cur = '';
+    } else if (c === '|') {
+      flush();
+      if (s[i + 1] === '&') i++;
+    } else if (c === '&') {
+      if (s[i - 1] === '>' || s[i - 1] === '<' || s[i + 1] === '>') cur += c;
+      else flush();
+    } else if (c === ';' || c === '\n') {
+      flush();
     } else {
       cur += c;
     }
   }
-  segments.push(cur);
-  return segments.map(x => x.trim()).filter(Boolean);
+  flush();
+  return segments.map(x => x.trim()).filter(Boolean).concat(subs);
 }
 
-/** Whitespace-split a command segment, respecting quotes (quotes stripped). */
+/**
+ * Whitespace-split a command segment, respecting quotes (quotes stripped).
+ * Inside double quotes, \" and \ become literal " and \; backslashes elsewhere
+ * (e.g. Windows paths) are left untouched.
+ */
 function tokenize(segment) {
   const tokens = [];
   let cur = '';
   let has = false;
   let quote = null;
-  for (const c of String(segment || '')) {
+  const t = String(segment || '');
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
     if (quote) {
-      if (c === quote) quote = null;
+      if (quote === '"' && c === '\\' && (t[i + 1] === '"' || t[i + 1] === '\\')) {
+        cur += t[++i];
+      } else if (c === quote) quote = null;
       else cur += c;
     } else if (c === '"' || c === "'") {
       quote = c;
