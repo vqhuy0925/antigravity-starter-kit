@@ -106,3 +106,17 @@ test('commit behind an unknown prefix (timeout) is still checked', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   assert.strictEqual(run(dir, 'timeout 30 git commit -am x').decision, 'ask');
 });
+const addRepo = () => {
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'src/b.ts': '0' } });
+  write(dir, 'src/a.ts', '1'); write(dir, 'notes.txt', 'x'); write(dir, 'src/b.ts', '1');
+  return dir;
+};
+test('git add <planned file> && commit ignores unrelated dirty files', () =>
+  assert.strictEqual(run(addRepo(), 'git add src/a.ts && git commit -m "feat: a"').decision, 'allow'));
+test('git add <unplanned file> && commit asks', () =>
+  assert.strictEqual(run(addRepo(), 'git add src/b.ts && git commit -m "feat: a"').decision, 'ask'));
+for (const add of ['git add -A', 'git add --all', 'git add -u', 'git add .', 'git add :/'])
+  test(`${add} && commit checks the whole worktree`, () =>
+    assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'ask'));
+test('git add inside bash -c followed by commit is checked', () =>
+  assert.strictEqual(run(addRepo(), 'bash -c "git add src/b.ts" && git commit -m x').decision, 'ask'));

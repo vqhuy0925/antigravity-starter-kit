@@ -284,7 +284,7 @@ The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`.
 - **`plan-boundary`**:
   - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md` (looked up in the conversation artifact folder, then the working directory and up to 4 directories above it). **No plan found means it asks** before the commit proceeds.
   - Staged files are matched by repo-relative path against the plan's backticked paths; a trailing `/` covers a directory. Uncovered files make it ask.
-  - It also catches `git add` in the same chain, `commit -a`, commit pathspecs, and `git -C <dir>`.
+  - It also catches `git add` in the same chain, `commit -a`, commit pathspecs, and `git -C <dir>`. `git add <paths>` adds only those paths to the check; `git add -A`/`--all`/`-u`/`--update`/`.`/`:/` and `commit -a` bring in every changed and untracked file.
 - **`secret-scan`**: Blocks raw private keys, GitHub tokens (`ghp_`, `github_pat_`), AWS credentials, Slack keys, `sk-ant-`, `sk-proj-`, `sk-svcacct-` and `sk-admin-` keys plus legacy hyphen-free `sk-` keys, Google `AIza` keys, and literal `Bearer <token>` values in any case. `Bearer $ENV_VAR` is allowed, and so are ordinary names that contain `sk-` (such as `feature/sk-1234-login`).
 
 **Known limits:**

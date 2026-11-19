@@ -92,6 +92,28 @@ function parseCommitArgs(args) {
   return { stagesAll, pathspecs };
 }
 
+const ADD_VALUE_LONG = new Set(['--chmod', '--pathspec-from-file']);
+
+/** Parse `git add` args into { stagesAll, pathspecs }. -A/--all/-u/--update/./:/ mean the whole worktree. */
+function parseAddArgs(args) {
+  let stagesAll = false;
+  const pathspecs = [];
+  for (let i = 0; i < args.length; i++) {
+    const t = args[i];
+    if (t === '--') { pathspecs.push(...args.slice(i + 1)); break; }
+    if (t === '--all' || t === '--update' || t.startsWith('--pathspec-from-file')) { stagesAll = true; continue; }
+    if (ADD_VALUE_LONG.has(t)) { i++; continue; }
+    if (t.startsWith('--')) continue;
+    if (/^-[A-Za-z]+$/.test(t)) { if (/[Au]/.test(t)) stagesAll = true; continue; }
+    if (t.startsWith('-')) continue;
+    pathspecs.push(t);
+  }
+  for (const p of pathspecs) {
+    if (['.', './', ':/', ':', '*', ':/:'].includes(p.replace(/\\/g, '/'))) stagesAll = true;
+  }
+  return { stagesAll, pathspecs };
+}
+
 /** Directory selected by git -C options in a git token list, resolved against base. */
 function gitDir(tokens, base) {
   let dir = base;
@@ -121,13 +143,22 @@ function analyze(cmdLine, baseDir, depth = 0) {
     const inner = shellInner(tokens);
     if (inner !== null) {
       const r = analyze(inner, baseDir, depth + 1);
-      if (r.commit) { res.commit = true; if (usePaths) res.pathspecs.push(...r.pathspecs); res.dir = r.dir; }
+      if (r.commit) { res.commit = true; res.dir = r.dir; }
+      if (usePaths) res.pathspecs.push(...r.pathspecs);
       res.includeWorktree = res.includeWorktree || r.includeWorktree;
       continue;
     }
     const g = parseGit(tokens);
     if (!g) continue;
-    if (g[0] === 'add') res.includeWorktree = true;
+    if (g[0] === 'add') {
+      // Explicit paths come from exact tokens only; an add seen only in the quote-stripped
+      // pass of a line with an unclosed quote is treated as staging the whole worktree.
+      if (usePaths) {
+        const a = parseAddArgs(g[1]);
+        if (a.stagesAll) res.includeWorktree = true;
+        res.pathspecs.push(...a.pathspecs);
+      } else if (!balanced) res.includeWorktree = true;
+    }
     if (g[0] === 'commit') {
       res.commit = true;
       res.dir = gitDir(tokens, baseDir);
