@@ -97,3 +97,8 @@ test('git -C <dir> commit resolves the repo from <dir>', () => {
   const r = runHook('plan-boundary.js', cmd(`git -C ${path.basename(dir)} commit -m x`, path.dirname(dir)));
   assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
 });
+test('multi-word commit message words are not pathspecs', () => {
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'lib/x.ts': '0' } });
+  write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts'); write(dir, 'lib/x.ts', '1');
+  assert.strictEqual(run(dir, 'git commit -m "update lib stuff"').decision, 'allow');
+});

@@ -76,10 +76,11 @@ function parseCommitArgs(args) {
     if (VALUE_LONG.has(t)) { i++; continue; }
     if (t.startsWith('--')) continue;
     if (/^-[A-Za-z]+$/.test(t)) {
-      for (const ch of t.slice(1)) {
+      for (let k = 1; k < t.length; k++) {
+        const ch = t[k];
         if (ch === 'a') stagesAll = true;
         if (VALUE_LETTERS.has(ch)) {
-          if (ch === t[t.length - 1]) i++;
+          if (k === t.length - 1) i++;
           break;
         }
       }
@@ -106,17 +107,17 @@ function gitDir(tokens, base) {
 function analyze(cmdLine, baseDir, depth = 0) {
   const res = { commit: false, includeWorktree: false, pathspecs: [], dir: baseDir };
   if (depth > 3) return res;
-  const segments = new Set([
-    ...splitCommands(cmdLine),
-    ...splitCommands(cmdLine.replace(/["'`]/g, ' '))
-  ]);
+  const exact = new Set(splitCommands(cmdLine));
+  const segments = new Set([...exact, ...splitCommands(cmdLine.replace(/["'`]/g, ' '))]);
   for (const seg of segments) {
+    // The quote-stripped pass only detects commits; pathspecs come from exact tokenization.
+    const usePaths = exact.has(seg);
     const tokens = normalizeHead(tokenize(seg));
     if (!tokens.length) continue;
     const inner = shellInner(tokens);
     if (inner !== null) {
       const r = analyze(inner, baseDir, depth + 1);
-      if (r.commit) { res.commit = true; res.pathspecs.push(...r.pathspecs); res.dir = r.dir; }
+      if (r.commit) { res.commit = true; if (usePaths) res.pathspecs.push(...r.pathspecs); res.dir = r.dir; }
       res.includeWorktree = res.includeWorktree || r.includeWorktree;
       continue;
     }
@@ -128,7 +129,7 @@ function analyze(cmdLine, baseDir, depth = 0) {
       res.dir = gitDir(tokens, baseDir);
       const c = parseCommitArgs(g[1]);
       if (c.stagesAll) res.includeWorktree = true;
-      res.pathspecs.push(...c.pathspecs);
+      if (usePaths) res.pathspecs.push(...c.pathspecs);
     }
   }
   return res;
