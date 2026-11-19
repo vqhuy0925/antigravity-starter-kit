@@ -46,7 +46,7 @@ test('checks files staged by the same chain', () => {
 });
 test('detached HEAD falls back to implementation_plan.md', () => {
   const dir = makeRepo({ files: { 'implementation_plan.md': '- `src/a.ts`\n' } });
-  execFileSync('git', ['checkout', '--detach'], { cwd: dir });
+  execFileSync('git', ['checkout', '--detach'], { cwd: dir, stdio: 'pipe' });
   write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   assert.strictEqual(run(dir).decision, 'allow');
 });
@@ -80,7 +80,7 @@ test('commit -am includes unstaged tracked changes', () => {
   assert.strictEqual(run(dir, 'git commit -am x').decision, 'ask');
 });
 test('detached HEAD with no plan reports <detached>', () => {
-  const dir = makeRepo({ files: { 'docs/plans/.gitkeep': '' } }); execFileSync('git', ['checkout', '--detach'], { cwd: dir });
+  const dir = makeRepo({ files: { 'docs/plans/.gitkeep': '' } }); execFileSync('git', ['checkout', '--detach'], { cwd: dir, stdio: 'pipe' });
   write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   const r = run(dir); assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /<detached>/);
 });
