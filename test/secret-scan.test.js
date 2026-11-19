@@ -19,3 +19,13 @@ test('Allows normal safe command strings', () => {
   const res = runHook('secret-scan.js', cmd('npm test --silent'));
   assert.strictEqual(res.decision, 'allow');
 });
+
+const deny = s => assert.strictEqual(runHook('secret-scan.js', cmd(s)).decision, 'deny');
+const allow = s => assert.strictEqual(runHook('secret-scan.js', cmd(s)).decision, 'allow');
+test('blocks sk-ant- keys', () => deny(`export K=${'sk-ant-api03-' + 'a'.repeat(40)}`));
+test('blocks sk-proj- keys', () => deny(`curl -d key=${'sk-proj-' + 'B1_'.repeat(14)}`));
+test('blocks Google API keys', () => deny(`curl "https://x?key=${'AIza' + 'c'.repeat(35)}"`));
+test('blocks github_pat_ tokens', () => deny(`git clone https://${'github_pat_' + 'd'.repeat(82)}@github.com/o/r`));
+test('blocks literal Bearer tokens', () => deny(`curl -H "Authorization: Bearer ${'e'.repeat(40)}"`));
+test('allows bearer env var', () => allow('curl -H "Authorization: Bearer $GITHUB_TOKEN"'));
+test('allows long hyphenated branch names', () => allow('git checkout -b task-add-login-for-users-and-admins-xyz-0123456789'));

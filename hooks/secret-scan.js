@@ -1,28 +1,41 @@
 #!/usr/bin/env node
 'use strict';
 
-const { readInput, outputDecision } = require('./lib');
-
-const payload = readInput();
-if (!payload || !payload.toolCall || payload.toolCall.name !== 'run_command') {
-  outputDecision('allow');
-}
-
-const cmd = (payload.toolCall.args && payload.toolCall.args.CommandLine) || '';
+const { readInput, outputDecision, getCommand } = require('./lib');
 
 // Detect inline hardcoded secrets in commands (e.g. git commit -m "... token=ghp_..." or curl with hardcoded bearer)
 const SECRET_PATTERNS = [
-  /-----BEGIN\s+(RSA|OPENSSH|EC|PGP)?\s*PRIVATE\s+KEY-----/,
-  /\bgh[pousr]_[A-Za-z0-9_]{36,255}\b/,          // GitHub tokens
-  /\bAKIA[0-9A-Z]{16}\b/,                         // AWS Access Key ID
-  /\bsk-[a-zA-Z0-9]{32,}\b/,                      // OpenAI / Anthropic API keys
-  /\bxox[baprs]-[0-9A-Za-z]{10,48}\b/             // Slack tokens
+  { label: 'private key', re: /-----BEGIN\s+(RSA|OPENSSH|EC|PGP)?\s*PRIVATE\s+KEY-----/ },
+  { label: 'GitHub token', re: /\bgh[pousr]_[A-Za-z0-9_]{36,255}\b/ },
+  { label: 'GitHub PAT', re: /\bgithub_pat_[A-Za-z0-9_]{82}\b/ },
+  { label: 'AWS key', re: /\bAKIA[0-9A-Z]{16}\b/ },
+  { label: 'Anthropic/OpenAI key', re: /\bsk-[A-Za-z0-9_-]{32,}/ },   // sk-ant-, sk-proj-, legacy sk-
+  { label: 'Google API key', re: /\bAIza[0-9A-Za-z_-]{35}\b/ },
+  { label: 'Slack token', re: /\bxox[baprs]-[0-9A-Za-z]{10,48}\b/ },
+  { label: 'bearer token', re: /\bBearer\s+[A-Za-z0-9._~+\/-]{30,}=*/ }
 ];
 
-for (const pattern of SECRET_PATTERNS) {
-  if (pattern.test(cmd)) {
-    outputDecision('deny', '🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string.');
+/** Return the label of the first secret pattern found in cmd, or null. */
+function findSecret(cmd) {
+  const s = String(cmd || '');
+  for (const { label, re } of SECRET_PATTERNS) {
+    if (re.test(s)) return label;
   }
+  return null;
 }
 
-outputDecision('allow');
+if (require.main === module) {
+  const payload = readInput();
+  if (!payload || !payload.toolCall || payload.toolCall.name !== 'run_command') {
+    outputDecision('allow');
+  }
+
+  const label = findSecret(getCommand(payload));
+  if (label) {
+    outputDecision('deny', `🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string (${label}).`);
+  }
+
+  outputDecision('allow');
+}
+
+module.exports = { findSecret };
