@@ -45,7 +45,7 @@
   | Edit files, Tier 1 trivial change | Do it, report in chat |
   | Edit files, Tier 2 before plan approved | Stop: present the plan once for approval |
   | Edit files, Tier 2 after plan approved | Run end-to-end without stopping, except on a genuine blocker. Fix failing tests, type errors and lint yourself and keep going |
-  | `git commit` | Ask once per commit with diff summary + message (Tier 1 included). In a Tier 2 run, no commits mid-run: at the end, `commit-code` groups the changes and asks once per grouped commit. For a commit with no plan (Tier 1, or a detached HEAD), the scope hook's "No approved plan found" prompt is that commit's single ask: answer it, do not ask a second time |
+  | `git commit` | Ask once per commit with diff summary + message (Tier 1 included). In a Tier 2 run, no commits mid-run: at the end, `commit-code` groups the changes and asks once per grouped commit. For a commit with no plan (Tier 1, or a detached HEAD) in a repo that uses `docs/plans/`, the scope hook's "No approved plan found" prompt is that commit's single ask: answer it, do not ask a second time. In a repo without `docs/plans/` the hook does not prompt, so ask as above |
   | `git push`, deploy, any external tracker or API write (Jira, GitHub Issues, Linear, Trello, …) | Ask individually, every time, never bundled |
 
 - **Plan Approval (Tier 2)**: Present the plan once; after the user approves, the Tier 2 edit row applies.

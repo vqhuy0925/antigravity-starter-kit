@@ -14,7 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Installers: `hooks.json` gets absolute hook paths at install, so the hooks run from any workspace. The CLI and `install.ps1` fail loudly if hook linking fails or links nothing; the shell installers only warn when Node is missing.
 
 ### Changed
-- `plan-boundary` asks when no plan exists for the branch, instead of allowing the commit silently.
+- `plan-boundary` asks when no plan exists for the branch, instead of allowing the commit silently, in repos that opt in by having a `docs/plans/` directory at the repo root. Repos without it are not prompted, so a global install does not prompt on every commit machine-wide.
 - `rules/AGENTS.md` section 2 is now a single approval ladder; skills and templates point to `docs/plans/<branch>.md`.
 - Tests run with the built-in runner: `npm test` is `node --test`.
 - Shell installers honour an `AGY_KIT_REPO` environment override for the clone URL.
@@ -27,5 +27,5 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Migration
 - Re-run the installer to get absolute hook paths in `hooks.json`. Git submodule users run `node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js` once.
 - Move plans to `docs/plans/<branch>.md` (each `/` in the branch name becomes `-`).
-- Commits with no plan now prompt for approval instead of passing silently.
+- Commits with no plan now prompt for approval instead of passing silently, but only in repos that have a `docs/plans/` directory. Create `docs/plans/` (for example with a `.gitkeep`) to opt a repo in.
 - `--force-with-lease` is now allowed on feature branches; plain force push stays denied.

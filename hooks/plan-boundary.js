@@ -172,6 +172,10 @@ function analyze(cmdLine, baseDir, depth = 0) {
 
 const lines = s => (s || '').split(/\r?\n/).filter(Boolean);
 
+function isDir(p) {
+  try { return fs.statSync(p).isDirectory(); } catch (err) { return false; }
+}
+
 function main() {
   const payload = readInput();
   if (!payload || !payload.toolCall || payload.toolCall.name !== 'run_command') outputDecision('allow');
@@ -184,6 +188,8 @@ function main() {
     const branch = currentBranch(cwd);
     const planPath = findPlan({ repoRoot, branch, artifactDir: payload.artifactDirectoryPath, cwd });
     if (!planPath) {
+      // The no-plan prompt is opt-in per repo: only repos that keep a docs/plans/ directory get it.
+      if (!isDir(path.join(repoRoot, 'docs', 'plans'))) return outputDecision('allow');
       return outputDecision('ask', `No approved plan found (expected docs/plans/${branch ? planSlug(branch) : '<detached>'}.md). Proceed with this commit?`);
     }
     const stagedFiles = lines(git(['diff', '--cached', '--name-only'], cwd));

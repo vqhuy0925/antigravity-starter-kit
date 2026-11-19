@@ -11,9 +11,13 @@ const { runHook, cmd, makeRepo, write, stage } = require('./helpers');
 const run = (dir, c = 'git commit -m x', extra = {}) =>
   runHook('plan-boundary.js', { ...cmd(c, dir), ...extra });
 
-test('asks when no plan exists', () => {
-  const dir = makeRepo({ branch: 'feat/login' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+test('asks when no plan exists in a repo that uses docs/plans/', () => {
+  const dir = makeRepo({ branch: 'feat/login', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   const r = run(dir); assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
+});
+test('allows when the repo has no docs/plans directory', () => {
+  const dir = makeRepo({ branch: 'feat/login' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  assert.strictEqual(run(dir).decision, 'allow');
 });
 test('allows files listed by path in docs/plans/<slug>.md', () => {
   const dir = makeRepo({ branch: 'feat/login', files: { 'docs/plans/feat-login.md': '- `src/auth/login.ts`\n' } });
@@ -59,15 +63,15 @@ test('plan file itself never counts as scope creep', () => {
   assert.strictEqual(run(dir).decision, 'allow');
 });
 test('sudo-prefixed commit with no plan asks', () => {
-  const dir = makeRepo({ branch: 'feat/a' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   assert.strictEqual(run(dir, 'sudo git commit -m x').decision, 'ask');
 });
 test('commit inside bash -c with no plan asks', () => {
-  const dir = makeRepo({ branch: 'feat/a' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   assert.strictEqual(run(dir, 'bash -c "git commit -m x"').decision, 'ask');
 });
 test('git -C <dir> commit is detected', () => {
-  const dir = makeRepo({ branch: 'feat/a' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   assert.strictEqual(run(dir, 'git -C . commit -m x').decision, 'ask');
 });
 test('commit -am includes unstaged tracked changes', () => {
@@ -76,7 +80,7 @@ test('commit -am includes unstaged tracked changes', () => {
   assert.strictEqual(run(dir, 'git commit -am x').decision, 'ask');
 });
 test('detached HEAD with no plan reports <detached>', () => {
-  const dir = makeRepo(); execFileSync('git', ['checkout', '--detach'], { cwd: dir });
+  const dir = makeRepo({ files: { 'docs/plans/.gitkeep': '' } }); execFileSync('git', ['checkout', '--detach'], { cwd: dir });
   write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   const r = run(dir); assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /<detached>/);
 });
@@ -93,7 +97,7 @@ test('commit with a pathspec checks unstaged named paths', () => {
   assert.strictEqual(run(dir, 'git commit -m x -- src/unplanned.ts').decision, 'ask');
 });
 test('git -C <dir> commit resolves the repo from <dir>', () => {
-  const dir = makeRepo({ branch: 'feat/login' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
+  const dir = makeRepo({ branch: 'feat/login', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   const r = runHook('plan-boundary.js', cmd(`git -C ${path.basename(dir)} commit -m x`, path.dirname(dir)));
   assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
 });
