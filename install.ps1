@@ -26,6 +26,7 @@ function Install-Kit([string]$Dest, [string]$Label) {
     }
     if (Get-Command node -ErrorAction SilentlyContinue) {
         node (Join-Path $Dest "bin/link-hooks.js") "$Dest"
+        if ($LASTEXITCODE -ne 0) { throw "link-hooks failed" }
     } else {
         Write-Host "WARNING: Node.js was not found. The safety guardrail hooks stay inactive until Node.js (>= 18) is installed." -ForegroundColor Yellow
         Write-Host "  Then run: node `"$Dest/bin/link-hooks.js`" `"$Dest`""

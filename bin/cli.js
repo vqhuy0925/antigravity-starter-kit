@@ -53,6 +53,16 @@ function copyRecursiveSync(src, dest) {
   }
 }
 
+function linkOrExit(dir) {
+  try {
+    const { linked } = linkHooks(dir);
+    if (linked === 0) throw new Error('no hook commands were linked; guardrails are not wired');
+  } catch (err) {
+    console.error('❌ Failed to link hook paths:', err.message);
+    process.exit(1);
+  }
+}
+
 function install(isGlobal) {
   console.log(BANNER);
   const targetDir = isGlobal
@@ -75,7 +85,7 @@ function install(isGlobal) {
   if (hasLocalAssets && path.resolve(sourceRoot) !== path.resolve(targetDir)) {
     console.log('🔄 Copying plugin files directly from package...');
     copyRecursiveSync(sourceRoot, targetDir);
-    linkHooks(targetDir);
+    linkOrExit(targetDir);
     console.log('\n✅ Installation successful!');
   } else {
     // Clone via Git
@@ -85,22 +95,22 @@ function install(isGlobal) {
         // hooks.json was rewritten with absolute paths at install time; restore it so pull never conflicts
         execSync(`git -C "${targetDir}" checkout -- hooks.json`, { stdio: 'inherit' });
         execSync(`git -C "${targetDir}" pull`, { stdio: 'inherit' });
-        linkHooks(targetDir);
-        console.log('\n✅ Successfully updated to latest version!');
       } catch (err) {
         console.error('❌ Failed to update repository via git:', err.message);
         process.exit(1);
       }
+      linkOrExit(targetDir);
+      console.log('\n✅ Successfully updated to latest version!');
     } else {
       console.log('📥 Cloning repository from GitHub...');
       try {
         execSync(`git clone --depth=1 "${REPO_URL}" "${targetDir}"`, { stdio: 'inherit' });
-        linkHooks(targetDir);
-        console.log('\n✅ Installation complete!');
       } catch (err) {
         console.error('❌ Failed to clone repository:', err.message);
         process.exit(1);
       }
+      linkOrExit(targetDir);
+      console.log('\n✅ Installation complete!');
     }
   }
 
