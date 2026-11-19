@@ -320,24 +320,6 @@ This runs Node's built-in test runner (`node --test`). Summary:
 ℹ todo 0
 ```
 
---- [1] Testing git-guardrail.js ---
-  ✅ PASS: Blocks git push --force
-  ✅ PASS: Blocks git push -f
-  ✅ PASS: Blocks direct push to origin main
-  ✅ PASS: Prompts on git reset --hard
-  ✅ PASS: Blocks catastrophic root deletion rm -rf /
-  ✅ PASS: Allows safe git commands like git status or git add
-
---- [2] Testing secret-scan.js ---
-  ✅ PASS: Blocks GitHub personal access token (ghp_)
-  ✅ PASS: Blocks raw RSA Private Key
-  ✅ PASS: Allows normal safe command strings
-
-========================================
-Test Results: 9/9 passed (100%)
-========================================
-```
-
 ---
 
 ## 🛠️ Customization & Extensions
