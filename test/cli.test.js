@@ -40,3 +40,30 @@ test('--verify does not warn when every hook path exists', () => {
   assert.doesNotMatch(res.stderr, /does not exist/);
   assert.strictEqual(res.status, 0);
 });
+
+test('--global copy skips .git and other local-only folders, then links hooks', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'kit-home-'));
+  const target = path.join(home, '.gemini', 'config', 'plugins', 'antigravity-starter-kit');
+  // An earlier git-clone install leaves read-only git objects behind; copying over them must not be attempted.
+  fs.mkdirSync(path.join(target, '.git'), { recursive: true });
+  const res = spawnSync(process.execPath, [path.join(ROOT, 'bin', 'cli.js'), '--global'],
+    { encoding: 'utf8', env: { ...process.env, HOME: home, USERPROFILE: home } });
+  assert.strictEqual(res.status, 0, res.stderr);
+  assert.deepStrictEqual(fs.readdirSync(path.join(target, '.git')), []);
+  for (const d of ['node_modules', '.superpowers', '.agents', '.worktrees']) assert.ok(!fs.existsSync(path.join(target, d)), d);
+  const cmds = JSON.parse(fs.readFileSync(path.join(target, 'hooks.json'), 'utf8'))['antigravity-guardrails'].PreToolUse[0].hooks.map(h => h.command);
+  assert.ok(cmds.every(c => c.includes(target.replace(/\\/g, '/'))), cmds.join('\n'));
+});
+
+test('--verify flags a node executable that no longer exists', () => {
+  const dir = kitCopy();
+  require('../bin/link-hooks').linkHooks(dir);
+  const file = path.join(dir, 'hooks.json');
+  const json = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const h = json['antigravity-guardrails'].PreToolUse[0].hooks[0];
+  h.command = h.command.replace(/^"[^"]+"/, '"/no/such/node"');
+  fs.writeFileSync(file, JSON.stringify(json, null, 2));
+  const res = verify(dir);
+  assert.match(res.stderr, /\/no\/such\/node/);
+  assert.strictEqual(res.status, 1);
+});

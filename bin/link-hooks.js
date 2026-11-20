@@ -4,7 +4,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const HOOK_CMD = /^node\s+"?(?:.*[\\/])?hooks[\\/]([\w.-]+\.js)"?$/;
+// `node hooks/x.js`, `node "<dir>/hooks/x.js"`, or an already-linked `"<node path>" "<dir>/hooks/x.js"`.
+const HOOK_CMD = /^(?:node|"[^"]*node(?:\.exe)?")\s+"?(?:.*[\\/])?hooks[\\/]([\w.-]+\.js)"?$/i;
+// The Node that runs the installer, by absolute path: hook runners may not have `node` on PATH.
+const NODE = process.execPath.replace(/\\/g, '/');
 
 function rewrite(node, base, counter) {
   if (Array.isArray(node)) {
@@ -13,7 +16,7 @@ function rewrite(node, base, counter) {
     if (typeof node.command === 'string') {
       const m = HOOK_CMD.exec(node.command);
       if (m) {
-        const next = `node "${base}/hooks/${m[1]}"`;
+        const next = `"${NODE}" "${base}/hooks/${m[1]}"`;
         if (next !== node.command) {
           node.command = next;
           counter.changed++;

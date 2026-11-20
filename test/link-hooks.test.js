@@ -32,7 +32,7 @@ test('rewrites relative hook commands to absolute paths', () => {
   linkHooks(dir);
   const abs = dir.replace(/\\/g, '/');
   assert.deepStrictEqual(commands(dir), ['git-guardrail.js', 'secret-scan.js', 'plan-boundary.js']
-    .map(f => `node "${abs}/hooks/${f}"`));
+    .map(f => `"${process.execPath.replace(/\\/g, '/')}" "${abs}/hooks/${f}"`));
 });
 
 test('is idempotent', () => {
@@ -80,4 +80,15 @@ test('linked is 0 when hooks.json has no matching commands, and CLI exits 1', ()
   const res = spawnSync(process.execPath, [path.join(ROOT, 'bin', 'link-hooks.js'), dir], { encoding: 'utf8' });
   assert.strictEqual(res.status, 1);
   assert.match(res.stderr, /not wired/);
+});
+
+test('relinks commands already pointing at a node executable path', () => {
+  const dir = freshKit(false);
+  const file = path.join(dir, 'hooks.json');
+  const json = JSON.parse(fs.readFileSync(file, 'utf8'));
+  json['antigravity-guardrails'].PreToolUse[0].hooks[0].command = '"C:/old/nodejs/node.exe" "C:/old/kit/hooks/git-guardrail.js"';
+  fs.writeFileSync(file, JSON.stringify(json, null, 2));
+  assert.strictEqual(linkHooks(dir).linked, 3);
+  assert.ok(commands(dir)[0].endsWith(`${dir.replace(/\\/g, '/')}/hooks/git-guardrail.js"`));
+  assert.ok(!commands(dir)[0].includes('C:/old/'));
 });

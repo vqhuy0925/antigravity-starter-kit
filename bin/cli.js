@@ -37,7 +37,12 @@ Examples:
 `);
 }
 
-function copyRecursiveSync(src, dest) {
+/** Top-level folders of a working copy that are never part of an install:
+ *  git metadata (read-only objects make overwriting fail with EPERM), dependencies,
+ *  scratch workspaces, and local installs (copying .agents into itself would never end). */
+const COPY_SKIP = new Set(['.git', 'node_modules', '.superpowers', '.agents', '.worktrees']);
+
+function copyRecursiveSync(src, dest, top = true) {
   const exists = fs.existsSync(src);
   const stats = exists && fs.statSync(src);
   const isDirectory = exists && stats.isDirectory();
@@ -46,7 +51,8 @@ function copyRecursiveSync(src, dest) {
       fs.mkdirSync(dest, { recursive: true });
     }
     fs.readdirSync(src).forEach((childItemName) => {
-      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+      if (top && COPY_SKIP.has(childItemName)) return;
+      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName), false);
     });
   } else {
     fs.copyFileSync(src, dest);
@@ -131,9 +137,11 @@ function missingHookPaths(root) {
     if (Array.isArray(node)) return node.forEach(walk);
     if (!node || typeof node !== 'object') return;
     if (typeof node.command === 'string') {
-      const m = /^node\s+(?:"([^"]+)"|(\S+))\s*$/.exec(node.command.trim());
+      // `node <file>` or `"<abs node path>" "<file>"` (as written by link-hooks).
+      const m = /^(?:node|"([^"]*node(?:\.exe)?)")\s+(?:"([^"]+)"|(\S+))\s*$/i.exec(node.command.trim());
       if (m) {
-        const file = m[1] || m[2];
+        if (m[1] && !fs.existsSync(m[1])) missing.push(m[1]);
+        const file = m[2] || m[3];
         if (!fs.existsSync(path.resolve(root, file))) missing.push(file);
       }
     }
