@@ -20,7 +20,7 @@ function kitFiles() {
 }
 
 const LEAKED = [/3-Layer/i, /penalty/i, /calendar matrix/i, /5-Context/, /510/, /Telesale/i,
-  /attendance/i, /DEFAULT '1\.0'/, /công/];
+  /attendance/i, /DEFAULT '1\.0'/, /công/, /\b(3|three) layers\b/i];
 test('no leaked product-domain vocabulary', () => {
   for (const f of kitFiles().filter(f => !f.startsWith('skills/color-system-design/')))
     for (const re of LEAKED) assert.ok(!re.test(read(f)), `${f} matches ${re}`);
@@ -65,6 +65,11 @@ test('fix-bug writes the failing test first only at a correct seam', () => {
   assert.match(f, /correct seam/);
   assert.match(f, /diagnosing-bugs/);
   assert.match(f, /no correct seam/i);
+  assert.match(f.split(/\r?\n/).find(l => /Permanent Institutional Memory/.test(l)), /seam/);
+});
+test('code-reviewer empty-catch rule applies to all changes, not only frontend', () => {
+  const c = read('agents/code-reviewer.md');
+  assert.ok(c.indexOf('empty catch') !== -1 && c.indexOf('empty catch') < c.indexOf('Frontend & Mobile Ergonomics'));
 });
 test('no dangling skill references; slice order stated in implement', () => {
   assert.doesNotMatch(read('skills/tdd/SKILL.md'), /`code-review`/);

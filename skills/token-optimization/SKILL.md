@@ -13,7 +13,7 @@ description: Enforce strict token conservation rules, context budgeting, lean fi
 ## 2. Command Execution & Output Suppression
 - **Build with Silent/Quiet Flags**:
   - Run the project's build and test commands (from `docs/project_profile.md`; see `rules/AGENTS.md` if there is no profile) with the tool's quiet flag, such as `-q` or `--silent`, to suppress noisy standard output.
-  - Otherwise pipe output through a filter that keeps only error messages.
+  - If the tool has no quiet flag, pipe output through a filter that keeps only error messages.
 - **Limit Output Buffering**: Avoid running commands that dump large outputs directly into the context window.
 
 ## 3. Subagent Lifecycle & Delegation

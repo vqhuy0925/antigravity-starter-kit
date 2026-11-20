@@ -15,8 +15,6 @@ This skill has two halves. **Part A** decides what the page says and how it is s
 
 Apply to all web UI work: landing pages, marketing sites, components, dashboards, prototypes, and design reviews. When a rule here conflicts with a framework default, this file wins. When the user's explicit prompt conflicts with a rule, the user wins.
 
-Cross-device and touch rules: `responsive-frontend-expert`.
-
 **Companion skills:**
 - **Color System & Tokens:** Defer all color weight (60-30-10 rule), semantic tokens (`color-primary`, `color-accent`), and WCAG 2.1 contrast ratios to [`color-system-design`](../color-system-design/SKILL.md).
 - **Responsive & Touch Ergonomics:** Defer viewport rules (`100dvh`), 3-zone mobile dialogs, iOS safe-area insets, and $44 \times 44\text{px}$ touch targets to [`responsive-frontend-expert`](../responsive-frontend-expert/SKILL.md).

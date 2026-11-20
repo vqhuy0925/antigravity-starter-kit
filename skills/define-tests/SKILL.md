@@ -57,7 +57,7 @@ Systematically cover the following dimensions:
 2. **Boundary Values (BVA):** Minimum boundaries (0.00 subtotal), the cap boundary (150.00 subtotal), and interval transitions (just below and above a threshold).
 3. **Negative & Validation Scenarios:** Invalid input (expired coupon, negative quantity), missing required links, duplicate requests.
 4. **State Fallback & Persistence Traps:** Ensure DB defaults (e.g., `DEFAULT 0`) do not overwrite calculated values; idempotency on request re-approval or cancellation.
-5. **UI / Mobile Ergonomics:** Paging, touch responsiveness, 3-zone dialog layouts, and safe-area insets.
+5. **UI / Mobile Ergonomics:** If the change touches a UI layer: paging, touch responsiveness, 3-zone dialog layouts, and safe-area insets.
 
 ---
 
