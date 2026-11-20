@@ -109,3 +109,19 @@ for (const c of [
   'sudo -u git git push origin main', 'sudo -u git -g git git push -f origin x', 'env -u git git push origin main',
   'sudo --user=git git push origin main', 'xargs -n 1 git push -f'
 ]) test(`denies wrapper-with-value ${c}`, () => assert.strictEqual(d(c), 'deny'));
+
+// --- Live check: workspace is a parent folder; the command cd's into the repo ---
+test('cd <repo on main> ; bare git push from a non-repo parent is denied', () => {
+  const repo = makeRepo({ branch: 'main' });
+  const parent = require('path').dirname(repo);
+  assert.strictEqual(d(`cd "${repo}"; git push`, parent), 'deny');
+  assert.strictEqual(d(`cd ${require('path').basename(repo)} && git push origin HEAD`, parent), 'deny');
+});
+test('git -C <repo on main> push from a non-repo parent is denied', () => {
+  const repo = makeRepo({ branch: 'main' });
+  assert.strictEqual(d(`git -C "${repo}" push`, require('path').dirname(repo)), 'deny');
+});
+test('cd <repo on feature> ; bare git push is allowed', () => {
+  const repo = makeRepo({ branch: 'feat/x' });
+  assert.strictEqual(d(`cd "${repo}"; git push`, require('path').dirname(repo)), 'allow');
+});

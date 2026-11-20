@@ -1,6 +1,8 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const { execFileSync } = require('child_process');
 
 /**
@@ -294,7 +296,56 @@ function parseGit(tokens) {
   return [tokens[i], tokens.slice(i + 1)];
 }
 
+/** Directory selected by `git -C <dir>` options in a git token list, resolved against base. */
+function gitDir(tokens, base) {
+  let dir = base;
+  for (let i = 1; i < tokens.length; i++) {
+    if (tokens[i] === '-C' && i + 1 < tokens.length) { dir = path.resolve(dir, tokens[i + 1]); i++; }
+    else if (tokens[i] === '-c' || tokens[i] === '--git-dir' || tokens[i] === '--work-tree' || tokens[i] === '--namespace') i++;
+    else if (!tokens[i].startsWith('-')) break;
+  }
+  return dir;
+}
+
+const CD_COMMANDS = new Set(['cd', 'chdir', 'pushd', 'set-location', 'sl', 'push-location']);
+
+/**
+ * Where a cd-style segment moves to from dir: null when the segment is not a cd,
+ * undefined when the target cannot be known here ($VAR, `cd -`, a relative path after
+ * an earlier unknown cd). dir may itself be undefined.
+ */
+function cdTarget(tokens, dir) {
+  if (!tokens.length || !CD_COMMANDS.has(tokens[0].toLowerCase())) return null;
+  // Skip flags: -Path / -LiteralPath (PowerShell), -L / -P (sh), /d (cmd).
+  const args = tokens.slice(1).filter(t => !/^(-path|-literalpath|-[LPe@]+|\/d)$/i.test(t));
+  const t = args[0];
+  if (t === undefined || t === '~') return os.homedir();
+  if (t === '-' || /[$`%]/.test(t)) return undefined;
+  if (/^~[\\/]/.test(t)) return path.join(os.homedir(), t.slice(2));
+  if (path.isAbsolute(t)) return path.resolve(t);
+  return dir === undefined ? undefined : path.resolve(dir, t);
+}
+
+/**
+ * The exact segments of a command line in order, each with the directory it runs in,
+ * following literal cd / Set-Location / pushd. dir is undefined after an unknowable cd.
+ */
+function segmentsWithDirs(cmd, base) {
+  let dir = base;
+  const out = [];
+  for (const seg of splitCommands(cmd)) {
+    out.push({ seg, dir });
+    const next = cdTarget(normalizeHead(tokenize(seg)), dir);
+    if (next !== null) dir = next;
+  }
+  return out;
+}
+
 module.exports = {
+  gitDir,
+  cdTarget,
+  segmentsWithDirs,
+  CD_COMMANDS,
   normalizeHead,
   fallbackTokens,
   quotesBalanced,

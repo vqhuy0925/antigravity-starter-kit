@@ -131,3 +131,27 @@ for (const add of [
   'git add $FILES', 'git add "$FILES"', 'cd src && git add b.ts'
 ]) test(`${add} && commit checks the whole worktree`, () =>
   assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'ask'));
+
+// --- Live check: workspace is a parent folder; the command cd's into the repo ---
+test('cd <repo> ; commit from a non-repo parent asks when the repo has no plan', () => {
+  const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
+  write(repo, 'x.txt', '1');
+  const parent = path.dirname(repo);
+  assert.strictEqual(run(parent, `cd "${repo}"; git add x.txt; git commit -m x`).decision, 'ask');
+  assert.strictEqual(run(parent, `cd ${path.basename(repo)} && git add x.txt && git commit -m x`).decision, 'ask');
+});
+test('cd <repo> ; add planned file ; commit from a parent is allowed', () => {
+  const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `x.txt`\n' } });
+  write(repo, 'x.txt', '1'); write(repo, 'other.txt', '1');
+  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add x.txt; git commit -m x`).decision, 'allow');
+});
+test('cd <repo> ; add unplanned file ; commit from a parent asks', () => {
+  const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `x.txt`\n' } });
+  write(repo, 'other.txt', '1');
+  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add other.txt; git commit -m x`).decision, 'ask');
+});
+test('Set-Location -Path <repo> is followed', () => {
+  const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
+  write(repo, 'x.txt', '1');
+  assert.strictEqual(run(path.dirname(repo), `Set-Location -Path "${repo}"; git add x.txt; git commit -m x`).decision, 'ask');
+});

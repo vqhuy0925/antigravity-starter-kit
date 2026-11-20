@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced, DELETES } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced, DELETES, gitDir, segmentsWithDirs } = require('./lib');
 
 const PROTECTED = ['main', 'master'];
 const SEVERITY = { allow: 0, ask: 1, deny: 2 };
@@ -115,13 +115,26 @@ function checkSegment(rawTokens, branch, fallback = true) {
  * The prefix fallback runs on exact segments, and on quote-stripped ones only when
  * the line has an unclosed quote (so `grep "git push origin main"` stays allowed).
  */
-function evaluate(cmd, branch) {
-  const exact = new Set(splitCommands(cmd));
+function evaluate(cmd, baseDir) {
+  // Branch is only needed for bare/HEAD pushes; resolve once per directory, lazily.
+  const branches = new Map();
+  const branchIn = dir => {
+    if (!/\bpush\b/.test(cmd) || dir === undefined) return null;
+    if (!branches.has(dir)) branches.set(dir, currentBranch(dir));
+    return branches.get(dir);
+  };
+  // Each exact segment runs in the directory left by earlier literal cd's (and its own git -C).
+  const dirOf = new Map(segmentsWithDirs(cmd, baseDir).map(({ seg, dir }) => [seg, dir]));
+  const exact = new Set(dirOf.keys());
   const strippedFallback = !quotesBalanced(cmd);
   const segments = new Set([...exact, ...splitCommands(cmd.replace(/["'`]/g, ' '))]);
   let worst = { decision: 'allow' };
   for (const seg of segments) {
-    const r = checkSegment(tokenize(seg), branch, exact.has(seg) || strippedFallback);
+    let dir = exact.has(seg) ? dirOf.get(seg) : baseDir;
+    const tokens = normalizeHead(tokenize(seg));
+    const g = fallbackTokens(tokens) || tokens;
+    if (dir !== undefined && g[0] === 'git') dir = gitDir(g, dir);
+    const r = checkSegment(tokenize(seg), branchIn(dir), exact.has(seg) || strippedFallback);
     if (r && SEVERITY[r.decision] > SEVERITY[worst.decision]) worst = r;
   }
   return worst;
@@ -133,9 +146,7 @@ if (require.main === module) {
     outputDecision('allow');
   }
   const cmd = getCommand(payload);
-  // Branch is only needed for bare/HEAD pushes; resolve lazily-ish but once.
-  const branch = /\bpush\b/.test(cmd) ? currentBranch(getCwd(payload)) : null;
-  const res = evaluate(cmd, branch);
+  const res = evaluate(cmd, getCwd(payload));
   outputDecision(res.decision, res.reason);
 }
 

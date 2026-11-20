@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { readInput, outputDecision, getCommand, getCwd, git, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced } = require('./lib');
+const { readInput, outputDecision, getCommand, getCwd, git, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced, gitDir, segmentsWithDirs } = require('./lib');
 
 const IGNORED_BASENAMES = new Set([
   'implementation_plan.md', 'task.md', 'walkthrough.md', 'test_cases.md',
@@ -114,31 +114,28 @@ function parseAddArgs(args) {
   return { stagesAll, pathspecs };
 }
 
-/** Directory selected by git -C options in a git token list, resolved against base. */
-function gitDir(tokens, base) {
-  let dir = base;
-  for (let i = 1; i < tokens.length; i++) {
-    if (tokens[i] === '-C' && i + 1 < tokens.length) { dir = path.resolve(dir, tokens[i + 1]); i++; }
-    else if (tokens[i] === '-c' || tokens[i] === '--git-dir' || tokens[i] === '--work-tree' || tokens[i] === '--namespace') i++;
-    else if (!tokens[i].startsWith('-')) break;
-  }
-  return dir;
-}
-
-const CD_COMMANDS = new Set(['cd', 'pushd', 'chdir', 'set-location', 'sl', 'push-location']);
 /** True for a path argument computed at run time ($VAR, $(...), backticks) rather than written out. */
 const nonLiteral = t => /[$`]/.test(t);
 
-/** Scan a command line; returns { commit, includeWorktree, pathspecs, dir }. */
+/**
+ * Scan a command line; returns { commit, includeWorktree, pathspecs, dir }.
+ * dir is the repo directory the commit runs in, following literal cd / Set-Location /
+ * pushd earlier in the chain and git -C, so a workspace that is a parent folder of the
+ * repo (Antigravity's Cwd) still resolves the right repo.
+ */
 function analyze(cmdLine, baseDir, depth = 0) {
   const res = { commit: false, includeWorktree: false, pathspecs: [], dir: baseDir };
   if (depth > 3) return res;
-  const exact = new Set(splitCommands(cmdLine));
+  const dirOf = new Map(segmentsWithDirs(cmdLine, baseDir).map(({ seg, dir }) => [seg, dir]));
+  const exact = new Set(dirOf.keys());
   const balanced = quotesBalanced(cmdLine);
   const segments = new Set([...exact, ...splitCommands(cmdLine.replace(/["'`]/g, ' '))]);
+  const addDirs = [];
   for (const seg of segments) {
     // The quote-stripped pass only detects commits; pathspecs come from exact tokenization.
     const usePaths = exact.has(seg);
+    // undefined after a cd whose target cannot be known here ($VAR, cd -).
+    const segDir = usePaths ? dirOf.get(seg) : baseDir;
     let tokens = normalizeHead(tokenize(seg));
     if (!tokens.length) continue;
     // Unknown prefix (timeout, nice, doas, ...): evaluate from the first git/shell/eval token.
@@ -146,16 +143,15 @@ function analyze(cmdLine, baseDir, depth = 0) {
     if (usePaths || !balanced) tokens = fallbackTokens(tokens) || tokens;
     const inner = shellInner(tokens);
     if (inner !== null) {
-      const r = analyze(inner, baseDir, depth + 1);
+      const r = analyze(inner, segDir === undefined ? baseDir : segDir, depth + 1);
       if (r.commit) { res.commit = true; res.dir = r.dir; }
-      if (usePaths) res.pathspecs.push(...r.pathspecs);
+      if (usePaths) { res.pathspecs.push(...r.pathspecs); if (r.pathspecs.length) addDirs.push(r.dir); }
       res.includeWorktree = res.includeWorktree || r.includeWorktree;
       continue;
     }
-    // A directory change makes later relative pathspecs unresolvable here.
-    if (usePaths && CD_COMMANDS.has(tokens[0].toLowerCase())) res.changesDir = true;
     const g = parseGit(tokens);
     if (!g) continue;
+    const dir = segDir === undefined ? undefined : gitDir(tokens, segDir);
     if (g[0] === 'add') {
       // Explicit paths come from exact tokens only; an add seen only in the quote-stripped
       // pass of a line with an unclosed quote is treated as staging the whole worktree.
@@ -165,17 +161,20 @@ function analyze(cmdLine, baseDir, depth = 0) {
         // staged set is unknown here, so check the whole worktree.
         if (a.stagesAll || !a.pathspecs.length || g[1].some(nonLiteral)) res.includeWorktree = true;
         res.pathspecs.push(...a.pathspecs);
+        addDirs.push(dir);
       } else if (!balanced) res.includeWorktree = true;
     }
     if (g[0] === 'commit') {
       res.commit = true;
-      res.dir = gitDir(tokens, baseDir);
+      res.dir = dir === undefined ? baseDir : dir;
       const c = parseCommitArgs(g[1]);
       if (c.stagesAll || (usePaths && c.pathspecs.some(nonLiteral))) res.includeWorktree = true;
-      if (usePaths) res.pathspecs.push(...c.pathspecs);
+      if (usePaths) { res.pathspecs.push(...c.pathspecs); if (c.pathspecs.length) addDirs.push(dir); }
     }
   }
-  if (res.changesDir && res.pathspecs.length) res.includeWorktree = true;
+  // Paths added from another (or an unknown) directory than the commit's cannot be
+  // resolved against the commit's directory: check the whole worktree instead.
+  if (addDirs.some(d => d === undefined || path.resolve(d) !== path.resolve(res.dir))) res.includeWorktree = true;
   return res;
 }
 
