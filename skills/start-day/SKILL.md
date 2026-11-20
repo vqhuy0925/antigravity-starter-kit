@@ -31,7 +31,7 @@ If not resuming (or if the user passed an intent like `/start-day fix ...` or `/
 
 | Intent | Skill Chain |
 |---|---|
-| **Brainstorm / Vague Idea** | `grill-me` → `to-spec` → (`wayfinder` if multi-session) |
+| **Brainstorm / Vague Idea** | `grilling` → `to-spec` → (`wayfinder` if multi-session) |
 | **Raw Ticket / Story Refinement** | `story-review` → `ai-native-sdlc` |
 | **New Feature (Full SDLC)** | `ai-native-sdlc`: `intent.md` → `spec.md` (+ `spec-critic`) → `define-tests` → `plan` → `implement` (`tdd`) |
 | **Bug / Broken / Slow** | `diagnosing-bugs` → `fix-bug` (Red-Before-Green) |

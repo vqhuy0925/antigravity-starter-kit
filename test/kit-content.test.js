@@ -81,3 +81,9 @@ test('no dangling skill references; slice order stated in implement', () => {
   assert.doesNotMatch(w, /CLAUDE\.md/);
   assert.match(w, /GEMINI\.md/);
 });
+
+test('removed grilling aliases are not referenced', () => {
+  for (const f of kitFiles()) assert.doesNotMatch(read(f), /grill-me|grill-with-docs/, f);
+  assert.match(read('skills/grilling/SKILL.md'), /^## With docs/m);
+  assert.match(read('skills/grilling/SKILL.md'), /skills\/domain-modeling\/SKILL\.md/);
+});

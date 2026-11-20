@@ -152,9 +152,7 @@ antigravity-starter-kit/
 │   ├── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
 │   ├── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
 │   │   # --- 5 Core Engineering & Productivity Pillars ---
-│   ├── grill-me/                        # Adversarial interview stress-testing plans & decisions
 │   ├── grilling/                        # Recursive design tree & frontier round interview engine
-│   ├── grill-with-docs/                 # Grilling coupled with live GLOSSARY.md & ADR generation
 │   ├── domain-modeling/                 # Active domain modeling, term sharpening & ADR maintenance
 │   ├── wait-what/                       # Plain-English translation using canonical domain vocabulary
 │   ├── tdd/                             # Red-green-refactor loop verifying through public interface seams
@@ -270,8 +268,6 @@ Copy `templates/project_profile_template.md` to `docs/project_profile.md` in you
 | `smart-researcher` | Codebase investigation | Researches in isolated subagents without polluting main chat |
 | `/seo` | SEO & GEO Audit Suite | Live technical audits, Schema JSON-LD, E-E-A-T & llms.txt generation |
 | `landing-page-design` | Landing Page Strategy | Conversion copywriting, responsive visual design & intake questions |
-| `/grill-me` | Adversarial Interview | Relentlessly stress-tests assumptions & designs via frontier question rounds |
-| `grill-with-docs` | Alignment & Live Docs | Grills design while updating ADRs and domain `GLOSSARY.md` in real-time |
 | `domain-modeling` | Ubiquitous Language | Actively challenges fuzzy terms and detects contradictions with code |
 | `/wait-what` | Plain-English Re-pitch | Translates complex agent explanations into canonical domain language |
 | `/tdd` | Test-Driven Development | Red-Green-Refactor loop testing public seams with vertical tracer bullets |
