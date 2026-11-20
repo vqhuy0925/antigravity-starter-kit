@@ -30,6 +30,11 @@ test('Cross-Layer Rule is defined once, in AGENTS.md, with the spec wording', ()
   assert.match(read('rules/AGENTS.md'), /assert at every layer the change touches; for a typical web app that is data, API, and UI/);
   assert.match(read('rules/AGENTS.md'), /docs\/project_profile\.md/);
 });
+test('Cross-Layer Rule defining sentence appears only in AGENTS.md', () => {
+  const re = /assert(s)? at every layer the change touches/i;
+  for (const f of kitFiles())
+    assert.strictEqual(re.test(read(f)), f === 'rules/AGENTS.md', `${f} ${f === 'rules/AGENTS.md' ? 'must define' : 'must not restate'} the rule`);
+});
 test('test_cases template takes layers from the project profile', () => {
   const t = read('templates/test_cases_template.md');
   assert.match(t, /project_profile\.md/);

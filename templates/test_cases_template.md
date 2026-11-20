@@ -18,7 +18,7 @@
 
 ## 2. Cross-Layer Verification Expectations (Cross-Layer Rule)
 > [!IMPORTANT]
-> A feature is NOT done just because an entity attribute or in-memory service calculation passes. Assert at every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md`. The layer list comes from `docs/project_profile.md` (`## Layers`). Web-app default, as an example:
+> A feature is NOT done just because an entity attribute or in-memory service calculation passes. Verify every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md`. The layer list comes from `docs/project_profile.md` (`## Layers`). Web-app default, as an example:
 1. **Data / Entity Layer:** Database row values, foreign keys, timestamps, default columns (preventing DB default value traps).
 2. **API / Service Layer:** Response DTOs, calculated values, audit comments, HTTP status codes.
 3. **UI / Presentation Layer:** Rendered values, table cells, badges, action dialogs.

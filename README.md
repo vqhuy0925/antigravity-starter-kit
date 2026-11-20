@@ -93,10 +93,7 @@ Developers writing their own test cases suffer from **confirmation bias**—they
 
 Antigravity Starter Kit introduces an **Independent QA Subagent Pattern**:
 1. **Isolated Execution:** QA runs as a dedicated subagent (`invoke_subagent` with `Role: 'QA Engineer'` executing `define-tests`) with a clean context, evaluating purely `intent.md` / `spec.md` or the ticket report without seeing dev implementation hacks.
-2. **The Cross-Layer Rule (opt-in via `docs/project_profile.md`):** QA asserts at every layer the change touches. For a typical web app:
-   - **Data / Entity Layer:** Database row values, foreign keys, and default columns.
-   - **API / Service Layer:** Response DTOs, calculated values (e.g. a coupon discount), and audit comments.
-   - **UI / Presentation Layer:** Rendered values, table cells, and badges.
+2. **The Cross-Layer Rule:** defined once in `rules/AGENTS.md`; the layers a project has are listed in its `docs/project_profile.md` (`## Layers`). Test cases assert at each of them, which catches values a database default silently overwrites.
 3. **Dual Verification Gate:**
    - **Dev (`implement`):** Guides code and automated test construction to satisfy every `TC-xx` scenario in `test_cases.md`.
    - **Reviewer (`review-code`):** Strictly audits test results against `test_cases.md` before approval.

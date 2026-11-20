@@ -17,10 +17,7 @@ Developers inherently suffer from confirmation bias—writing tests that validat
 - **Clean Requirements Source:** QA evaluates requirements strictly from `intent.md`, `spec.md`, user problem statements, or bug reports. QA does NOT consult dev implementation plans, in-progress code, or temporary mock shortcuts.
 
 ### Principle 2: Cross-Layer Verification
-A bug often lives in the disconnect between layers. Never define test cases that only assert internal entity state. Apply the Cross-Layer Rule in `rules/AGENTS.md`, using the layers listed in `docs/project_profile.md` (`## Layers`). Typical examples:
-1. **Data Layer (Entity / DB):** State transitions, persisted values, timestamps, and default column behavior (e.g., a `discount_total DEFAULT 0` overwriting a computed `15.00`).
-2. **Service / API Layer (DTOs):** Calculated attributes, response status codes, and audit logs.
-3. **Presentation / UI Layer:** Displayed values (e.g., `"15.00"` vs a default `"0.00"`), badges, and error alerts.
+A bug often lives in the disconnect between layers. Never define test cases that only assert internal entity state. Apply the Cross-Layer Rule in `rules/AGENTS.md`, using the layers listed in `docs/project_profile.md` (`## Layers`). Illustration: a `discount_total DEFAULT 0` column overwriting a computed `15.00` is only caught by checking the stored value, the API response, and the rendered value.
 
 ---
 
