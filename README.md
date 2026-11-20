@@ -122,7 +122,7 @@ antigravity-starter-kit/
 │   ├── code-reviewer.md                 # Independent diff, DTO boundary & OWASP security auditor
 │   └── seo-auditor.md                   # Technical & GEO audit lens (Schema, E-E-A-T, llms.txt)
 ├── rules/
-│   └── AGENTS.md                        # Core engineering standards, QA independence & AI-Native SDLC rules
+│   └── AGENTS.md                        # Core engineering standards, Cross-Layer Rule, QA independence & AI-Native SDLC rules
 ├── templates/                           # Standardized SDLC markdown templates
 │   ├── intent_template.md               # Stage 1 (Plan): Intent proto-spec
 │   ├── spec_template.md                 # Stage 2 (Design): Technical & UX specification
@@ -130,7 +130,7 @@ antigravity-starter-kit/
 │   ├── plan_template.md                 # Stage 3 (Build): Implementation plan
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
-│   └── project_profile_template.md      # Portable tech stack & domain glossary profile
+│   └── project_profile_template.md      # Copy to docs/project_profile.md: stack, layers, commands, domain glossary
 ├── skills/                              # 33 Specialized On-Demand Skills
 │   ├── start-day/                       # Single entry-point router (orient, resume, route, close loop)
 │   ├── story-review/                    # Shift-left 10-lens refinement QA review
@@ -240,6 +240,12 @@ node <install-dir>/bin/link-hooks.js
 ```
 
 Put this step in your project's own workflow so nobody has to remember it, for example as a `postinstall` script in your `package.json` (`"postinstall": "node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js"`) or in your setup / onboarding notes. `node <install-dir>/bin/cli.js --verify` warns, with this exact command, when any hook path in `hooks.json` does not exist.
+
+---
+
+### Project profile
+
+Copy `templates/project_profile_template.md` to `docs/project_profile.md` in your project and fill in your stack, your layers (`## Layers`) and your lint, type-check and test commands. Agents read it first when it exists and take those commands from it; without it they detect them from your manifest and say which they used.
 
 ---
 

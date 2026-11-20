@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.7.0] - 2026-11-20
+
+### Changed
+- `rules/AGENTS.md` defines the Cross-Layer Rule, replacing the 3-Layer Rule: test cases assert at each layer the project has, not a fixed Database / DTO / UI trio. The layers are listed in the project profile (`templates/project_profile_template.md` gained a `## Layers` section).
+- Agents read `docs/project_profile.md` first when it exists. Projects create it from `templates/project_profile_template.md`.
+- Lint, type-check and test commands come from the project profile; without one, agents detect them from the manifest and say which they used. `./gradlew`, `vue-tsc` and `build-local-with-test.bat` are no longer defaults.
+- Product-domain examples (attendance, penalties) in the rules, skills and templates are replaced by a neutral order-with-coupon example.
+- The frontend taste rules are removed from `rules/AGENTS.md` section 5 and live in the `responsive-frontend-expert` skill; `landing-page-design` points there.
+- Layering follows the project's existing layering; the default for a new backend service is Controller -> Service -> Repository -> Entity.
+- `fix-bug` writes the failing test first only at a correct seam (per `diagnosing-bugs` Phase 5); otherwise the missing seam is recorded as a finding.
+- `writing-for-agents` targets `GEMINI.md` instead of `CLAUDE.md`.
+
+### Fixed
+- Dangling references: `tdd` points to `review-code`; `ai-native-sdlc` no longer cites a nonexistent `/deploy`; `wait-what` points to `domain-modeling`; `implement` states the vertical-slice order.
+
+### Added
+- `test/kit-content.test.js` guards against leaked domain vocabulary, hard-coded stack commands and dangling references.
+- README: a "Project profile" note.
+
+### Migration
+- Teams that relied on the global frontend rules in `AGENTS.md` now get them only when the `responsive-frontend-expert` skill is used.
+- Copy `templates/project_profile_template.md` to `docs/project_profile.md` and list your layers and commands there.
+- Existing `test_cases.md` files that say "3-Layer" keep working; the new name is Cross-Layer.
+
 ## [1.6.0] - 2026-11-19
 
 ### Fixed

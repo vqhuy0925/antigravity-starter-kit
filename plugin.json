@@ -2,7 +2,7 @@
   "name": "antigravity-starter-kit",
   "displayName": "Antigravity Enterprise Starter Kit",
   "description": "Enterprise-grade toolkit for Antigravity AI agents featuring AI-Native SDLC, independent QA Agent testing, cross-layer verification, token economy, responsive mobile UX, programmatic hooks, and conventional commits.",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "author": "Huy Vu",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
