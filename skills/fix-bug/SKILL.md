@@ -30,10 +30,11 @@ Fix defects with mathematical certainty through Test-Driven Remediation.
 Read and follow `skills/diagnosing-bugs/SKILL.md` Phases 1-4. Skip this phase only when the root cause is already known AND a reproduction exists.
 
 ### Phase 3: Fix & Regression Test
-Fix the root cause and add the regression test per `diagnosing-bugs` Phase 5 (seam rule), then confirm the test is green. With no correct seam, re-run the reproduction steps instead.
+Fix the root cause and add the regression test per `diagnosing-bugs` Phase 5 (seam rule), then confirm the test is green (with no correct seam: per Rule 1).
 
 ### Phase 4: Close
 1. Run the full project test suite (command from `docs/project_profile.md`; see the Review & Verification Phase of `rules/AGENTS.md` if there is no profile) to confirm zero regressions.
 2. Update `bug_report.md` with the Root Cause Analysis (RCA) and a link to the regression test (or, with no correct seam, the missing-seam finding).
 3. Update the matching TC in `test_cases.md`.
-4. Commit per `rules/AGENTS.md` §2, format `fix(<scope>): ...`.
+4. Before committing, meet the `diagnosing-bugs` Phase 6 checklist (re-run the original loop, remove debug instrumentation and throwaway prototypes).
+5. Commit per `rules/AGENTS.md` §2, format `fix(<scope>): ...`, and state the confirmed hypothesis in the commit message.

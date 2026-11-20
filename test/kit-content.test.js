@@ -120,5 +120,6 @@ test('fix-bug routes diagnosis to diagnosing-bugs without repeating it', () => {
   const f = read('skills/fix-bug/SKILL.md');
   assert.match(f, /skills\/diagnosing-bugs\/SKILL\.md/);
   assert.doesNotMatch(f, /Reproduce as Failing Test/);
+  assert.match(f, /Phase 6/);
   assert.match(read('skills/start-day/SKILL.md'), /\| \*\*Bug[^|]*\|\s*`fix-bug`/);
 });
