@@ -105,3 +105,13 @@ test('request-only skills say so in their description', () => {
     assert.match(desc, /only when the user asks/i, s);
   }
 });
+
+test('tool names match Antigravity; research skill folded into token-optimization', () => {
+  for (const f of kitFiles()) {
+    assert.doesNotMatch(read(f), /grep_search|view_file|smart-researcher/, f);
+    assert.doesNotMatch(read(f), /<=\s*100 lines|≤\s*100 lines/, f);
+  }
+  const t = read('skills/token-optimization/SKILL.md');
+  assert.match(t, /read_file/);
+  assert.match(t, /Key Files/);
+});

@@ -139,7 +139,7 @@ antigravity-starter-kit/
 │   ├── ai-native-sdlc/                  # AI-Native SDLC artifact loop with QA Gate
 │   ├── define-tests/                    # Independent QA Agent acceptance & boundary test definition
 │   ├── fix-bug/                         # TDD "Red Before Green" bug remediation
-│   ├── token-optimization/              # Context budgeting & lean file reading (≤ 100 lines)
+│   ├── token-optimization/              # Context budgeting & lean file reading
 │   ├── responsive-frontend-expert/      # Cross-device UI (Mobile 100dvh, iPad, Desktop)
 │   ├── modern-web-guidance/             # Modern Web & Baseline standards by Google Chrome & MDN
 │   ├── color-system-design/             # UI/UX color harmony, semantic tokens & OKLCH scales
@@ -148,7 +148,6 @@ antigravity-starter-kit/
 │   ├── review-code/                     # Code audit & QA test matrix cross-verification
 │   ├── commit-code/                     # Conventional commit generator & splitter
 │   ├── backend-development/             # REST API, DTOs & transactional standards
-│   ├── smart-researcher/                # Token-lean codebase research
 │   ├── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
 │   ├── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
 │   │   # --- 5 Core Engineering & Productivity Pillars ---
@@ -262,10 +261,9 @@ Copy `templates/project_profile_template.md` to `docs/project_profile.md` in you
 | `/implement` | Structured task execution | Incremental changes cross-checked against QA test cases |
 | `/review-code` | Code & QA audit | Audits code against OWASP, clean architecture, and test suites |
 | `/commit-code` | Git commit generator | Groups changes by domain and formats Conventional Commits |
-| `token-optimization` | Context budgeting | Enforces $\le 100$-line reads and suppresses noisy CLI outputs |
+| `token-optimization` | Context budgeting | Enforces targeted range reads and suppresses noisy CLI outputs |
 | `responsive-frontend-expert` | Frontend UI standards | Enforces 3-zone mobile dialogs (`100dvh`) and 44px touch targets |
 | `backend-development` | Backend architecture | Enforces DTO boundaries and parameterized ORM queries |
-| `smart-researcher` | Codebase investigation | Researches in isolated subagents without polluting main chat |
 | `/seo` | SEO & GEO Audit Suite | Live technical audits, Schema JSON-LD, E-E-A-T & llms.txt generation |
 | `landing-page-design` | Landing Page Strategy | Conversion copywriting, responsive visual design & intake questions |
 | `domain-modeling` | Ubiquitous Language | Actively challenges fuzzy terms and detects contradictions with code |

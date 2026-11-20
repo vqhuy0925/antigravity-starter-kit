@@ -58,9 +58,9 @@
 - **Terminal Execution & Auto-Approval**:
   - Do not overuse `BypassSandbox: true` for search commands (`grep`, `find`, `rg`) to avoid prompting the user with constant approval modals. Use Standard Sandbox first.
   - Use standard command shapes (avoid eval and complex wrappers) to ensure commands are prefix-matchable and remembered by auto-approval.
-- **Lean File Reading**: Never dump whole directories or load massive files completely. Use targeted line ranges (`StartLine` - `EndLine` <= 100 lines).
-- **Quiet Terminal Output**: Always append quiet/silent flags (`-q`, `--silent`) to avoid dumping thousands of build lines into the context.
-- **Subagent Lifecycle**: Delegate heavy exploration or QA definition tasks to subagents (`research` or `qa-engineer`) and terminate them (`manage_subagents` with `Action='kill'`) immediately when finished.
+- **Lean File Reading**: Read targeted ranges, not whole directories or large files; see `skills/token-optimization/SKILL.md`.
+- **Quiet Terminal Output**: Keep build and test output quiet; see `skills/token-optimization/SKILL.md`.
+- **Subagent Lifecycle**: Delegate heavy exploration to a subagent and kill it when done; see `skills/token-optimization/SKILL.md`.
 - **Knowledge Wiki & Traceability-First**: When a project contains a knowledge wiki (`*-knowledge/tools/ksearch.mjs` or `docs/knowledge/tools/ksearch.mjs`), run `ksearch` first before broad grep scans, read directly from the returned `traceability` paths, and sync domain specs + `indexer.mjs` before finalizing feature changes.
 
 ## 4. CODE QUALITY & ARCHITECTURAL SAFETY
