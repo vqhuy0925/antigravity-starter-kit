@@ -1,6 +1,6 @@
 ---
 name: fix-bug
-description: Systematic TDD bug remediation workflow. Enforces 'Red Before Green' — seam-aware: where a correct seam exists, the defect is reproduced as an automated failing test first.
+description: Entry point for any bug, broken behaviour or regression. Triages the report, diagnoses via diagnosing-bugs, fixes with Red Before Green where a correct seam exists, and closes with the RCA and regression record.
 ---
 
 # TDD Bug Remediation Workflow (Red Before Green)
@@ -11,7 +11,7 @@ Fix defects with mathematical certainty through Test-Driven Remediation.
 
 ## The 3 Inviolate Rules
 
-1. **Red Before Green:** When a correct seam exists (as defined in Phase 5 of the `diagnosing-bugs` skill), the first code written MUST be an automated test (unit or integration) at that seam that reproduces the bug and is **seen to FAIL** before touching any production source code. When there is no correct seam, do not write a shallow test: see Phase 2 step 0.
+1. **Red Before Green:** When a correct seam exists (as defined in Phase 5 of the `diagnosing-bugs` skill), the first code written MUST be an automated test (unit or integration) at that seam that reproduces the bug and is **seen to FAIL** before touching any production source code. When there is no correct seam, do not write a shallow test: record the missing seam as a finding in `bug_report.md`, verify the fix by the reproduction steps instead, and propose the seam as a follow-up task.
 2. **Minimal Blast Radius:** Fix the root cause and no more. A desired architectural refactor is a separate follow-up task.
 3. **Permanent Institutional Memory:** Every bug fix leaves a permanent regression test case in the test suite where a correct seam exists, or the documented missing seam in `bug_report.md`, and an updated record in `test_cases.md` and `bug_report.md`.
 
@@ -26,21 +26,14 @@ Fix defects with mathematical certainty through Test-Driven Remediation.
    - Associated Test Case ID (`Breaks: TC...`) or affected Acceptance Criterion.
    - Reproduction steps and specific environment/input conditions.
 
-### Phase 2: Reproduce as Failing Test (RED)
-0. **Is there a correct seam?** (per `diagnosing-bugs` Phase 5.) If not, skip steps 1–3 and Phase 3 step 3: record the missing seam as a finding in `bug_report.md`, verify the fix by the reproduction steps instead, and propose the seam as a follow-up task.
-1. Write an automated test asserting the expected behavior under the defect condition.
-2. Execute the project's test command (from `docs/project_profile.md`; see the Review & Verification Phase of `rules/AGENTS.md` if there is no profile).
-3. **Verify failure:** Confirm the test fails with the exact symptom reported.
-   - *If the test passes, the test does not accurately reproduce the defect condition.*
+### Phase 2: Diagnose
+Read and follow `skills/diagnosing-bugs/SKILL.md` Phases 1-4. Skip this phase only when the root cause is already known AND a reproduction exists.
 
-### Phase 3: Targeted Remediation (GREEN)
-1. Diagnose root cause in production logic.
-2. Implement the minimal necessary change to fix the defect.
-3. Re-run the reproduction test (or, with no correct seam, the reproduction steps): **Verify it now PASSES (GREEN)**.
+### Phase 3: Fix & Regression Test
+Fix the root cause and add the regression test per `diagnosing-bugs` Phase 5 (seam rule), then confirm the test is green. With no correct seam, re-run the reproduction steps instead.
 
-### Phase 4: Regression Audit & Verification
-1. Run the entire project test suite to confirm zero regressions in neighboring components.
-2. Update `bug_report.md` with:
-   - Root Cause Analysis (RCA).
-   - Link to new regression test (or, with no correct seam, the missing-seam finding).
-3. Commit using conventional commit format: `fix(<scope>): resolve <defect description>`.
+### Phase 4: Close
+1. Run the full project test suite (command from `docs/project_profile.md`; see the Review & Verification Phase of `rules/AGENTS.md` if there is no profile) to confirm zero regressions.
+2. Update `bug_report.md` with the Root Cause Analysis (RCA) and a link to the regression test (or, with no correct seam, the missing-seam finding).
+3. Update the matching TC in `test_cases.md`.
+4. Commit per `rules/AGENTS.md` §2, format `fix(<scope>): ...`.

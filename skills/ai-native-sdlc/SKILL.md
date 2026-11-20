@@ -59,7 +59,7 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 ### Stage 4: Implement & Test (Continuous Evals & Cross-Verification)
 - **Execution:** Automated tests, type checkers, and linters run continuously during implementation.
 - **Cross-Check:** Developer must verify each scenario in `test_cases.md` with passing automated unit/integration tests (`auto:unit`, `auto:integration`).
-- **Bug Remediation:** Strictly follow **Red Before Green** TDD workflow (`/fix-bug`).
+- **Bug fixes:** `fix-bug` (Red-Before-Green where a correct seam exists).
 - **Eval Hardening:** Tricky domain edge-cases are captured as regression tests in the codebase test suite.
 
 ### Stage 5: Deploy (Multi-Tier Governance & Audit)

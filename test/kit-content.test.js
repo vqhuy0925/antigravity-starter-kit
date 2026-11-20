@@ -115,3 +115,10 @@ test('tool names match Antigravity; research skill folded into token-optimizatio
   assert.match(t, /read_file/);
   assert.match(t, /Key Files/);
 });
+
+test('fix-bug routes diagnosis to diagnosing-bugs without repeating it', () => {
+  const f = read('skills/fix-bug/SKILL.md');
+  assert.match(f, /skills\/diagnosing-bugs\/SKILL\.md/);
+  assert.doesNotMatch(f, /Reproduce as Failing Test/);
+  assert.match(read('skills/start-day/SKILL.md'), /\| \*\*Bug[^|]*\|\s*`fix-bug`/);
+});

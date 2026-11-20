@@ -34,7 +34,7 @@ If not resuming (or if the user passed an intent like `/start-day fix ...` or `/
 | **Brainstorm / Vague Idea** | `grilling` → `to-spec` → (`wayfinder` if multi-session) |
 | **Raw Ticket / Story Refinement** | `story-review` → `ai-native-sdlc` |
 | **New Feature (Full SDLC)** | `ai-native-sdlc`: `intent.md` → `spec.md` (+ `spec-critic`) → `define-tests` → `plan` → `implement` (`tdd`) |
-| **Bug / Broken / Slow** | `diagnosing-bugs` → `fix-bug` (Red-Before-Green) |
+| **Bug / Broken / Slow** | `fix-bug` (uses `diagnosing-bugs`) |
 | **Refactor / Deepen Modules** | `improve-codebase-architecture` → `plan` → `implement` |
 | **Knowledge Wiki (Init / Search / Sync)** | `knowledge-wiki` |
 | **Docs / Domain / Landing / SEO** | `domain-modeling` / `writing-for-agents` / `landing-page-design` / `seo` |
