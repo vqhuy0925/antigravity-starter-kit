@@ -5,6 +5,14 @@ description: Plan the implementation of a task or ticket by researching the code
 
 # Plan Implementation Workflow (`/plan`)
 
+## Which planning skill
+
+| Skill | Scope | Output |
+|---|---|---|
+| `plan` | one change in one session or branch | `docs/plans/<branch>.md` |
+| `to-tickets` | one spec into tracker tickets | tickets with blocking edges |
+| `wayfinder` | a multi-session epic whose route is unknown | a map ticket |
+
 ## 1. Research & Analysis
 - Research existing classes, schemas, API routes, and components related to the task.
 - Pinpoint dependencies and side effects before modifying any code.

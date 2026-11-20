@@ -123,3 +123,12 @@ test('fix-bug routes diagnosis to diagnosing-bugs without repeating it', () => {
   assert.match(f, /Phase 6/);
   assert.match(read('skills/start-day/SKILL.md'), /\| \*\*Bug[^|]*\|\s*`fix-bug`/);
 });
+
+test('planning boundary stated once in plan', () => {
+  const p = read('skills/plan/SKILL.md');
+  assert.match(p, /^## Which planning skill/m);
+  for (const s of ['to-tickets', 'wayfinder']) {
+    assert.match(p, new RegExp('`' + s + '`'));
+    assert.match(read(`skills/${s}/SKILL.md`), /skills\/plan\/SKILL\.md/);
+  }
+});
