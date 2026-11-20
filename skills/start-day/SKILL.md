@@ -19,7 +19,7 @@ A thin single-command entry point that answers *"what are we working on?"* and c
 ## Phase 0 — Orient & Resume Check
 
 1. Check `git status` and current branch (`git branch --show-current`) silently.
-2. Check for active SDLC artifacts in the workspace or artifact directory (`intent.md`, `spec.md`, `test_cases.md`, `plan.md`, `task.md`, `bug_report.md`).
+2. Check for active SDLC artifacts in the workspace or artifact directory (`intent.md`, `spec.md`, `test_cases.md`, `docs/plans/<branch>.md`, `task.md`, `bug_report.md`).
 3. Detect if a project Knowledge Wiki exists (`*-knowledge/tools/ksearch.mjs` or `docs/knowledge/tools/ksearch.mjs`). If present, use `ksearch` first during investigation/planning instead of broad codebase greps.
 4. If in-flight work is detected, summarize it in 2–3 lines and ask whether to **resume** from the current stage or **start something new**.
 
@@ -48,5 +48,5 @@ Confirm the chosen route once with the user before starting Phase 1 of the targe
 When implementation/fixes finish:
 1. Run `review-code` (verify tests, lint, type-check, and `test_cases.md` coverage).
 2. **Sync Knowledge Wiki (if present):** When domain logic, APIs, entities, or UI views changed, update the affected `domains/<domain>/<feature>.md` spec (and `glossary.md` if needed), run `scan-drift.mjs` to catch undocumented modules, and re-run `indexer.mjs` to update `catalog.json`.
-3. Offer `commit-code` / `pr` (never push without explicit approval).
+3. Run `commit-code` once at the end of the run: it groups changes and asks once per grouped commit (`rules/AGENTS.md` §2); no mid-run commits. Offer `pr` (never push without explicit approval).
 4. Offer `retro` once to capture learnings for the next cycle.

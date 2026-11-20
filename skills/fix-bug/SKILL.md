@@ -13,7 +13,7 @@ Fix defects with mathematical certainty through Test-Driven Remediation.
 
 1. **Red Before Green:** The first code written MUST be an automated test (unit or integration) that reproduces the bug and is **seen to FAIL** before touching any production source code.
 2. **Minimal Blast Radius:** Fix the root cause and no more. A desired architectural refactor is a separate follow-up task.
-3. **Permanent Institutional Memory:** Every bug fix leaves a permanent regression test case in the test suite and an updated record in `test_cases_<feature>.md` and `bug_report.md`.
+3. **Permanent Institutional Memory:** Every bug fix leaves a permanent regression test case in the test suite and an updated record in `test_cases.md` and `bug_report.md`.
 
 ---
 

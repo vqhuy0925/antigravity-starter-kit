@@ -9,6 +9,8 @@ description: Scan changes, group them logically by domain topic, and execute con
 - Never bundle unrelated changes across multiple domains into a single massive commit.
 - Group staged files by topic/layer (e.g. backend api vs frontend ui vs docs).
 
+- Ask once per grouped commit (diff summary + message) per `rules/AGENTS.md` §2; never push without separate approval.
+
 ## 2. Commit Message Structure
 - Format: `<type>(<scope>): <subject>`
   - Types: `feat`, `fix`, `refactor`, `test`, `chore`, `perf`, `docs`, `style`.

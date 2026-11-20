@@ -4,7 +4,9 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
+
+const { linkHooks } = require('./link-hooks');
 
 const REPO_URL = 'https://github.com/vqhuy0925/antigravity-starter-kit.git';
 
@@ -35,7 +37,12 @@ Examples:
 `);
 }
 
-function copyRecursiveSync(src, dest) {
+/** Top-level folders of a working copy that are never part of an install:
+ *  git metadata (read-only objects make overwriting fail with EPERM), dependencies,
+ *  scratch workspaces, and local installs (copying .agents into itself would never end). */
+const COPY_SKIP = new Set(['.git', 'node_modules', '.superpowers', '.agents', '.worktrees']);
+
+function copyRecursiveSync(src, dest, top = true) {
   const exists = fs.existsSync(src);
   const stats = exists && fs.statSync(src);
   const isDirectory = exists && stats.isDirectory();
@@ -44,10 +51,21 @@ function copyRecursiveSync(src, dest) {
       fs.mkdirSync(dest, { recursive: true });
     }
     fs.readdirSync(src).forEach((childItemName) => {
-      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+      if (top && COPY_SKIP.has(childItemName)) return;
+      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName), false);
     });
   } else {
     fs.copyFileSync(src, dest);
+  }
+}
+
+function linkOrExit(dir) {
+  try {
+    const { linked } = linkHooks(dir);
+    if (linked === 0) throw new Error('no hook commands were linked; guardrails are not wired');
+  } catch (err) {
+    console.error('❌ Failed to link hook paths:', err.message);
+    process.exit(1);
   }
 }
 
@@ -73,27 +91,32 @@ function install(isGlobal) {
   if (hasLocalAssets && path.resolve(sourceRoot) !== path.resolve(targetDir)) {
     console.log('🔄 Copying plugin files directly from package...');
     copyRecursiveSync(sourceRoot, targetDir);
+    linkOrExit(targetDir);
     console.log('\n✅ Installation successful!');
   } else {
     // Clone via Git
     if (fs.existsSync(path.join(targetDir, '.git'))) {
       console.log('🔄 Updating existing installation...');
       try {
+        // hooks.json was rewritten with absolute paths at install time; restore it so pull never conflicts
+        execSync(`git -C "${targetDir}" checkout -- hooks.json`, { stdio: 'inherit' });
         execSync(`git -C "${targetDir}" pull`, { stdio: 'inherit' });
-        console.log('\n✅ Successfully updated to latest version!');
       } catch (err) {
         console.error('❌ Failed to update repository via git:', err.message);
         process.exit(1);
       }
+      linkOrExit(targetDir);
+      console.log('\n✅ Successfully updated to latest version!');
     } else {
       console.log('📥 Cloning repository from GitHub...');
       try {
         execSync(`git clone --depth=1 "${REPO_URL}" "${targetDir}"`, { stdio: 'inherit' });
-        console.log('\n✅ Installation complete!');
       } catch (err) {
         console.error('❌ Failed to clone repository:', err.message);
         process.exit(1);
       }
+      linkOrExit(targetDir);
+      console.log('\n✅ Installation complete!');
     }
   }
 
@@ -107,15 +130,49 @@ function install(isGlobal) {
   }
 }
 
+/** Hook script paths in <root>/hooks.json that do not exist (relative paths resolve against root). */
+function missingHookPaths(root) {
+  const missing = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (!node || typeof node !== 'object') return;
+    if (typeof node.command === 'string') {
+      // `node <file>` or `"<abs node path>" "<file>"` (as written by link-hooks).
+      const m = /^(?:node|"([^"]*node(?:\.exe)?)")\s+(?:"([^"]+)"|(\S+))\s*$/i.exec(node.command.trim());
+      if (m) {
+        if (m[1] && !fs.existsSync(m[1])) missing.push(m[1]);
+        const file = m[2] || m[3];
+        if (!fs.existsSync(path.resolve(root, file))) missing.push(file);
+      }
+    }
+    Object.values(node).forEach(walk);
+  };
+  try {
+    walk(JSON.parse(fs.readFileSync(path.join(root, 'hooks.json'), 'utf8')));
+  } catch (err) {
+    missing.push(`hooks.json (${err.message})`);
+  }
+  return missing;
+}
+
 function verifyHooks() {
   console.log(BANNER);
   console.log('🔍 Verifying Antigravity Safety Guardrails & Hooks...\n');
-  const testScript = path.join(__dirname, '..', 'test', 'verify-hooks.test.js');
-  if (fs.existsSync(testScript)) {
-    require(testScript);
+  const root = path.resolve(__dirname, '..');
+  const missing = missingHookPaths(root);
+  if (missing.length) {
+    console.error('⚠️  WARNING: hooks.json points at hook files that do not exist, so these guardrails will not run:');
+    missing.forEach((f) => console.error(`   - ${f}`));
+    console.error(`   Fix it by re-linking the hooks to this install:\n   node "${path.join(root, 'bin', 'link-hooks.js')}"\n`);
+  }
+  const failed = missing.length > 0;
+  if (fs.existsSync(path.join(root, 'test'))) {
+    const res = spawnSync(process.execPath, ['--test'], { cwd: root, stdio: 'inherit' });
+    process.exit(res.status === null || failed ? 1 : res.status);
   } else {
+    if (failed) process.exit(1);
     console.log('✅ Hook definitions present in hooks.json:');
-    const hooksJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'hooks.json'), 'utf8'));
+    const hooksJson = JSON.parse(fs.readFileSync(path.join(root, 'hooks.json'), 'utf8'));
     console.dir(hooksJson, { depth: null });
   }
 }

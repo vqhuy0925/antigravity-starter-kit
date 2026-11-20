@@ -37,7 +37,7 @@ Autonomous AI coding agents are extraordinarily powerful, but in real-world prod
 | :--- | :--- | :--- |
 | **Git Safety** | May execute `git push -f` or push broken code to `main` | **Hard-blocked** by `git-guardrail.js` at runtime |
 | **Secret Protection** | Can inadvertently leak API keys or AWS credentials | **Scanned & blocked** in real-time by `secret-scan.js` |
-| **Scope Boundary** | Edits random files beyond original user request | **Halted** by `plan-boundary.js` if file is not in approved plan |
+| **Scope Boundary** | Edits random files beyond original user request | **Prompted** by `plan-boundary.js` if a file is not in the approved plan (`docs/plans/<branch>.md`) |
 | **Requirements** | Makes assumptions and codes immediately | **Interrogated** by adversarial `spec-critic` subagent |
 | **QA & Verification** | Dev tests own code with confirmation bias | **Isolated QA Agent** derives 3-layer test matrix with zero dev bias |
 | **Quality Gate** | Code written without automated tests | **Strict TDD** ("Red Before Green") enforced by `define-tests` & `fix-bug` |
@@ -54,11 +54,11 @@ $ git push origin feature-auth --force
 
 # Scenario 2: Agent attempts to run a command with a hardcoded token
 $ curl -H "Authorization: token ghp_39charHexToken..."
-🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string.
+🚨 BLOCKED by Antigravity Guardrail: A raw credential or private key was detected in the command string (GitHub token).
 
 # Scenario 3: Agent attempts to modify an unapproved file
 $ git commit -m "fix: update db schema"
-🚨 BLOCKED by Antigravity Plan-Boundary: Staged file 'src/database/migration.sql' is not declared in implementation_plan.md.
+⚠️ Scope Creep Detected by Antigravity Guardrail: Files not mentioned in the approved plan (my-branch.md): [src/database/migration.sql]. Do you want to proceed with this commit?
 ```
 
 ---
@@ -72,7 +72,7 @@ flowchart TD
     A["Stage 1: Intent<br/>(intent.md)"] --> B["Stage 2: Design<br/>(spec.md)"]
     B --> C["Adversarial Critic<br/>(spec-critic Agent)"]
     C -->|Ownership Test Passed| D["Stage 2b: Independent QA<br/>(define-tests QA Agent)"]
-    D --> E["Stage 3: Plan & Task<br/>(plan.md & task.md)"]
+    D --> E["Stage 3: Plan & Task<br/>(docs/plans/&lt;branch&gt;.md)"]
     E --> F["Stage 4: TDD Implement<br/>(Red Before Green)"]
     F --> G["Stage 5: Review & Audit<br/>(code-reviewer Agent)"]
     G --> H["Stage 6: Deploy Gate<br/>(deploy.md Checklist)"]
@@ -109,7 +109,7 @@ Antigravity Starter Kit introduces an **Independent QA Subagent Pattern**:
 antigravity-starter-kit/
 ├── bin/
 │   └── cli.js                           # Cross-platform CLI runner (npx / global)
-├── plugin.json                          # Plugin declaration manifest (v1.2.0)
+├── plugin.json                          # Plugin declaration manifest (v1.6.0)
 ├── hooks.json                           # Active lifecycle hooks manifest
 ├── install.sh                           # One-click installer (macOS / Linux / Bash)
 ├── install.ps1                          # One-click installer (Windows PowerShell native)
@@ -117,7 +117,7 @@ antigravity-starter-kit/
 │   └── logo.svg                         # Vector icon for Antigravity UI
 ├── hooks/                               # Programmatic Runtime Guardrails (Node.js)
 │   ├── git-guardrail.js                 # Blocks force push, catastrophic deletes & main push
-│   ├── plan-boundary.js                 # Enforces plan boundaries and halts scope creep
+│   ├── plan-boundary.js                 # Enforces plan boundaries; asks before committing out-of-plan files
 │   ├── secret-scan.js                   # Scans and blocks inline secrets & private keys
 │   └── lib.js                           # Shared hook utilities
 ├── agents/                              # Specialized Independent Subagents
@@ -170,7 +170,7 @@ antigravity-starter-kit/
 │   ├── pr/                              # Evidence-first PRs with blast radius & one-way/two-way doors
 │   └── writing-for-agents/              # High-leverage drafting guidelines for agent steering docs & skills
 ├── test/
-│   └── verify-hooks.test.js             # Automated test suite for safety guardrails
+│   └── *.test.js                        # Automated test suite for safety guardrails (node:test)
 ├── mcp_config.json                      # MCP Server integration template
 └── package.json                         # npm package declaration & test scripts
 ```
@@ -188,6 +188,7 @@ Or install only into the current repository:
 ```bash
 npx antigravity-starter-kit --local
 ```
+A `--local` install writes absolute paths for this machine into `.agents/plugins/antigravity-starter-kit/hooks.json`. If you commit that folder, every other developer must re-link it after clone, pull or move (see [Re-linking hooks](#re-linking-hooks-after-clone-pull-or-move)).
 
 ---
 
@@ -207,6 +208,7 @@ curl -fsSL https://raw.githubusercontent.com/vqhuy0925/antigravity-starter-kit/m
 Or via direct git clone on Windows PowerShell:
 ```powershell
 git clone https://github.com/vqhuy0925/antigravity-starter-kit.git "$HOME\.gemini\config\plugins\antigravity-starter-kit"
+node "$HOME\.gemini\config\plugins\antigravity-starter-kit\bin\link-hooks.js"
 ```
 
 ---
@@ -227,7 +229,20 @@ curl -fsSL https://raw.githubusercontent.com/vqhuy0925/antigravity-starter-kit/m
 ```bash
 mkdir -p .agents/plugins
 git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agents/plugins/antigravity-starter-kit
+node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js
 ```
+A submodule install bypasses the installers, so run `link-hooks.js`. It writes absolute hook paths into `hooks.json` so the guardrails run from any workspace, and fails loudly if nothing is linked. Every developer runs it on their own machine, after every clone, submodule update or move (see below). The shell installers honour an `AGY_KIT_REPO` environment variable to override the clone URL.
+
+#### Re-linking hooks after clone, pull or move
+
+`hooks.json` holds **absolute** paths for the machine and folder it was linked on. A committed `hooks.json` with absolute paths will not work on other machines, and moving the install folder breaks it on yours: the hook files it names do not exist there, so the guardrails do not run. After every clone, pull, submodule update or move, each developer runs:
+
+```bash
+node <install-dir>/bin/link-hooks.js
+# e.g. node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js
+```
+
+Put this step in your project's own workflow so nobody has to remember it, for example as a `postinstall` script in your `package.json` (`"postinstall": "node .agents/plugins/antigravity-starter-kit/bin/link-hooks.js"`) or in your setup / onboarding notes. `node <install-dir>/bin/cli.js --verify` warns, with this exact command, when any hook path in `hooks.json` does not exist.
 
 ---
 
@@ -241,7 +256,7 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 | `/knowledge-wiki` | Project Knowledge Wiki (OKF) | Bootstraps, BM25-searches (`ksearch`), and drift-checks (`scan-drift`) docs |
 | `ai-native-sdlc` | AI-Native SDLC artifact loop with QA Gate | Orchestrates the full 6-stage artifact loop |
 | `/define-tests` | Independent QA Engineer workflow | Derives acceptance criteria & 3-layer test matrices (`test_cases.md`) |
-| `/plan` | Implementation planning | Analyzes dependencies and produces `implementation_plan.md` |
+| `/plan` | Implementation planning | Analyzes dependencies and produces `docs/plans/<branch>.md` |
 | `/fix-bug` | Bug remediation | Enforces TDD "Red Before Green" reproduction test first |
 | `/implement` | Structured task execution | Incremental changes cross-checked against QA test cases |
 | `/review-code` | Code & QA audit | Audits code against OWASP, clean architecture, and test suites |
@@ -272,10 +287,25 @@ git submodule add https://github.com/vqhuy0925/antigravity-starter-kit.git .agen
 
 ## 🛡️ Programmatic Guardrails (Hooks)
 
-The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`:
-- **`git-guardrail`**: Hard-blocks `git push --force`, direct pushes to `main`/`master`, and catastrophic `rm -rf /` commands.
-- **`plan-boundary`**: Halts commits containing files not listed in the approved `implementation_plan.md` Changes list to prevent silent scope creep.
-- **`secret-scan`**: Automatically scans command arguments for raw private keys, GitHub tokens, AWS credentials, and Slack keys.
+The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`. Install writes absolute hook paths into it, plus the absolute path of the Node executable that ran the installer, so they run from any workspace even when `node` is not on the hook runner's `PATH`. Re-link after moving or upgrading Node to a different path.
+
+- **`git-guardrail`**:
+  - Force push (`--force`, `-f`, clusters like `-fu`, `+refspec`) is denied on any branch. `--force-with-lease` is allowed, except to `main`/`master`.
+  - Pushes to `main`/`master` are denied via any remote, `HEAD:main`, `--all`/`--mirror`, or a bare `git push` (or `git push origin HEAD` / `@`) while on main.
+  - Root deletion is denied: a recursive `rm`, `Remove-Item`/`ri`, `rd`/`rmdir`, `del`/`erase` (`-r`, `-Recurse`, `/s`) of `/`, `/*`, `~`, `$HOME`, `$env:USERPROFILE`, or a drive root such as `C:\` or `C:\*`. `git reset --hard` asks first.
+  - Every segment of a chained command is checked (`&&`, `||`, `;`, `|`, `&`, newlines, `$(...)`, backticks). Common wrappers and prefixes are seen through (`sudo`, `env`, `VAR=x`, `command`, `time`, `nohup`, `xargs`, `exec`, absolute paths, `git.exe`, `eval`, and `bash`/`sh`/`zsh`/`pwsh`/`powershell`/`cmd` with `-c`), including wrapper options that take a value (`sudo -u git`, `env -u X`, `xargs -n 1`). Behind any other prefix command (`timeout 60`, `nice`, `doas`, ...) the first `git`, shell or delete command in the segment is checked as if it came first.
+- **`plan-boundary`**:
+  - On `git commit`, looks for the plan at `docs/plans/<branch>.md` (each `/` in the branch becomes `-`), then `implementation_plan.md` (looked up in the conversation artifact folder, then the working directory and up to 4 directories above it). When no plan is found, it asks before the commit proceeds **only in repos that opt in** by having a `docs/plans/` directory at the repo root; in other repos the commit is allowed. When a plan is found, files are always matched against it.
+  - Staged files are matched by repo-relative path against the plan's backticked paths; a trailing `/` covers a directory. Uncovered files make it ask. A `git add` in the same chain whose paths are not written out (`xargs git add`, `$FILES`, `$(...)`) makes it check the whole worktree. Both `plan-boundary` and `git-guardrail` follow a literal `cd` / `Set-Location` / `pushd` earlier in the command and `git -C`, so they find the right repo when the workspace is a parent folder holding several repos.
+  - It also catches `git add` in the same chain, `commit -a`, commit pathspecs, and `git -C <dir>`. `git add <paths>` adds only those paths to the check; `git add -A`/`--all`/`-u`/`--update`/`.`/`:/` and `commit -a` bring in every changed and untracked file.
+- **`secret-scan`**: Blocks raw private keys, GitHub tokens (`ghp_`, `github_pat_`), AWS credentials, Slack keys, `sk-ant-`, `sk-proj-`, `sk-svcacct-` and `sk-admin-` keys plus legacy hyphen-free `sk-` keys, Google `AIza` keys, and literal `Bearer <token>` values in any case. `Bearer $ENV_VAR` is allowed, and so are ordinary names that contain `sk-` (such as `feature/sk-1234-login`).
+
+**Known limits:**
+- Only `run_command` tool calls are inspected (the `hooks.json` matcher). A secret written through a file-edit tool is not scanned, and file edits are not checked against the plan. The hooks guard the shell, not every way an agent can change files.
+- A quoted command passed to an unknown prefix command (for example `ssh host "git push origin main"`) is not checked.
+- `rm -rf /./` is not caught by the root-delete guard.
+- `git commit --pathspec-from-file` is not read by `plan-boundary`.
+- Secret patterns have minimum lengths; apart from `bearer`, they are case-sensitive.
 
 ---
 
@@ -293,30 +323,19 @@ You can verify that all guardrails and security hooks are active and functioning
 
 ```bash
 npm test
-# or
-node test/verify-hooks.test.js
 ```
 
-Output:
+This runs Node's built-in test runner (`node --test`). Summary:
+
 ```text
-🧪 Starting Antigravity Safety Guardrails Test Suite...
-
---- [1] Testing git-guardrail.js ---
-  ✅ PASS: Blocks git push --force
-  ✅ PASS: Blocks git push -f
-  ✅ PASS: Blocks direct push to origin main
-  ✅ PASS: Prompts on git reset --hard
-  ✅ PASS: Blocks catastrophic root deletion rm -rf /
-  ✅ PASS: Allows safe git commands like git status or git add
-
---- [2] Testing secret-scan.js ---
-  ✅ PASS: Blocks GitHub personal access token (ghp_)
-  ✅ PASS: Blocks raw RSA Private Key
-  ✅ PASS: Allows normal safe command strings
-
-========================================
-Test Results: 9/9 passed (100%)
-========================================
+✔ allows long hyphenated branch names
+ℹ tests 102
+ℹ suites 0
+ℹ pass 102
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
 ```
 
 ---
