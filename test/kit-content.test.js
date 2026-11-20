@@ -60,3 +60,9 @@ test('layering follows the project', () => {
   assert.match(read('rules/AGENTS.md'), /project's existing layering/);
   assert.match(read('agents/code-reviewer.md'), /project's existing layering/);
 });
+test('fix-bug writes the failing test first only at a correct seam', () => {
+  const f = read('skills/fix-bug/SKILL.md');
+  assert.match(f, /correct seam/);
+  assert.match(f, /diagnosing-bugs/);
+  assert.match(f, /no correct seam/i);
+});
