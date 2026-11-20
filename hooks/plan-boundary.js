@@ -165,8 +165,10 @@ function analyze(cmdLine, baseDir, depth = 0) {
       } else if (!balanced) res.includeWorktree = true;
     }
     if (g[0] === 'commit') {
+      // Exact segments come first and know their cd directory; a commit seen only in the
+      // quote-stripped pass (e.g. `-m "a: b"` re-split) must not overwrite that directory.
+      if (usePaths || !res.commit) res.dir = dir === undefined ? baseDir : dir;
       res.commit = true;
-      res.dir = dir === undefined ? baseDir : dir;
       const c = parseCommitArgs(g[1]);
       if (c.stagesAll || (usePaths && c.pathspecs.some(nonLiteral))) res.includeWorktree = true;
       if (usePaths) { res.pathspecs.push(...c.pathspecs); if (c.pathspecs.length) addDirs.push(dir); }

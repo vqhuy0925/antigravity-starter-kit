@@ -155,3 +155,16 @@ test('Set-Location -Path <repo> is followed', () => {
   write(repo, 'x.txt', '1');
   assert.strictEqual(run(path.dirname(repo), `Set-Location -Path "${repo}"; git add x.txt; git commit -m x`).decision, 'ask');
 });
+test('cd <repo> ; commit with a quoted message from a parent still finds the repo', () => {
+  const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
+  write(repo, 'x.txt', '1');
+  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add x.txt; git commit -m "chore: livecheck step 4"`).decision, 'ask');
+});
+test('Antigravity payload shape (cwd + workspacePaths, no args.Cwd) with cd into the repo', () => {
+  const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
+  write(repo, 'x.txt', '1');
+  const parent = path.dirname(repo);
+  const payload = { cwd: parent, workspacePaths: [parent.replace(/\\/g, '/')],
+    toolCall: { name: 'run_command', args: { CommandLine: `cd ${repo}; git add x.txt; git commit -m "step 4"` } } };
+  assert.strictEqual(runHook('plan-boundary.js', payload).decision, 'ask');
+});

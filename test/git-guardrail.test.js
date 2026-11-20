@@ -125,3 +125,7 @@ test('cd <repo on feature> ; bare git push is allowed', () => {
   const repo = makeRepo({ branch: 'feat/x' });
   assert.strictEqual(d(`cd "${repo}"; git push`, require('path').dirname(repo)), 'allow');
 });
+test('cd <repo on main> ; bare push in a line with quotes elsewhere is denied', () => {
+  const repo = makeRepo({ branch: 'main' });
+  assert.strictEqual(d(`cd "${repo}"; git commit -m "wip"; git push`, require('path').dirname(repo)), 'deny');
+});
