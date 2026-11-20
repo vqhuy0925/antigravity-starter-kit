@@ -4,19 +4,19 @@ The skill-specific branch of [`writing-for-agents`](SKILL.md): what changes when
 
 ## Invocation
 
-Two choices, trading the two loads:
+Frontmatter has only `name` and `description`. Every skill can fire on its own, when the agent matches the description, or when the user types `/<name>`; there is no field that turns either off. Two choices remain, trading the two loads:
 
-- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously, and other skills can reach it. You can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the human's. The description is the skill's top-level context pointer, forced to stay loaded at all times: permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: omit `disable-model-invocation`, and write a model-facing description carrying the trigger branches (the pointer-writing rules in `SKILL.md` apply in full).
-- A **user-invoked** skill strips the description from the agent's reach: only the human typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load: you are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`; the `description` becomes human-facing: a one-line summary, trigger lists stripped.
+- An **auto-firing** skill carries a `description` with the trigger branches, so the agent can fire it autonomously. The description is the skill's top-level context pointer, forced to stay loaded at all times: permanent context load in exchange for discoverability (the pointer-writing rules in `SKILL.md` apply in full). A skill whose content is all reference is also one home for shared reference: other skills read its SKILL.md, so reference needed by several skills lives in one place.
+- A **request-only** skill says so in its `description`: a one-line summary, trigger lists stripped, ending "Use only when the user asks for it by name." The agent then leaves it alone unless asked. This is a convention the agent follows, not a switch, so the description still loads, but it stays short. It spends cognitive load: you are the index that must remember it exists.
 
-Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
+Pick auto-firing only when the agent must reach the skill on its own. If it only ever fires by hand, make it request-only and keep the description short.
 
-Shared reference that two user-invoked skills both need can live in neither: with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
+To chain a skill, tell the agent to read its SKILL.md: "Read and follow `skills/<name>/SKILL.md`". There is no tool for invoking a skill and no alias; reading the file is the whole mechanism, and it works for request-only skills too. Shared reference that several skills need can therefore live in one skill and be read by the others.
 
 ## Splitting by invocation
 
-The invocation cut of splitting (the sequence cut lives in `SKILL.md`): split off a model-invoked skill when you have a distinct leading word that should trigger it on its own (a trigger word you actually use in your prompts), or another skill must reach it. You pay context load for the new always-loaded description, so that independent reach has to be worth it.
+The invocation cut of splitting (the sequence cut lives in `SKILL.md`): split off an auto-firing skill when you have a distinct leading word that should trigger it on its own (a trigger word you actually use in your prompts), or another skill must read it. You pay context load for the new always-loaded description, so that independent reach has to be worth it.
 
 ## Router skills
 
-When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the human has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the human can reach them.
+When request-only skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one request-only skill that names the others and when to reach for each, so the human has one skill to remember instead of many. It tells the agent to read the right SKILL.md for the request.

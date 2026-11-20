@@ -87,3 +87,21 @@ test('removed grilling aliases are not referenced', () => {
   assert.match(read('skills/grilling/SKILL.md'), /^## With docs/m);
   assert.match(read('skills/grilling/SKILL.md'), /skills\/domain-modeling\/SKILL\.md/);
 });
+
+test('no Claude Code skill mechanics remain', () => {
+  for (const f of kitFiles()) {
+    assert.doesNotMatch(read(f), /Skill tool/, f);
+    assert.doesNotMatch(read(f), /disable-model-invocation/, f);
+  }
+});
+test('every skills/<name>/SKILL.md path named in the kit exists', () => {
+  for (const f of kitFiles())
+    for (const m of read(f).matchAll(/(?<![\w\/.-])skills\/([a-z0-9-]+)\/SKILL\.md/g))
+      assert.ok(fs.existsSync(path.join(ROOT, 'skills', m[1], 'SKILL.md')), `${f} -> ${m[0]}`);
+});
+test('request-only skills say so in their description', () => {
+  for (const s of ['improve-codebase-architecture', 'to-spec', 'to-tickets', 'wait-what', 'wayfinder']) {
+    const desc = read(`skills/${s}/SKILL.md`).match(/^description:(.*)$/m)[1];
+    assert.match(desc, /only when the user asks/i, s);
+  }
+});
