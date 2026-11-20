@@ -48,3 +48,15 @@ test('stack commands appear only as profile examples', () => {
       assert.ok(!re.test(read(f)), `${f} matches ${re}`);
   assert.match(read('skills/review-code/SKILL.md'), /project_profile\.md/);
 });
+test('frontend taste rules live in responsive-frontend-expert, not AGENTS.md', () => {
+  const a = read('rules/AGENTS.md');
+  for (const re of [/120%/, /oklch/i, /100dvh/, /Asset-First/i, /44x44/]) assert.doesNotMatch(a, re);
+  assert.match(a, /responsive-frontend-expert/);
+  const r = read('skills/responsive-frontend-expert/SKILL.md');
+  for (const re of [/120%/, /oklch/i, /text-wrap: pretty/, /100dvh/, /44/, /Asset-First/i]) assert.match(r, re);
+  assert.match(read('skills/landing-page-design/SKILL.md'), /responsive-frontend-expert/);
+});
+test('layering follows the project', () => {
+  assert.match(read('rules/AGENTS.md'), /project's existing layering/);
+  assert.match(read('agents/code-reviewer.md'), /project's existing layering/);
+});

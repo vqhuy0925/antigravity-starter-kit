@@ -64,7 +64,7 @@
 - **Knowledge Wiki & Traceability-First**: When a project contains a knowledge wiki (`*-knowledge/tools/ksearch.mjs` or `docs/knowledge/tools/ksearch.mjs`), run `ksearch` first before broad grep scans, read directly from the returned `traceability` paths, and sync domain specs + `indexer.mjs` before finalizing feature changes.
 
 ## 4. CODE QUALITY & ARCHITECTURAL SAFETY
-- **Layered Architecture**: Controller -> Service -> Repository -> Entity/Data Model.
+- **Layered Architecture**: Follow the project's existing layering. Default for a new backend service: Controller -> Service -> Repository -> Entity.
 - **Data Transfer Objects (DTOs)**: Always use DTOs for external API contracts. Never expose database entities directly.
 - **Security & Secret Sanitization**:
   - Never hardcode credentials, keys, or tokens in source code. Use environment variables.
@@ -72,12 +72,4 @@
   - Sanitize all user-controlled inputs against XSS.
 - **Error Handling**: Never swallow exceptions silently. Log contextually and return standardized error responses.
 
-## 5. RESPONSIVE FRONTEND, TOUCH ERGONOMICS & UI/UX TASTE
-- **Viewport Standards**: Optimize for Desktop (>= 1440px), Laptop/iPad Pro (1024px-1439px), iPad/Tablet (600px-1023px), and Mobile (< 600px).
-- **Mobile Dialogs (3-Zone Flexbox)**: Always use `height: 100dvh` / `max-height: 100dvh`, Header (`shrink-0`), Body (`col scroll min-h-0`), Footer (`shrink-0` with safe-area padding).
-- **Touch Targets**: Minimum 44x44px clickable area for touch accessibility.
-- **Anti-AI Slop & Visual Taste**:
-  - Strictly avoid generic AI clichés: SaaS purple gradients, emojis as bullet icons, rounded cards with left border accents, awkward hand-drawn SVG illustrations, default Inter/Roboto for display headings, or lazy dark themes (`#0D1117` + neon glow).
-  - Apply modern typographic craft: `text-wrap: pretty`, `oklch()` color spaces, pairing distinctive editorial serifs for headings with clean sans-serif for body copy.
-- **Asset-First Protocol**: Never design from a blank canvas. Gather official brand logos (SVG), high-quality authentic imagery, and extract exact brand hex codes (`var(--brand-*)`) before building layouts. Never use grey placeholder boxes or CSS silhouettes.
-- **120% Signature Rule**: Select exactly 1 marquee hero detail to polish to 120% craft; maintain the remaining elements clean, concise, and disciplined at 80%.
+Frontend work: follow the `responsive-frontend-expert` skill (landing pages: `landing-page-design`).

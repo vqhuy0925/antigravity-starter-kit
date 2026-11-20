@@ -6,6 +6,7 @@ description: Standards and architectural patterns for RESTful backend services, 
 # Backend Development Standards
 
 ## 1. Layered Architecture
+The default for new services; follow the project's existing layering where it differs.
 - **Controller/Resource**: Exposes REST endpoints, handles HTTP status codes, validates input DTOs.
 - **Service Layer**: Encapsulates business logic, orchestrates transactions, fires domain events.
 - **Repository/DAO**: Manages database queries using parameterized JPA/ORM methods.
