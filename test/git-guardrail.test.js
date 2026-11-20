@@ -103,3 +103,9 @@ for (const c of ['Remove-Item -Recurse -Force .\\build', 'rd /s /q build', 'rm -
 // --- Final review: @ is HEAD ---
 test('denies push origin @ while on main', () => assert.strictEqual(d('git push origin @', makeRepo({ branch: 'main' })), 'deny'));
 test('allows push origin @ on a feature branch', () => assert.strictEqual(d('git push origin @', makeRepo({ branch: 'feat/x' })), 'allow'));
+
+// --- Residual: wrapper options that take a value ---
+for (const c of [
+  'sudo -u git git push origin main', 'sudo -u git -g git git push -f origin x', 'env -u git git push origin main',
+  'sudo --user=git git push origin main', 'xargs -n 1 git push -f'
+]) test(`denies wrapper-with-value ${c}`, () => assert.strictEqual(d(c), 'deny'));

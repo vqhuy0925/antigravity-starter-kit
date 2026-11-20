@@ -198,6 +198,14 @@ function tokenize(segment) {
 
 
 const WRAPPERS = new Set(['sudo', 'env', 'command', 'time', 'nohup', 'xargs', 'exec']);
+/** Wrapper options whose value is the next token. */
+const WRAPPER_VALUE_OPTS = {
+  sudo: new Set(['-u', '-g', '-h', '-p', '-C', '-D', '-r', '-t', '-U', '-T']),
+  env: new Set(['-u', '-C', '-S']),
+  xargs: new Set(['-I', '-n', '-L', '-P', '-d', '-E', '-s', '-a']),
+  exec: new Set(['-a']),
+  time: new Set(['-f', '-o'])
+};
 const SHELLS = new Set(['bash', 'sh', 'zsh', 'pwsh', 'powershell', 'cmd']);
 
 const baseName = t => t.replace(/^.*[\\/]/, '').toLowerCase().replace(/\.exe$/, '');
@@ -209,8 +217,13 @@ function normalizeHead(tokens) {
     const t = tokens[i];
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(t)) { i++; continue; }
     if (WRAPPERS.has(baseName(t))) {
+      const valueOpts = WRAPPER_VALUE_OPTS[baseName(t)] || new Set();
       i++;
-      while (i < tokens.length && tokens[i].startsWith('-')) i++;
+      while (i < tokens.length && tokens[i].startsWith('-')) {
+        // Short options that take a separate value (sudo -u git) consume the next token.
+        if (valueOpts.has(tokens[i])) i++;
+        i++;
+      }
       continue;
     }
     break;

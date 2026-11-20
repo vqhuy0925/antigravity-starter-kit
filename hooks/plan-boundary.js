@@ -125,6 +125,10 @@ function gitDir(tokens, base) {
   return dir;
 }
 
+const CD_COMMANDS = new Set(['cd', 'pushd', 'chdir', 'set-location', 'sl', 'push-location']);
+/** True for a path argument computed at run time ($VAR, $(...), backticks) rather than written out. */
+const nonLiteral = t => /[$`]/.test(t);
+
 /** Scan a command line; returns { commit, includeWorktree, pathspecs, dir }. */
 function analyze(cmdLine, baseDir, depth = 0) {
   const res = { commit: false, includeWorktree: false, pathspecs: [], dir: baseDir };
@@ -148,6 +152,8 @@ function analyze(cmdLine, baseDir, depth = 0) {
       res.includeWorktree = res.includeWorktree || r.includeWorktree;
       continue;
     }
+    // A directory change makes later relative pathspecs unresolvable here.
+    if (usePaths && CD_COMMANDS.has(tokens[0].toLowerCase())) res.changesDir = true;
     const g = parseGit(tokens);
     if (!g) continue;
     if (g[0] === 'add') {
@@ -155,7 +161,9 @@ function analyze(cmdLine, baseDir, depth = 0) {
       // pass of a line with an unclosed quote is treated as staging the whole worktree.
       if (usePaths) {
         const a = parseAddArgs(g[1]);
-        if (a.stagesAll) res.includeWorktree = true;
+        // No written-out paths (xargs git add) or computed ones ($FILES, $(...)): the
+        // staged set is unknown here, so check the whole worktree.
+        if (a.stagesAll || !a.pathspecs.length || g[1].some(nonLiteral)) res.includeWorktree = true;
         res.pathspecs.push(...a.pathspecs);
       } else if (!balanced) res.includeWorktree = true;
     }
@@ -163,10 +171,11 @@ function analyze(cmdLine, baseDir, depth = 0) {
       res.commit = true;
       res.dir = gitDir(tokens, baseDir);
       const c = parseCommitArgs(g[1]);
-      if (c.stagesAll) res.includeWorktree = true;
+      if (c.stagesAll || (usePaths && c.pathspecs.some(nonLiteral))) res.includeWorktree = true;
       if (usePaths) res.pathspecs.push(...c.pathspecs);
     }
   }
+  if (res.changesDir && res.pathspecs.length) res.includeWorktree = true;
   return res;
 }
 

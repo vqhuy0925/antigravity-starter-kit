@@ -68,7 +68,7 @@ test('tokenize: empty quotes give an empty token; Windows paths are unchanged', 
 const { fallbackTokens, quotesBalanced, normalizeHead } = require('../hooks/lib');
 test('fallbackTokens skips unknown prefixes to the first git/shell/delete token', () => {
   assert.deepStrictEqual(fallbackTokens(normalizeHead(tokenize('timeout 60 git push'))), ['git', 'push']);
-  assert.deepStrictEqual(fallbackTokens(normalizeHead(tokenize('sudo -u x /usr/bin/git push'))), ['git', 'push']);
+  assert.deepStrictEqual(normalizeHead(tokenize('sudo -u x /usr/bin/git push')), ['git', 'push']);
   assert.strictEqual(fallbackTokens(normalizeHead(tokenize('git push'))), null);
   assert.strictEqual(fallbackTokens(normalizeHead(tokenize('echo git push'))), null);
   assert.strictEqual(fallbackTokens(normalizeHead(tokenize('timeout 60 npm test'))), null);

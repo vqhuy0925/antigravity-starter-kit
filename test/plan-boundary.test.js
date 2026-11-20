@@ -124,3 +124,10 @@ for (const add of ['git add -A', 'git add --all', 'git add -u', 'git add .', 'gi
     assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'ask'));
 test('git add inside bash -c followed by commit is checked', () =>
   assert.strictEqual(run(addRepo(), 'bash -c "git add src/b.ts" && git commit -m x').decision, 'ask'));
+
+// --- Residual: non-literal git add widens the check to the whole worktree ---
+for (const add of [
+  'git add $(git ls-files -m)', 'git add `git ls-files -m`', 'git ls-files -m | xargs git add',
+  'git add $FILES', 'git add "$FILES"', 'cd src && git add b.ts'
+]) test(`${add} && commit checks the whole worktree`, () =>
+  assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'ask'));
