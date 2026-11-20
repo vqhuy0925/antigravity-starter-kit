@@ -72,4 +72,5 @@
   - Sanitize all user-controlled inputs against XSS.
 - **Error Handling**: Never swallow exceptions silently. Log contextually and return standardized error responses.
 
-Frontend work: follow the `responsive-frontend-expert` skill (landing pages: `landing-page-design`).
+## 5. FRONTEND
+- Frontend work: follow the `responsive-frontend-expert` skill (landing pages: `landing-page-design`).

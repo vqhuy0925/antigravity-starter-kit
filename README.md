@@ -40,7 +40,7 @@ Autonomous AI coding agents are extraordinarily powerful, but in real-world prod
 | **Scope Boundary** | Edits random files beyond original user request | **Prompted** by `plan-boundary.js` if a file is not in the approved plan (`docs/plans/<branch>.md`) |
 | **Requirements** | Makes assumptions and codes immediately | **Interrogated** by adversarial `spec-critic` subagent |
 | **QA & Verification** | Dev tests own code with confirmation bias | **Isolated QA Agent** derives a cross-layer test matrix with zero dev bias |
-| **Quality Gate** | Code written without automated tests | **Strict TDD** ("Red Before Green") enforced by `define-tests` & `fix-bug` |
+| **Quality Gate** | Code written without automated tests | **Strict TDD** ("Red Before Green", seam-aware) enforced by `define-tests` & `fix-bug` |
 | **Context Window** | Reads entire 1,000+ line files, burning token quota | **Lean slicing** ($\le 100$ lines), silenced noisy outputs (`-q`) |
 
 ---
@@ -93,7 +93,7 @@ Developers writing their own test cases suffer from **confirmation bias**—they
 
 Antigravity Starter Kit introduces an **Independent QA Subagent Pattern**:
 1. **Isolated Execution:** QA runs as a dedicated subagent (`invoke_subagent` with `Role: 'QA Engineer'` executing `define-tests`) with a clean context, evaluating purely `intent.md` / `spec.md` or the ticket report without seeing dev implementation hacks.
-2. **The Cross-Layer Rule:** defined once in `rules/AGENTS.md`; the layers a project has are listed in its `docs/project_profile.md` (`## Layers`). Test cases assert at each of them, which catches values a database default silently overwrites.
+2. **The Cross-Layer Rule:** defined once in `rules/AGENTS.md`; the layers a project has are listed in its `docs/project_profile.md` (`## Layers`). Test cases assert at the layers the change touches (per the rule in `rules/AGENTS.md`), which catches values a database default silently overwrites.
 3. **Dual Verification Gate:**
    - **Dev (`implement`):** Guides code and automated test construction to satisfy every `TC-xx` scenario in `test_cases.md`.
    - **Reviewer (`review-code`):** Strictly audits test results against `test_cases.md` before approval.
@@ -260,7 +260,7 @@ Copy `templates/project_profile_template.md` to `docs/project_profile.md` in you
 | `ai-native-sdlc` | AI-Native SDLC artifact loop with QA Gate | Orchestrates the full 6-stage artifact loop |
 | `/define-tests` | Independent QA Engineer workflow | Derives acceptance criteria & cross-layer test matrices (`test_cases.md`) |
 | `/plan` | Implementation planning | Analyzes dependencies and produces `docs/plans/<branch>.md` |
-| `/fix-bug` | Bug remediation | Enforces TDD "Red Before Green" reproduction test first |
+| `/fix-bug` | Bug remediation | Enforces TDD "Red Before Green" (seam-aware): reproduction test first where a correct seam exists |
 | `/implement` | Structured task execution | Incremental changes cross-checked against QA test cases |
 | `/review-code` | Code & QA audit | Audits code against OWASP, clean architecture, and test suites |
 | `/commit-code` | Git commit generator | Groups changes by domain and formats Conventional Commits |
