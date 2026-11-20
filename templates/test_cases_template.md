@@ -11,17 +11,17 @@
 ## 1. Scope & Acceptance Criteria (AC)
 <!-- Core functional criteria that MUST be satisfied for the feature to be accepted -->
 - **AC-01:** [Primary expected user flow or business rule]
-- **AC-02:** [Deduction / calculation / transformation rules]
-- **AC-03:** [Audit logging, state transitions, and exception waiver rules]
+- **AC-02:** [Calculation / transformation rules]
+- **AC-03:** [Audit logging, state transitions, and exception rules]
 
 ---
 
-## 2. Cross-Layer Verification Expectations (The 3-Layer Rule)
+## 2. Cross-Layer Verification Expectations (Cross-Layer Rule)
 > [!IMPORTANT]
-> A feature is NOT done just because an entity attribute or in-memory service calculation passes. QA mandates verifying assertions across all 3 layers:
+> A feature is NOT done just because an entity attribute or in-memory service calculation passes. Assert at every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md`. The layer list comes from `docs/project_profile.md` (`## Layers`). Web-app default, as an example:
 1. **Data / Entity Layer:** Database row values, foreign keys, timestamps, default columns (preventing DB default value traps).
-2. **API / Service Layer:** Response DTOs, calculated ratios, audit comments, HTTP status codes.
-3. **UI / Presentation Layer:** Calendar matrix, table cells, display codes, badges, action dialogs.
+2. **API / Service Layer:** Response DTOs, calculated values, audit comments, HTTP status codes.
+3. **UI / Presentation Layer:** Rendered values, table cells, badges, action dialogs.
 
 ---
 
@@ -29,12 +29,12 @@
 
 | TC ID | Covers (AC / Risk) | Level | Task Ref | Category | Preconditions & Inputs | Expected Outcome Across Layers | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **TC01** | AC-01 | `auto:unit` | Task 1 | Happy Path | Shift Telesale (10:00-19:30, net 510m). Checkin 10:00. Early leave approved at 18:30 (60m early). | **DB:** actual worked 450m, ratio 0.88.<br>**DTO:** displayCode '0.88', penalty 0.<br>**UI:** matrix shows '0.88' (NOT '1.0'). | Pending |
-| **TC02** | AC-02 | `auto:unit` | Task 1 | Boundary (Min) | Early leave at start of shift (0 mins worked). | Ratio = 0.0, displayCode = '0.0', appropriate status. | Pending |
-| **TC03** | AC-02 | `auto:unit` | Task 1 | Boundary (Max) | Early leave requested with 0 mins early (leaving at shift end). | Ratio = 1.0, displayCode = '1.0', no penalty. | Pending |
-| **TC04** | AC-03 | `auto:integration` | Task 2 | Negative | Checkout timestamp after shift end or before checkin. | Rejection with HTTP 400 Validation Error. | Pending |
-| **TC05** | AC-01 / Risk | `auto:integration` | Task 2 | DB Default Trap | View attendance matrix for date with approved early leave. | Matrix cell must NOT fall back to DB default `'1.0'`. Reflects calculated ratio. | Pending |
-| **TC06** | AC-01 | `manual` | Task 3 | UI Presentation | Open mobile action dialog & matrix calendar view on iPad/Mobile. | 3-Zone flexbox dialog displays correct shift selection and ratio badge. | Pending |
+| **TC01** | AC-01 | `auto:unit` | Task 1 | Happy Path | Subtotal 200.00, 10% coupon capped at 15.00. | **DB:** `discount_total` 15.00.<br>**API:** `discount: "15.00"`.<br>**UI:** shows "−15.00". | Pending |
+| **TC02** | AC-02 | `auto:unit` | Task 1 | Boundary (Min) | Subtotal 0.00 with the same coupon. | Discount 0.00 at every layer. | Pending |
+| **TC03** | AC-02 | `auto:unit` | Task 1 | Boundary (At Cap) | Subtotal 150.00 (10% equals the 15.00 cap). | Discount 15.00 at every layer. | Pending |
+| **TC04** | AC-03 | `auto:integration` | Task 2 | Negative | Apply an expired coupon. | Rejection with HTTP 422 Validation Error. | Pending |
+| **TC05** | AC-01 / Risk | `auto:integration` | Task 2 | DB Default Trap | Re-read the order after the 15.00 discount was computed. | `discount_total DEFAULT 0` must NOT overwrite the computed 15.00. | Pending |
+| **TC06** | AC-01 | `manual` | Task 3 | UI Presentation | Open the mobile checkout page for the discounted order. | The discount line is shown with the correct amount. | Pending |
 
 > **Levels Guide:**
 > - `auto:unit`: In-memory isolated test (unit runner, mock dependencies, fast execution).
@@ -44,10 +44,10 @@
 ---
 
 ## 4. Regression & Security Edge Cases
-- [ ] **No Hardcoded Defaults Override:** Verify DB defaults (e.g. `'1.0'`) do not overwrite calculated fractional ratios.
-- [ ] **Division by Zero Protection:** Standard shift duration = 0 or missing shifts gracefully handled.
-- [ ] **Idempotency & Re-approval:** Re-approving or rejecting an already approved request properly recalculates or reverts attendance metrics.
-- [ ] **Permission & Role Security:** Unauthorized users cannot approve their own early leave or override penalties.
+- [ ] **No Hardcoded Defaults Override:** Verify DB defaults (e.g. `DEFAULT 0`) do not overwrite calculated values.
+- [ ] **Division by Zero Protection:** Zero or missing divisors gracefully handled.
+- [ ] **Idempotency & Re-approval:** Re-approving or rejecting an already approved request properly recalculates or reverts the affected values.
+- [ ] **Permission & Role Security:** Unauthorized users cannot approve their own request or override calculated values.
 
 ---
 
@@ -61,5 +61,5 @@
 
 ## 6. QA Sign-Off Gate
 - [ ] All test cases in Section 3 have corresponding automated tests (`auto:unit`, `auto:integration`) or verified manual proof.
-- [ ] Review-Code agent verified that entity state, API DTO, and UI display codes match expectations.
-- [ ] No regression detected in related attendance or payroll calculations.
+- [ ] Review-Code agent verified the change at every layer listed for this change.
+- [ ] No regression detected in related calculations.

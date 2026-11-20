@@ -13,7 +13,7 @@ description: Execute code changes step-by-step based on the approved plan (`docs
 
 ## 2. QA Test Cases Cross-Verification (Anti-Bias Rule)
 - **Reference QA Truth:** Load `test_cases.md` produced by the independent QA Agent.
-- **Cross-Layer Implementation:** Ensure code changes and automated tests cover all specified scenarios (TC-01, TC-02, etc.) across all 3 layers (Database state, Service/DTO calculations, and UI presentation/display codes).
+- **Cross-Layer Implementation:** Ensure code changes and automated tests cover all specified scenarios (TC-01, TC-02, etc.) at every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md`.
 - **No Self-Serving Shortcuts:** Developer cannot skip edge cases or boundary validations defined by QA. All automated tests must pass before marking tasks complete.
 
 ## 3. Handling Plan Deviations

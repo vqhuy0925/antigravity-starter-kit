@@ -44,7 +44,7 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 - **Approval Gate:** Tech Lead / Architect approves `spec.md`.
 
 ### Stage 2b: QA Verification Contract (`define-tests`)
-- **Artifact:** `test_cases.md` (Acceptance criteria, boundary conditions, cross-layer assertions: DB vs API DTO vs UI matrix).
+- **Artifact:** `test_cases.md` (Acceptance criteria, boundary conditions, assertions at every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md`).
 - **Owner:** `define-tests` is triggered here, once; `plan` only reads `test_cases.md`.
 - **Agent Role:** Independent **QA Agent** (executed in an isolated subagent context with zero dev implementation bias).
 - **Process:** QA derives pure black-box test scenarios from `intent.md`/`spec.md` before developer implementation starts.

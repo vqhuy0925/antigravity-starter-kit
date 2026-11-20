@@ -14,10 +14,10 @@ description: Run automated tests, linters, type checks, and audit code against Q
 > [!IMPORTANT]
 > Developer tests alone are not sufficient. The reviewer MUST independently cross-check implementation evidence against `test_cases.md` defined by the QA Agent:
 - **Scenario Completeness:** Verify that every scenario (`TC-01`, `TC-02`, etc.) in `test_cases.md` has a corresponding passing automated test or documented verification.
-- **The 3-Layer Rule Audit:** Ensure verification covers all 3 layers:
+- **Cross-Layer Rule Audit:** Ensure verification covers every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md` (layers listed in `docs/project_profile.md`). For a typical web app:
   1. Data layer: Entity state & DB column defaults.
-  2. Service layer: API DTO response payloads, calculated ratios, penalty waivers.
-  3. Presentation layer: UI display codes, calendar matrix rendering, and badge values.
+  2. Service layer: API DTO response payloads and calculated values.
+  3. Presentation layer: Rendered values and badges.
 - **Reject on Missing QA Coverage:** If any QA test scenario is skipped, mocked away superficially, or failing, REJECT the review and require dev fixes.
 
 ## 3. Clean Code & Security Audit Checklist

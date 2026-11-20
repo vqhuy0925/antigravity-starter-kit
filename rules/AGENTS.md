@@ -1,22 +1,23 @@
 # Global Agent Guidelines & Engineering Standards
 
 ## 1. DEVELOPMENT WORKFLOW & AI-NATIVE SDLC LIFECYCLE
+- If `docs/project_profile.md` exists, read it first: it names the project's layers and verification commands (template: `templates/project_profile_template.md`).
 - **6-Stage Artifact Loop**:
   - **Stage 1 (Plan)**: Brainstorm intent $\rightarrow$ produce and commit `intent.md` (Problem, Desired Outcome, Constraints, Open Questions).
   - **Stage 2 (Design)**: Produce `spec.md` with requirements, UI/UX specs, API contracts, and flagged policy concerns (critiqued by `spec-critic`).
   - **Stage 2b (QA - `define-tests`)**: Independent QA Agent (running in an isolated subagent context with zero dev bias) derives acceptance criteria, boundary tests, and cross-layer assertions into `test_cases.md`.
   - **Stage 3 (Build/Plan)**: Plan mode as default $\rightarrow$ write the plan to `docs/plans/<branch>.md` (branch `/` → `-`) and commit it with the work (changed files, execution order, risks, proof).
   - **Stage 4 (Implement & Test)**: TDD discipline. Implement incrementally against `test_cases.md`. Continuous verification with automated tests, type checks, and linters.
-  - **Stage 5 (Deploy & Review)**: Tiered deployment (`deploy.md`). Reviewer audits code strictly against `test_cases.md` across 3 layers (DB, API DTO, UI matrix). Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
+  - **Stage 5 (Deploy & Review)**: Tiered deployment (`deploy.md`). Reviewer audits code strictly against `test_cases.md` across the layers the change touches (Cross-Layer Rule, §1). Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
   - **Stage 6 (Maintain)**: Incident diagnosis $\rightarrow$ `bug_report.md` with RCA and fix plan. Close the loop by adding permanent regression tests.
 - **QA Independence Rule (No Dev Bias)**:
   - QA Agent and Dev MUST NOT share context during test case definition.
   - QA evaluates requirements purely from `intent.md`, `spec.md`, or the ticket/issue report in a dedicated subagent invocation (`invoke_subagent` with `Role: 'QA Engineer'`).
-  - QA tests must enforce the **3-Layer Rule**: Assertions must cover (1) Database / Entity State, (2) API / Service DTOs, and (3) UI / Matrix Presentation (preventing DB default value traps).
+  - QA tests must enforce the **Cross-Layer Rule**: assert at every layer the change touches; for a typical web app that is data, API, and UI. The layers a project has are listed in `docs/project_profile.md` (`## Layers`). This prevents DB default value traps, where a column default silently overwrites a computed value.
 - **Task Complexity Tiers & Auto-Detection**:
   - **Tier 1 (Trivial / Fast-Track)**: Minor text/label updates, typo fixes, icon changes, minor CSS/styling adjustments, simple constant values without schema or business logic impact.
     - *Action*: Auto-detect and execute directly without creating a plan file, `task.md`, or `walkthrough.md`; commit still asks per §2. Inspect $\rightarrow$ Edit $\rightarrow$ Quick Verify (lint/type-check) $\rightarrow$ Report summary directly in chat response.
-  - **Tier 2 (Standard / Complex)**: New features, logic fixes, API/DTO modifications, database migrations, financial/clinical business logic changes (5-Context rules).
+  - **Tier 2 (Standard / Complex)**: New features, logic fixes, API/DTO modifications, database migrations, business-rule or calculation changes.
     - *Action*: Strictly follow the 6-Stage SDLC Loop (plan approved per §2, `task.md`, implementation, verification, and `walkthrough.md`).
 - **Institutional Memory (2-Mistake Rule)**:
   - Whenever an AI assistant repeats a mistake twice, immediately update `AGENTS.md` or the corresponding project rule files with the corrective instruction.

@@ -39,7 +39,7 @@ Autonomous AI coding agents are extraordinarily powerful, but in real-world prod
 | **Secret Protection** | Can inadvertently leak API keys or AWS credentials | **Scanned & blocked** in real-time by `secret-scan.js` |
 | **Scope Boundary** | Edits random files beyond original user request | **Prompted** by `plan-boundary.js` if a file is not in the approved plan (`docs/plans/<branch>.md`) |
 | **Requirements** | Makes assumptions and codes immediately | **Interrogated** by adversarial `spec-critic` subagent |
-| **QA & Verification** | Dev tests own code with confirmation bias | **Isolated QA Agent** derives 3-layer test matrix with zero dev bias |
+| **QA & Verification** | Dev tests own code with confirmation bias | **Isolated QA Agent** derives a cross-layer test matrix with zero dev bias |
 | **Quality Gate** | Code written without automated tests | **Strict TDD** ("Red Before Green") enforced by `define-tests` & `fix-bug` |
 | **Context Window** | Reads entire 1,000+ line files, burning token quota | **Lean slicing** ($\le 100$ lines), silenced noisy outputs (`-q`) |
 
@@ -80,7 +80,7 @@ flowchart TD
 
 1. **Stage 1 (Intent):** Captures high-level business goals, constraints, and success metrics.
 2. **Stage 2 (Design & Spec):** Detailed architectural, API DTO contracts, and responsive UI specifications.
-3. **Stage 2b (Adversarial Critique & QA):** Independent QA Agent and `spec-critic` derive test cases with **zero dev bias** across 3 layers (Database, DTO, UI).
+3. **Stage 2b (Adversarial Critique & QA):** Independent QA Agent and `spec-critic` derive test cases with **zero dev bias** at every layer the change touches (e.g. Database, DTO, UI).
 4. **Stage 3 (Plan):** Execution order, change boundaries, risks, and proof verification plan.
 5. **Stage 4 (Implement & TDD):** Incremental code changes verified by automated tests.
 6. **Stage 5 (Review & Deploy):** Independent code audit against OWASP Top 10, clean architecture, and staging gate.
@@ -89,14 +89,14 @@ flowchart TD
 
 ## 🧪 Independent QA Agent & Zero-Dev-Bias
 
-Developers writing their own test cases suffer from **confirmation bias**—they test against implementation assumptions rather than actual requirements, often missing presentation traps (e.g. database column defaults overriding calculated values in calendar/matrix views).
+Developers writing their own test cases suffer from **confirmation bias**—they test against implementation assumptions rather than actual requirements, often missing presentation traps (e.g. database column defaults overriding calculated values in rendered views).
 
 Antigravity Starter Kit introduces an **Independent QA Subagent Pattern**:
 1. **Isolated Execution:** QA runs as a dedicated subagent (`invoke_subagent` with `Role: 'QA Engineer'` executing `define-tests`) with a clean context, evaluating purely `intent.md` / `spec.md` or the ticket report without seeing dev implementation hacks.
-2. **The 3-Layer Rule:** QA defines test assertions across 3 layers:
+2. **The Cross-Layer Rule (opt-in via `docs/project_profile.md`):** QA asserts at every layer the change touches. For a typical web app:
    - **Data / Entity Layer:** Database row values, foreign keys, and default columns.
-   - **API / Service Layer:** Response DTOs, calculated ratios, penalty waivers, and audit comments.
-   - **UI / Presentation Layer:** Calendar matrix, table cells, display codes, and badges.
+   - **API / Service Layer:** Response DTOs, calculated values (e.g. a coupon discount), and audit comments.
+   - **UI / Presentation Layer:** Rendered values, table cells, and badges.
 3. **Dual Verification Gate:**
    - **Dev (`implement`):** Guides code and automated test construction to satisfy every `TC-xx` scenario in `test_cases.md`.
    - **Reviewer (`review-code`):** Strictly audits test results against `test_cases.md` before approval.
@@ -129,7 +129,7 @@ antigravity-starter-kit/
 ├── templates/                           # Standardized SDLC markdown templates
 │   ├── intent_template.md               # Stage 1 (Plan): Intent proto-spec
 │   ├── spec_template.md                 # Stage 2 (Design): Technical & UX specification
-│   ├── test_cases_template.md           # Stage 2b (QA): Independent test specification & 3-layer matrix
+│   ├── test_cases_template.md           # Stage 2b (QA): Independent test specification & cross-layer matrix
 │   ├── plan_template.md                 # Stage 3 (Build): Implementation plan
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
@@ -255,7 +255,7 @@ Put this step in your project's own workflow so nobody has to remember it, for e
 | `/retro` | Closed-loop AI retrospective | Captures developer-first feedback & tracks cross-sprint themes |
 | `/knowledge-wiki` | Project Knowledge Wiki (OKF) | Bootstraps, BM25-searches (`ksearch`), and drift-checks (`scan-drift`) docs |
 | `ai-native-sdlc` | AI-Native SDLC artifact loop with QA Gate | Orchestrates the full 6-stage artifact loop |
-| `/define-tests` | Independent QA Engineer workflow | Derives acceptance criteria & 3-layer test matrices (`test_cases.md`) |
+| `/define-tests` | Independent QA Engineer workflow | Derives acceptance criteria & cross-layer test matrices (`test_cases.md`) |
 | `/plan` | Implementation planning | Analyzes dependencies and produces `docs/plans/<branch>.md` |
 | `/fix-bug` | Bug remediation | Enforces TDD "Red Before Green" reproduction test first |
 | `/implement` | Structured task execution | Incremental changes cross-checked against QA test cases |
