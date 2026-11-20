@@ -15,13 +15,8 @@ description: Run automated tests, linters, type checks, and audit code against Q
 - **Cross-Layer Rule Audit:** Ensure verification covers every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md` (layers listed in `docs/project_profile.md`).
 - **Reject on Missing QA Coverage:** If any QA test scenario is skipped, mocked away superficially, or failing, REJECT the review and require dev fixes.
 
-## 3. Clean Code & Security Audit Checklist
-- **No Hardcoded Secrets:** Ensure no API keys, tokens, or passwords are committed.
-- **SQL Injection Prevention:** Verify all queries use parameter binding / ORM mechanisms.
-- **XSS Sanitization:** Check user-rendered inputs for potential injection vectors.
-- **Exception Safety:** Confirm no empty catch blocks (`catch (e) {}`).
-- **DRY & SRP:** Ensure functions and components have single responsibility.
-- **Modern Web Standards Audit:** For frontend changes, flag redundant dependencies (e.g. Popper.js, floating-ui, custom modal JS) where native Web Baseline APIs (`<dialog>`, Popover API, CSS Anchor Positioning) should be used (see [`modern-web-guidance`](../modern-web-guidance/SKILL.md)).
+## 3. Clean Code & Security Audit
+- Run the `code-reviewer` subagent on the diff (`invoke_subagent`, definition `agents/code-reviewer.md`) and include its verdict.
 
 ## 4. Walkthrough Documentation
 - Create or update `walkthrough.md` with a summary of changes, verified behaviors, QA test case coverage matrix, and test execution evidence.

@@ -132,3 +132,13 @@ test('planning boundary stated once in plan', () => {
     assert.match(read(`skills/${s}/SKILL.md`), /skills\/plan\/SKILL\.md/);
   }
 });
+
+test('code-reviewer owns the audit checklist', () => {
+  const r = read('skills/review-code/SKILL.md');
+  assert.match(r, /agents\/code-reviewer\.md/);
+  assert.doesNotMatch(r, /SQL Injection/i);
+  const c = read('agents/code-reviewer.md');
+  assert.match(c, /SRP/);
+  assert.match(c, /modern-web-guidance/);
+  assert.doesNotMatch(c, /Controllers only orchestrate/);
+});

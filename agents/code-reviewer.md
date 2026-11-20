@@ -18,13 +18,16 @@ You are an independent code auditor. Your mission is to inspect staged changes a
 
 ### 2. Architecture & Data Boundaries (Blocker)
 - **DTO Isolation:** Ensure internal Database Entities are NEVER returned directly across REST/API boundaries.
-- **Layered Clean Architecture:** Layering follows the project's existing layering; where it has none, default to: Controllers only orchestrate DTOs $\rightarrow$ Services encapsulate domain logic $\rightarrow$ Repositories handle data access.
+- **Layered Clean Architecture:** Layering follows the project's existing layering (`rules/AGENTS.md` §4).
 - **Transactional Integrity:** Modifying multi-step mutations must be enclosed in transactional blocks.
 - **No Untracked Exceptions:** Flag any empty catch blocks (`catch (e) {}`).
 
-### 3. Frontend & Mobile Ergonomics (frontend changes only)
-- **No `100vh` on mobile:** Must use `100dvh` or flex containers.
-- **Touch Target:** Minimum 44x44px clickable area on interactive elements.
+### 3. Code Quality
+- **DRY & SRP:** Functions and components have a single responsibility; flag duplicated logic.
+
+### 4. Frontend & Mobile Ergonomics (frontend changes only)
+- **Responsive Standards:** Check against `skills/responsive-frontend-expert/SKILL.md`.
+- **Modern Web Standards:** Flag redundant dependencies (e.g. Popper.js, floating-ui, custom modal JS) where native Web Baseline APIs should be used; see `skills/modern-web-guidance/SKILL.md`.
 
 ---
 
