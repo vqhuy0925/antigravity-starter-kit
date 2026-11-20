@@ -66,3 +66,13 @@ test('fix-bug writes the failing test first only at a correct seam', () => {
   assert.match(f, /diagnosing-bugs/);
   assert.match(f, /no correct seam/i);
 });
+test('no dangling skill references; slice order stated in implement', () => {
+  assert.doesNotMatch(read('skills/tdd/SKILL.md'), /`code-review`/);
+  assert.match(read('skills/tdd/SKILL.md'), /`review-code`/);
+  assert.doesNotMatch(read('skills/ai-native-sdlc/SKILL.md'), /`\/deploy`/);
+  assert.match(read('skills/wait-what/SKILL.md'), /domain-modeling/);
+  assert.match(read('skills/implement/SKILL.md'), /vertical slice/i);
+  const w = read('skills/writing-for-agents/SKILL.md');
+  assert.doesNotMatch(w, /CLAUDE\.md/);
+  assert.match(w, /GEMINI\.md/);
+});

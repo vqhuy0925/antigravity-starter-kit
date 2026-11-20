@@ -66,7 +66,7 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 - **Artifact:** `deploy.md`
 - **Development/Local:** Agents can run formatters, linters, and unit tests freely.
 - **Review Gate (`review-code`):** Reviewer strictly audits the implementation and test results against `test_cases.md`. If any QA scenario is missed or unverified, review fails.
-- **Staging/Production:** Strictly gated. Agents prepare PRs, release notes, and migration scripts; execution requires explicit human authorization (`/deploy`).
+- **Staging/Production:** Strictly gated. Agents prepare PRs, release notes, and migration scripts; execution requires explicit human authorization (fill in `templates/deploy_template.md` and ask per the approval ladder in `rules/AGENTS.md` §2).
 
 ### Stage 6: Maintain (Closing the Loop)
 - **Triggers:** Production incidents, error alerts, or QA bug tickets trigger the AI.
