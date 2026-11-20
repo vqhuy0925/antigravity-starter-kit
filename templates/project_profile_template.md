@@ -12,12 +12,21 @@ This profile captures core technology stack commands, domain terminology, and ar
 
 ---
 
+## Layers
+The layers each test case must assert at (Cross-Layer Rule, `rules/AGENTS.md`). Example: `Data (DB) · API (DTO) · UI`. A CLI or library may have only one or two.
+- **Layers:** [e.g. Data (DB) · API (DTO) · UI]
+
+---
+
 ## 2. Standard Verification Commands
 Agents use these exact commands for testing, linting, and building:
 - **Run Unit Tests:** `npm test -- --silent` or `./gradlew test -q`
 - **Run Integration Tests:** `npm run test:e2e` or `./gradlew integrationTest -q`
 - **Run Linter:** `npm run lint` or `./gradlew check`
 - **Run Typecheck:** `npx tsc --noEmit` or `npx vue-tsc --noEmit`
+- **Run Build:** `npm run build` or `./gradlew build -q`
+- **Run Migrations:** `npm run migrate` or `./gradlew flywayMigrate`
+- **Rollback Migrations:** `npm run migrate:down` or `./gradlew flywayUndo`
 - **Local Dev Server:** `npm run dev`
 
 ---
@@ -35,7 +44,7 @@ Crucial business domain terminology. AI agents must use these exact terms:
 - **Authentication Mechanism:** [e.g. JWT in Authorization Bearer / HttpOnly Cookie / Session]
 - **Enforced Roles:**
   - `ADMIN`: Full access to configuration, user management, and system logs.
-  - `STAFF` / `USER`: Standard access to assigned tenant/patient data.
+  - `STAFF` / `USER`: Standard access to assigned tenant/account data.
 
 ---
 

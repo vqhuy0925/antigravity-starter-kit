@@ -16,11 +16,8 @@ Developers inherently suffer from confirmation bias—writing tests that validat
 - **Independent Agent Execution:** The QA Agent MUST execute in an isolated context (e.g., via `invoke_subagent` with `Role: 'QA Engineer'` or a standalone prompt).
 - **Clean Requirements Source:** QA evaluates requirements strictly from `intent.md`, `spec.md`, user problem statements, or bug reports. QA does NOT consult dev implementation plans, in-progress code, or temporary mock shortcuts.
 
-### Principle 2: Cross-Layer Verification (The 3-Layer Rule)
-A bug often lives in the disconnect between data layers. Never define test cases that only assert internal entity state. Every test scenario must verify:
-1. **Data Layer (Entity / DB):** State transitions, persisted values, timestamps, and default column behavior (e.g., preventing DB default value traps).
-2. **Service / API Layer (DTOs):** Calculated attributes, response status codes, penalty waivers, and audit logs.
-3. **Presentation / UI Layer (Client / Matrix):** Display codes (e.g., `'0.88'` vs DB default `'1.0'`), badges, error alerts, and matrix calendar cells.
+### Principle 2: Cross-Layer Verification
+A bug often lives in the disconnect between layers. Never define test cases that only assert internal entity state. Apply the Cross-Layer Rule in `rules/AGENTS.md`, using the layers listed in `docs/project_profile.md` (`## Layers`). Illustration: a `discount_total DEFAULT 0` column overwriting a computed `15.00` is only caught by checking the stored value, the API response, and the rendered value.
 
 ---
 
@@ -31,8 +28,8 @@ A bug often lives in the disconnect between data layers. Never define test cases
 - **Focus:**
   - Map every Acceptance Criterion (AC) to observable behaviors.
   - Formulate mathematical boundary cases, state transitions, and edge cases.
-  - Scrutinize business formulas (e.g., attendance deductions, penalty thresholds) and identify conflicting logic.
-  - Specify clear Preconditions, Test Steps, and Expected Results across all 3 layers.
+  - Scrutinize business formulas (e.g., discount caps, tiered pricing thresholds) and identify conflicting logic.
+  - Specify clear Preconditions, Test Steps, and Expected Results at every layer the change touches (Cross-Layer Rule).
 
 ### Mode B: Developer Test Planning Mode (Code & Plan Aware)
 - **Context:** The developer maps QA test cases to the plan (`docs/plans/<branch>.md`) and codebase test suites.
@@ -56,11 +53,11 @@ A bug often lives in the disconnect between data layers. Never define test cases
 ## 4. Test Design & Derivation Methodology
 
 Systematically cover the following dimensions:
-1. **Happy Path:** The primary flow that confirms the basic business requirement works and formulas calculate correctly (e.g., $(510 - 60) / 510 = 0.88$ công).
-2. **Boundary Values (BVA):** Minimum boundaries (0 mins worked), maximum boundaries (leaving at shift end), and interval transitions (unpaid lunch breaks).
-3. **Negative & Validation Scenarios:** Invalid timestamps (checkout before checkin), missing required shift links, duplicate requests.
-4. **State Fallback & Persistence Traps:** Ensure DB defaults (e.g., `DEFAULT '1.0'`) do not overwrite calculated fractional ratios; idempotency on request re-approval or cancellation.
-5. **UI / Mobile Ergonomics:** Paging, touch responsiveness, 3-zone dialog layouts, and safe-area insets.
+1. **Happy Path:** The primary flow that confirms the basic business requirement works and formulas calculate correctly (e.g., a 10% coupon on a 200.00 subtotal, capped at 15.00, gives a 15.00 discount).
+2. **Boundary Values (BVA):** Minimum boundaries (0.00 subtotal), the cap boundary (150.00 subtotal), and interval transitions (just below and above a threshold).
+3. **Negative & Validation Scenarios:** Invalid input (expired coupon, negative quantity), missing required links, duplicate requests.
+4. **State Fallback & Persistence Traps:** Ensure DB defaults (e.g., `DEFAULT 0`) do not overwrite calculated values; idempotency on request re-approval or cancellation.
+5. **UI / Mobile Ergonomics:** If the change touches a UI layer: paging, touch responsiveness, 3-zone dialog layouts, and safe-area insets.
 
 ---
 

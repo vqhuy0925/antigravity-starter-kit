@@ -18,7 +18,7 @@
 
 ## 2. Deployment Artifacts & Steps
 1. **Database Migration:**
-   - Command: `npm run migrate` or `./gradlew flywayMigrate`
+   - Command: `[migration command from docs/project_profile.md]`
 2. **Deploy Application Container:**
    - Image tag: `registry.example.com/app:v1.2.0`
 3. **Cache / CDN Invalidation:**
@@ -35,5 +35,5 @@
 
 ## 4. Rollback Plan (If Critical Failure Occurs)
 1. **Rollback Container Image:** Re-deploy previous stable tag `v1.1.9`.
-2. **Database Rollback:** Execute down migration script: `npm run migrate:down`.
+2. **Database Rollback:** Execute down migration script: `[rollback command from docs/project_profile.md]`.
 3. **Incident Notice:** Notify team and create `bug_report.md` for post-mortem analysis.

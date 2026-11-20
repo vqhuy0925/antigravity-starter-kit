@@ -22,7 +22,7 @@ Before raising any question, run the **Ownership Test** to avoid spamming the us
 
 ### Send to the PO / User (Record under "Blocking Questions"):
 - The answer alters what a user sees, can do, or pays.
-- The answer depends on real-world business policy (e.g. attendance penalty rules, grace periods, payment terms).
+- The answer depends on real-world business policy (e.g. refund windows, grace periods, payment terms).
 - A mathematical contradiction or conflicting rules exist between two criteria.
 - Multiple interpretations exist and each leads to substantially different functional outcomes.
 

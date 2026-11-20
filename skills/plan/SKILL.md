@@ -16,7 +16,7 @@ description: Plan the implementation of a task or ticket by researching the code
 - Read `test_cases.md` (produced at Stage 2b). If it exists, use it and do not re-run `define-tests`.
 - Only if `test_cases.md` is missing, invoke an isolated subagent via `invoke_subagent`:
   - `Role`: `'QA Engineer'`
-  - `Prompt`: Instruct the QA subagent to analyze the user request / bug report / `spec.md`, execute the `define-tests` skill, and generate `test_cases.md` across 3 layers (DB, API DTO, UI matrix) using `templates/test_cases_template.md`.
+  - `Prompt`: Instruct the QA subagent to analyze the user request / bug report / `spec.md`, execute the `define-tests` skill, and generate `test_cases.md` per the Cross-Layer Rule in `rules/AGENTS.md`, using `templates/test_cases_template.md`.
 - Wait for the QA subagent to produce `test_cases.md`.
 
 ## 3. Generate Plan Artifacts

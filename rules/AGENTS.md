@@ -1,22 +1,23 @@
 # Global Agent Guidelines & Engineering Standards
 
 ## 1. DEVELOPMENT WORKFLOW & AI-NATIVE SDLC LIFECYCLE
+- If `docs/project_profile.md` exists, read it first: it names the project's layers and verification commands (template: `templates/project_profile_template.md`).
 - **6-Stage Artifact Loop**:
   - **Stage 1 (Plan)**: Brainstorm intent $\rightarrow$ produce and commit `intent.md` (Problem, Desired Outcome, Constraints, Open Questions).
   - **Stage 2 (Design)**: Produce `spec.md` with requirements, UI/UX specs, API contracts, and flagged policy concerns (critiqued by `spec-critic`).
   - **Stage 2b (QA - `define-tests`)**: Independent QA Agent (running in an isolated subagent context with zero dev bias) derives acceptance criteria, boundary tests, and cross-layer assertions into `test_cases.md`.
   - **Stage 3 (Build/Plan)**: Plan mode as default $\rightarrow$ write the plan to `docs/plans/<branch>.md` (branch `/` → `-`) and commit it with the work (changed files, execution order, risks, proof).
   - **Stage 4 (Implement & Test)**: TDD discipline. Implement incrementally against `test_cases.md`. Continuous verification with automated tests, type checks, and linters.
-  - **Stage 5 (Deploy & Review)**: Tiered deployment (`deploy.md`). Reviewer audits code strictly against `test_cases.md` across 3 layers (DB, API DTO, UI matrix). Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
+  - **Stage 5 (Deploy & Review)**: Tiered deployment (`deploy.md`). Reviewer audits code strictly against `test_cases.md` across the layers the change touches (Cross-Layer Rule, §1). Local/Dev tests run automatically; Staging/Production deployments are strictly gated.
   - **Stage 6 (Maintain)**: Incident diagnosis $\rightarrow$ `bug_report.md` with RCA and fix plan. Close the loop by adding permanent regression tests.
 - **QA Independence Rule (No Dev Bias)**:
   - QA Agent and Dev MUST NOT share context during test case definition.
   - QA evaluates requirements purely from `intent.md`, `spec.md`, or the ticket/issue report in a dedicated subagent invocation (`invoke_subagent` with `Role: 'QA Engineer'`).
-  - QA tests must enforce the **3-Layer Rule**: Assertions must cover (1) Database / Entity State, (2) API / Service DTOs, and (3) UI / Matrix Presentation (preventing DB default value traps).
+  - QA tests must enforce the **Cross-Layer Rule**: assert at every layer the change touches; for a typical web app that is data, API, and UI. The layers a project has are listed in `docs/project_profile.md` (`## Layers`). This prevents DB default value traps, where a column default silently overwrites a computed value.
 - **Task Complexity Tiers & Auto-Detection**:
   - **Tier 1 (Trivial / Fast-Track)**: Minor text/label updates, typo fixes, icon changes, minor CSS/styling adjustments, simple constant values without schema or business logic impact.
     - *Action*: Auto-detect and execute directly without creating a plan file, `task.md`, or `walkthrough.md`; commit still asks per §2. Inspect $\rightarrow$ Edit $\rightarrow$ Quick Verify (lint/type-check) $\rightarrow$ Report summary directly in chat response.
-  - **Tier 2 (Standard / Complex)**: New features, logic fixes, API/DTO modifications, database migrations, financial/clinical business logic changes (5-Context rules).
+  - **Tier 2 (Standard / Complex)**: New features, logic fixes, API/DTO modifications, database migrations, business-rule or calculation changes.
     - *Action*: Strictly follow the 6-Stage SDLC Loop (plan approved per §2, `task.md`, implementation, verification, and `walkthrough.md`).
 - **Institutional Memory (2-Mistake Rule)**:
   - Whenever an AI assistant repeats a mistake twice, immediately update `AGENTS.md` or the corresponding project rule files with the corrective instruction.
@@ -30,7 +31,7 @@
   - Update `task.md` with progress (`[/]` for in-progress, `[x]` for completed) when in Tier 2 mode.
   - Verify syntax and run lightweight compilation commands frequently.
 - **Review & Verification Phase**:
-  - Run linters, unit tests, and type checks before finishing.
+  - Run the project's lint, type-check, and test commands (from `docs/project_profile.md`) before finishing. If there is no profile, detect the commands from the project's manifest (`package.json` scripts, `Makefile`, build files) and say which ones you used.
   - Audit test coverage against `test_cases.md`. If any QA scenario is missing or failing, the review is rejected.
   - Produce a `walkthrough.md` artifact summarizing changes, QA test coverage, and test evidence for Tier 2 tasks.
 - **Commit Phase**:
@@ -63,7 +64,7 @@
 - **Knowledge Wiki & Traceability-First**: When a project contains a knowledge wiki (`*-knowledge/tools/ksearch.mjs` or `docs/knowledge/tools/ksearch.mjs`), run `ksearch` first before broad grep scans, read directly from the returned `traceability` paths, and sync domain specs + `indexer.mjs` before finalizing feature changes.
 
 ## 4. CODE QUALITY & ARCHITECTURAL SAFETY
-- **Layered Architecture**: Controller -> Service -> Repository -> Entity/Data Model.
+- **Layered Architecture**: Follow the project's existing layering. Default for a new backend service: Controller -> Service -> Repository -> Entity.
 - **Data Transfer Objects (DTOs)**: Always use DTOs for external API contracts. Never expose database entities directly.
 - **Security & Secret Sanitization**:
   - Never hardcode credentials, keys, or tokens in source code. Use environment variables.
@@ -71,12 +72,5 @@
   - Sanitize all user-controlled inputs against XSS.
 - **Error Handling**: Never swallow exceptions silently. Log contextually and return standardized error responses.
 
-## 5. RESPONSIVE FRONTEND, TOUCH ERGONOMICS & UI/UX TASTE
-- **Viewport Standards**: Optimize for Desktop (>= 1440px), Laptop/iPad Pro (1024px-1439px), iPad/Tablet (600px-1023px), and Mobile (< 600px).
-- **Mobile Dialogs (3-Zone Flexbox)**: Always use `height: 100dvh` / `max-height: 100dvh`, Header (`shrink-0`), Body (`col scroll min-h-0`), Footer (`shrink-0` with safe-area padding).
-- **Touch Targets**: Minimum 44x44px clickable area for touch accessibility.
-- **Anti-AI Slop & Visual Taste**:
-  - Strictly avoid generic AI clichés: SaaS purple gradients, emojis as bullet icons, rounded cards with left border accents, awkward hand-drawn SVG illustrations, default Inter/Roboto for display headings, or lazy dark themes (`#0D1117` + neon glow).
-  - Apply modern typographic craft: `text-wrap: pretty`, `oklch()` color spaces, pairing distinctive editorial serifs for headings with clean sans-serif for body copy.
-- **Asset-First Protocol**: Never design from a blank canvas. Gather official brand logos (SVG), high-quality authentic imagery, and extract exact brand hex codes (`var(--brand-*)`) before building layouts. Never use grey placeholder boxes or CSS silhouettes.
-- **120% Signature Rule**: Select exactly 1 marquee hero detail to polish to 120% craft; maintain the remaining elements clean, concise, and disciplined at 80%.
+## 5. FRONTEND
+- Frontend work: follow the `responsive-frontend-expert` skill (landing pages: `landing-page-design`).

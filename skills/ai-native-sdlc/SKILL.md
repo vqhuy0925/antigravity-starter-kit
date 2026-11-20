@@ -44,7 +44,7 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 - **Approval Gate:** Tech Lead / Architect approves `spec.md`.
 
 ### Stage 2b: QA Verification Contract (`define-tests`)
-- **Artifact:** `test_cases.md` (Acceptance criteria, boundary conditions, cross-layer assertions: DB vs API DTO vs UI matrix).
+- **Artifact:** `test_cases.md` (Acceptance criteria, boundary conditions, assertions at every layer the change touches, per the Cross-Layer Rule in `rules/AGENTS.md`).
 - **Owner:** `define-tests` is triggered here, once; `plan` only reads `test_cases.md`.
 - **Agent Role:** Independent **QA Agent** (executed in an isolated subagent context with zero dev implementation bias).
 - **Process:** QA derives pure black-box test scenarios from `intent.md`/`spec.md` before developer implementation starts.
@@ -66,7 +66,7 @@ This skill encodes the stage-by-stage workflow for modern AI-native software dev
 - **Artifact:** `deploy.md`
 - **Development/Local:** Agents can run formatters, linters, and unit tests freely.
 - **Review Gate (`review-code`):** Reviewer strictly audits the implementation and test results against `test_cases.md`. If any QA scenario is missed or unverified, review fails.
-- **Staging/Production:** Strictly gated. Agents prepare PRs, release notes, and migration scripts; execution requires explicit human authorization (`/deploy`).
+- **Staging/Production:** Strictly gated. Agents prepare PRs, release notes, and migration scripts; execution requires explicit human authorization (fill in `templates/deploy_template.md` and ask per the approval ladder in `rules/AGENTS.md` §2).
 
 ### Stage 6: Maintain (Closing the Loop)
 - **Triggers:** Production incidents, error alerts, or QA bug tickets trigger the AI.

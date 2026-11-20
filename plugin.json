@@ -1,15 +1,15 @@
 {
   "name": "antigravity-starter-kit",
   "displayName": "Antigravity Enterprise Starter Kit",
-  "description": "Enterprise-grade toolkit for Antigravity AI agents featuring AI-Native SDLC, independent QA Agent testing, 3-layer verification, token economy, responsive mobile UX, programmatic hooks, and conventional commits.",
-  "version": "1.6.0",
+  "description": "Enterprise-grade toolkit for Antigravity AI agents featuring AI-Native SDLC, independent QA Agent testing, cross-layer verification, token economy, responsive mobile UX, programmatic hooks, and conventional commits.",
+  "version": "1.7.0",
   "author": "Huy Vu",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "/start-day Resume in-flight work or route by intent (feature, bug, brainstorm, docs)",
     "/plan Design a new feature following the AI-Native SDLC workflow",
     "/grill-me Stress-test a plan and resolve open design decisions",
-    "/define-tests Define black-box test cases and a 3-layer verification matrix from requirements",
+    "/define-tests Define black-box test cases and a cross-layer verification matrix from requirements",
     "/tdd Develop with the Red-Green-Refactor loop at public seams",
     "/improve-codebase-architecture Audit shallow modules and propose deepening opportunities",
     "/review-code Audit security, inspect diffs, and verify against QA test cases",
