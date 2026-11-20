@@ -2,7 +2,7 @@
 
 Run this by hand from the repo root, on branch `fix/pass-1-correctness`, against a real Antigravity install. In Windows PowerShell, `~` is `$HOME`. Record the results in the PR.
 
-1. Install globally from this branch: `node bin/cli.js --global`. Open `~/.gemini/config/plugins/antigravity-starter-kit/hooks.json`. The hook paths must be absolute and must exist.
+1. Install globally from this branch: `node bin/cli.js --global`. Open `~/.gemini/config/plugins/antigravity-starter-kit/hooks.json`. Each hook command must start with the absolute path of a Node executable, followed by an absolute hook path, and both files must exist.
 2. Make a throwaway project whose `origin` is a local bare repo, so a push that slips through cannot reach a real remote:
    `git init --bare /tmp/agy-remote.git && git init agy-scratch && cd agy-scratch && git remote add origin /tmp/agy-remote.git && git commit --allow-empty -m init && git switch -c test`
    (on Windows use a folder such as `%TEMP%\agy-remote.git`). Open `agy-scratch` in Antigravity. Use it for steps 2-5 and 8. Ask the agent to run `git push --force origin test`. Expect the "Force push" block message.

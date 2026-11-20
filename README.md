@@ -287,7 +287,7 @@ Put this step in your project's own workflow so nobody has to remember it, for e
 
 ## 🛡️ Programmatic Guardrails (Hooks)
 
-The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`. Install writes absolute hook paths into it, so they run from any workspace.
+The starter kit ships with active `PreToolUse` hooks configured in `hooks.json`. Install writes absolute hook paths into it, plus the absolute path of the Node executable that ran the installer, so they run from any workspace even when `node` is not on the hook runner's `PATH`. Re-link after moving or upgrading Node to a different path.
 
 - **`git-guardrail`**:
   - Force push (`--force`, `-f`, clusters like `-fu`, `+refspec`) is denied on any branch. `--force-with-lease` is allowed, except to `main`/`master`.
