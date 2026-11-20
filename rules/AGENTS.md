@@ -49,7 +49,7 @@
   | `git push`, deploy, any external tracker or API write (Jira, GitHub Issues, Linear, Trello, …) | Ask individually, every time, never bundled |
 
 - **Plan Approval (Tier 2)**: Present the plan once; after the user approves, the Tier 2 edit row applies.
-- **Genuine Blockers**: Failing build, missing required file, unresolvable conflict, or a test you cannot make pass after a reasonable attempt. Stop and ask.
+- **Genuine Blockers**: Failing build, missing required file, unresolvable conflict, a test you cannot make pass after a reasonable attempt, or a plan deviation (a change to the approved plan's file list or approach). Stop and ask; for a plan deviation, update `docs/plans/<branch>.md` and present it for approval.
 - **Batch Questions**: Gather all other questions (domain, logic, edge cases) and ask them in **one batch** together with the plan, each with a **recommended answer and a 1-line rationale** so the user can approve all or override by number. Do not ask piecemeal while working. A non-blocking question that comes up after approval is not asked: take a stated default and list it in the end-of-run report as a decision taken.
 - **Gates Never Move Into Subagents**: Present previews and obtain user confirmation in the **main conversation thread**. Subagents only execute already-approved writes or perform read-only analysis; a subagent never asks the user for approval.
 
