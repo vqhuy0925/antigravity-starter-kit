@@ -41,3 +41,10 @@ test('test_cases template takes layers from the project profile', () => {
   assert.doesNotMatch(t, /UI display codes/);
   assert.match(read('templates/project_profile_template.md'), /^## .*Layers/m);
 });
+test('stack commands appear only as profile examples', () => {
+  const allowed = new Set(['templates/project_profile_template.md']);
+  for (const f of kitFiles().filter(f => !allowed.has(f)))
+    for (const re of [/vue-tsc/, /build-local-with-test/, /gradlew/])
+      assert.ok(!re.test(read(f)), `${f} matches ${re}`);
+  assert.match(read('skills/review-code/SKILL.md'), /project_profile\.md/);
+});

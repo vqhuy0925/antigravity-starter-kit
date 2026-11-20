@@ -6,9 +6,7 @@ description: Run automated tests, linters, type checks, and audit code against Q
 # Automated Code Review Standards
 
 ## 1. Static Verification & Test Execution
-- Run project linters (`npm run lint`, `eslint`, `./gradlew check`).
-- Run type checkers (`npx vue-tsc --noEmit`, `tsc --noEmit`).
-- Run automated unit and integration tests (`./gradlew test -q`, `npm test`, or project-specific test runners like `build-local-with-test.bat`).
+- Run the project's lint, type-check, and unit and integration test commands. Take them from `docs/project_profile.md`; if there is no profile, follow the fallback in the Review & Verification Phase of `rules/AGENTS.md`.
 
 ## 2. QA Test Matrix Audit (Independent Verification)
 > [!IMPORTANT]

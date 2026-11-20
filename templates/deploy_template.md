@@ -18,7 +18,7 @@
 
 ## 2. Deployment Artifacts & Steps
 1. **Database Migration:**
-   - Command: `npm run migrate` or `./gradlew flywayMigrate`
+   - Command: `[migration command from docs/project_profile.md]`
 2. **Deploy Application Container:**
    - Image tag: `registry.example.com/app:v1.2.0`
 3. **Cache / CDN Invalidation:**

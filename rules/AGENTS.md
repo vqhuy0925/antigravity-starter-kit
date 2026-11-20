@@ -31,7 +31,7 @@
   - Update `task.md` with progress (`[/]` for in-progress, `[x]` for completed) when in Tier 2 mode.
   - Verify syntax and run lightweight compilation commands frequently.
 - **Review & Verification Phase**:
-  - Run linters, unit tests, and type checks before finishing.
+  - Run the project's lint, type-check, and test commands (from `docs/project_profile.md`) before finishing. If there is no profile, detect the commands from the project's manifest (`package.json` scripts, `Makefile`, build files) and say which ones you used.
   - Audit test coverage against `test_cases.md`. If any QA scenario is missing or failing, the review is rejected.
   - Produce a `walkthrough.md` artifact summarizing changes, QA test coverage, and test evidence for Tier 2 tasks.
 - **Commit Phase**:

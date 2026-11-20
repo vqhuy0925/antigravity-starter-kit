@@ -28,7 +28,7 @@ Fix defects with mathematical certainty through Test-Driven Remediation.
 
 ### Phase 2: Reproduce as Failing Test (RED)
 1. Write an automated test asserting the expected behavior under the defect condition.
-2. Execute the test command (`npm test`, `./gradlew test -q`, `pytest`).
+2. Execute the project's test command (from `docs/project_profile.md`; see the Review & Verification Phase of `rules/AGENTS.md` if there is no profile).
 3. **Verify failure:** Confirm the test fails with the exact symptom reported.
    - *If the test passes, the test does not accurately reproduce the defect condition.*
 
