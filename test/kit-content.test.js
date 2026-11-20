@@ -142,3 +142,14 @@ test('code-reviewer owns the audit checklist', () => {
   assert.match(c, /modern-web-guidance/);
   assert.doesNotMatch(c, /Controllers only orchestrate/);
 });
+
+test('start-day routes and plugin suggested prompts name existing skills only', () => {
+  const known = new Set([...fs.readdirSync(path.join(ROOT, 'skills')), 'spec-critic', 'code-reviewer']);
+  const rows = read('skills/start-day/SKILL.md').split(/\r?\n/).filter(l => /^\| \*\*/.test(l));
+  for (const row of rows) {
+    const chain = row.split('|')[2];
+    for (const m of chain.matchAll(/`([a-z][a-z0-9-]*)`/g)) assert.ok(known.has(m[1]), `start-day route -> ${m[1]}`);
+  }
+  for (const p of JSON.parse(read('plugin.json')).suggestedPrompts.filter(p => p.startsWith('/')))
+    assert.ok(known.has(p.split(' ')[0].slice(1)), p);
+});

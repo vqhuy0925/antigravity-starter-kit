@@ -131,7 +131,7 @@ antigravity-starter-kit/
 │   ├── deploy_template.md               # Stage 5 (Deploy Gate): Staging/Prod release checklist
 │   ├── bug_report_template.md           # Stage 6 (Maintain): Incident & RCA report
 │   └── project_profile_template.md      # Copy to docs/project_profile.md: stack, layers, commands, domain glossary
-├── skills/                              # 33 Specialized On-Demand Skills
+├── skills/                              # 30 Specialized On-Demand Skills
 │   ├── start-day/                       # Single entry-point router (orient, resume, route, close loop)
 │   ├── story-review/                    # Shift-left 10-lens refinement QA review
 │   ├── retro/                           # Closed-loop AI retrospective (capture & synthesize)
@@ -150,7 +150,7 @@ antigravity-starter-kit/
 │   ├── backend-development/             # REST API, DTOs & transactional standards
 │   ├── seo/                             # Full-spectrum SEO & GEO audit suite with llms.txt generator
 │   ├── landing-page-design/             # High-converting landing page strategy, copywriting & visual system
-│   │   # --- 5 Core Engineering & Productivity Pillars ---
+│   │   # --- 12 Core Engineering & Productivity Pillars ---
 │   ├── grilling/                        # Recursive design tree & frontier round interview engine
 │   ├── domain-modeling/                 # Active domain modeling, term sharpening & ADR maintenance
 │   ├── wait-what/                       # Plain-English translation using canonical domain vocabulary
@@ -276,7 +276,7 @@ Copy `templates/project_profile_template.md` to `docs/project_profile.md` in you
 | `/improve-codebase-architecture` | Architecture Survey | Scans codebase for shallow modules and generates visual deepening reports |
 | `/wayfinder` | Complex Epic Roadmapping | Plans multi-session epics as a shared map of decision tickets |
 | `color-system-design` | UI/UX Color System & Harmony | Enforces 60-30-10 rule, semantic tokens, WCAG AA/AAA contrast & OKLCH scales |
-| `/modern-web` | Modern Web & Baseline Standards | Google Chrome & MDN native web APIs (dialog, popover, anchor positioning, container queries) |
+| `/modern-web-guidance` | Modern Web & Baseline Standards | Google Chrome & MDN native web APIs (dialog, popover, anchor positioning, container queries) |
 | `/pr` | Evidence-First PR | Generates high-signal PR bodies with blast-radius scoping & proof |
 | `writing-for-agents` | Agent Documentation Guide | Best practices for drafting prompt steering files, rules, and skills |
 

@@ -2,6 +2,33 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.0] - 2026-11-20
+
+### Removed
+- `grill-me` and `grill-with-docs`: use `grilling`. Its new `## With docs` mode records terms and ADRs as it goes (and follows `skills/domain-modeling/SKILL.md`).
+- `smart-researcher`: folded into `token-optimization` section 3.
+
+### Changed
+- Skills chain by reading the next skill: "Read and follow `skills/<name>/SKILL.md`" replaces "Call the Skill tool", which Antigravity does not have.
+- `disable-model-invocation` is removed from `improve-codebase-architecture`, `to-spec`, `to-tickets`, `wait-what` and `wayfinder` (Antigravity frontmatter has `name` and `description` only; a live `/wait-what` test ran despite the field). Their descriptions now end "Use only when the user asks for it by name."
+- `wayfinder` no longer points to nonexistent `research` and `prototype` skills; research goes through the built-in `research` subagent.
+- `skills/writing-for-agents/SKILL-MECHANICS.md` is rewritten for Antigravity, and a test checks that every `skills/<name>/SKILL.md` path named in the kit exists.
+- Tool names follow Antigravity: `read_file` and `run_command`; content search goes through `run_command`. The fixed 100-line read rule is relaxed to "read the range you need". `rules/AGENTS.md` section 3 points to `token-optimization`.
+- `fix-bug` is the single bug entry point: Triage, Diagnose (`diagnosing-bugs` Phases 1-4), Fix (Phase 5), Close (including the Phase 6 checklist). The `/start-day` Bug route is `fix-bug`.
+- `plan` holds one `## Which planning skill` table; `to-tickets` and `wayfinder` point to it.
+- `agents/code-reviewer.md` is the single audit checklist; `review-code` section 3 delegates to it with `invoke_subagent`.
+- `plugin.json` suggested prompt `/modern-web` is now `/modern-web-guidance` (the skill's real name); README command reference likewise.
+- README: skill count (30) and the tree comment for the core skills corrected.
+- `docs/checklists/antigravity-skills-check.md` records the 2026-11-20 live results.
+
+### Added
+- Test: `/start-day` routes and `plugin.json` suggested prompts name existing skills only.
+
+### Migration
+- Typed `/grill-me` or `/grill-with-docs`: use `/grilling` (ask for docs mode for the latter).
+- Typed `/smart-researcher`: use `token-optimization`, or delegate to the built-in `research` subagent.
+- Local forks that relied on `disable-model-invocation` should put "Use only when the user asks for it by name" in the skill description.
+
 ## [1.7.0] - 2026-11-20
 
 ### Changed

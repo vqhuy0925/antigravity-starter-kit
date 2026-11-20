@@ -2,7 +2,7 @@
   "name": "antigravity-starter-kit",
   "displayName": "Antigravity Enterprise Starter Kit",
   "description": "Enterprise-grade toolkit for Antigravity AI agents featuring AI-Native SDLC, independent QA Agent testing, cross-layer verification, token economy, responsive mobile UX, programmatic hooks, and conventional commits.",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "author": "Huy Vu",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
@@ -14,6 +14,6 @@
     "/improve-codebase-architecture Audit shallow modules and propose deepening opportunities",
     "/review-code Audit security, inspect diffs, and verify against QA test cases",
     "/seo audit Run a Technical SEO, Schema JSON-LD, and AI Search (GEO) audit",
-    "/modern-web Scan & apply Modern Web Platform & Web Baseline standards (Google Chrome)"
+    "/modern-web-guidance Scan & apply Modern Web Platform & Web Baseline standards (Google Chrome)"
   ]
 }
