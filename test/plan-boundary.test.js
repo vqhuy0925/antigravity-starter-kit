@@ -13,7 +13,7 @@ const run = (dir, c = 'git commit -m x', extra = {}) =>
 
 test('asks when no plan exists in a repo that uses docs/plans/', () => {
   const dir = makeRepo({ branch: 'feat/login', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
-  const r = run(dir); assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
+  const r = run(dir); assert.strictEqual(r.decision, 'force_ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
 });
 test('allows when the repo has no docs/plans directory', () => {
   const dir = makeRepo({ branch: 'feat/login' }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
@@ -27,7 +27,7 @@ test('allows files listed by path in docs/plans/<slug>.md', () => {
 test('asks on basename collision', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `index.ts`\n', 'lib/index.ts': '0' } });
   write(dir, 'src/index.ts', '1'); write(dir, 'lib/index.ts', '1'); stage(dir, 'src/index.ts', 'lib/index.ts');
-  assert.strictEqual(run(dir).decision, 'ask');
+  assert.strictEqual(run(dir).decision, 'force_ask');
 });
 test('allows files under a listed directory', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/auth/`\n' } });
@@ -42,7 +42,7 @@ test('matches backslash paths and CRLF plans', () => {
 test('checks files staged by the same chain', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n' } });
   write(dir, 'src/a.ts', '1'); write(dir, 'src/extra.ts', '1');
-  assert.strictEqual(run(dir, 'git add -A && git commit -m x').decision, 'ask');
+  assert.strictEqual(run(dir, 'git add -A && git commit -m x').decision, 'force_ask');
 });
 test('detached HEAD falls back to implementation_plan.md', () => {
   const dir = makeRepo({ files: { 'implementation_plan.md': '- `src/a.ts`\n' } });
@@ -64,25 +64,25 @@ test('plan file itself never counts as scope creep', () => {
 });
 test('sudo-prefixed commit with no plan asks', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
-  assert.strictEqual(run(dir, 'sudo git commit -m x').decision, 'ask');
+  assert.strictEqual(run(dir, 'sudo git commit -m x').decision, 'force_ask');
 });
 test('commit inside bash -c with no plan asks', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
-  assert.strictEqual(run(dir, 'bash -c "git commit -m x"').decision, 'ask');
+  assert.strictEqual(run(dir, 'bash -c "git commit -m x"').decision, 'force_ask');
 });
 test('git -C <dir> commit is detected', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
-  assert.strictEqual(run(dir, 'git -C . commit -m x').decision, 'ask');
+  assert.strictEqual(run(dir, 'git -C . commit -m x').decision, 'force_ask');
 });
 test('commit -am includes unstaged tracked changes', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'src/z.ts': '0' } });
   write(dir, 'src/z.ts', '1');
-  assert.strictEqual(run(dir, 'git commit -am x').decision, 'ask');
+  assert.strictEqual(run(dir, 'git commit -am x').decision, 'force_ask');
 });
 test('detached HEAD with no plan reports <detached>', () => {
   const dir = makeRepo({ files: { 'docs/plans/.gitkeep': '' } }); execFileSync('git', ['checkout', '--detach'], { cwd: dir, stdio: 'pipe' });
   write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
-  const r = run(dir); assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /<detached>/);
+  const r = run(dir); assert.strictEqual(r.decision, 'force_ask'); assert.match(r.reason, /<detached>/);
 });
 test('exports helpers', () => {
   const pb = require('../hooks/plan-boundary');
@@ -93,13 +93,13 @@ test('exports helpers', () => {
 test('commit with a pathspec checks unstaged named paths', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'src/unplanned.ts': '0' } });
   write(dir, 'src/unplanned.ts', '1');
-  assert.strictEqual(run(dir, 'git commit -m x src/unplanned.ts').decision, 'ask');
-  assert.strictEqual(run(dir, 'git commit -m x -- src/unplanned.ts').decision, 'ask');
+  assert.strictEqual(run(dir, 'git commit -m x src/unplanned.ts').decision, 'force_ask');
+  assert.strictEqual(run(dir, 'git commit -m x -- src/unplanned.ts').decision, 'force_ask');
 });
 test('git -C <dir> commit resolves the repo from <dir>', () => {
   const dir = makeRepo({ branch: 'feat/login', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
   const r = runHook('plan-boundary.js', cmd(`git -C ${path.basename(dir)} commit -m x`, path.dirname(dir)));
-  assert.strictEqual(r.decision, 'ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
+  assert.strictEqual(r.decision, 'force_ask'); assert.match(r.reason, /docs\/plans\/feat-login\.md/);
 });
 test('multi-word commit message words are not pathspecs', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'lib/x.ts': '0' } });
@@ -108,7 +108,7 @@ test('multi-word commit message words are not pathspecs', () => {
 });
 test('commit behind an unknown prefix (timeout) is still checked', () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } }); write(dir, 'src/a.ts', '1'); stage(dir, 'src/a.ts');
-  assert.strictEqual(run(dir, 'timeout 30 git commit -am x').decision, 'ask');
+  assert.strictEqual(run(dir, 'timeout 30 git commit -am x').decision, 'force_ask');
 });
 const addRepo = () => {
   const dir = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `src/a.ts`\n', 'src/b.ts': '0' } });
@@ -118,27 +118,27 @@ const addRepo = () => {
 test('git add <planned file> && commit ignores unrelated dirty files', () =>
   assert.strictEqual(run(addRepo(), 'git add src/a.ts && git commit -m "feat: a"').decision, 'allow'));
 test('git add <unplanned file> && commit asks', () =>
-  assert.strictEqual(run(addRepo(), 'git add src/b.ts && git commit -m "feat: a"').decision, 'ask'));
+  assert.strictEqual(run(addRepo(), 'git add src/b.ts && git commit -m "feat: a"').decision, 'force_ask'));
 for (const add of ['git add -A', 'git add --all', 'git add -u', 'git add .', 'git add :/'])
   test(`${add} && commit checks the whole worktree`, () =>
-    assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'ask'));
+    assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'force_ask'));
 test('git add inside bash -c followed by commit is checked', () =>
-  assert.strictEqual(run(addRepo(), 'bash -c "git add src/b.ts" && git commit -m x').decision, 'ask'));
+  assert.strictEqual(run(addRepo(), 'bash -c "git add src/b.ts" && git commit -m x').decision, 'force_ask'));
 
 // --- Residual: non-literal git add widens the check to the whole worktree ---
 for (const add of [
   'git add $(git ls-files -m)', 'git add `git ls-files -m`', 'git ls-files -m | xargs git add',
   'git add $FILES', 'git add "$FILES"', 'cd src && git add b.ts'
 ]) test(`${add} && commit checks the whole worktree`, () =>
-  assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'ask'));
+  assert.strictEqual(run(addRepo(), `${add} && git commit -m "feat: a"`).decision, 'force_ask'));
 
 // --- Live check: workspace is a parent folder; the command cd's into the repo ---
 test('cd <repo> ; commit from a non-repo parent asks when the repo has no plan', () => {
   const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
   write(repo, 'x.txt', '1');
   const parent = path.dirname(repo);
-  assert.strictEqual(run(parent, `cd "${repo}"; git add x.txt; git commit -m x`).decision, 'ask');
-  assert.strictEqual(run(parent, `cd ${path.basename(repo)} && git add x.txt && git commit -m x`).decision, 'ask');
+  assert.strictEqual(run(parent, `cd "${repo}"; git add x.txt; git commit -m x`).decision, 'force_ask');
+  assert.strictEqual(run(parent, `cd ${path.basename(repo)} && git add x.txt && git commit -m x`).decision, 'force_ask');
 });
 test('cd <repo> ; add planned file ; commit from a parent is allowed', () => {
   const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `x.txt`\n' } });
@@ -148,17 +148,17 @@ test('cd <repo> ; add planned file ; commit from a parent is allowed', () => {
 test('cd <repo> ; add unplanned file ; commit from a parent asks', () => {
   const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/feat-a.md': '- `x.txt`\n' } });
   write(repo, 'other.txt', '1');
-  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add other.txt; git commit -m x`).decision, 'ask');
+  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add other.txt; git commit -m x`).decision, 'force_ask');
 });
 test('Set-Location -Path <repo> is followed', () => {
   const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
   write(repo, 'x.txt', '1');
-  assert.strictEqual(run(path.dirname(repo), `Set-Location -Path "${repo}"; git add x.txt; git commit -m x`).decision, 'ask');
+  assert.strictEqual(run(path.dirname(repo), `Set-Location -Path "${repo}"; git add x.txt; git commit -m x`).decision, 'force_ask');
 });
 test('cd <repo> ; commit with a quoted message from a parent still finds the repo', () => {
   const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
   write(repo, 'x.txt', '1');
-  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add x.txt; git commit -m "chore: livecheck step 4"`).decision, 'ask');
+  assert.strictEqual(run(path.dirname(repo), `cd "${repo}"; git add x.txt; git commit -m "chore: livecheck step 4"`).decision, 'force_ask');
 });
 test('Antigravity payload shape (cwd + workspacePaths, no args.Cwd) with cd into the repo', () => {
   const repo = makeRepo({ branch: 'feat/a', files: { 'docs/plans/.gitkeep': '' } });
@@ -166,5 +166,5 @@ test('Antigravity payload shape (cwd + workspacePaths, no args.Cwd) with cd into
   const parent = path.dirname(repo);
   const payload = { cwd: parent, workspacePaths: [parent.replace(/\\/g, '/')],
     toolCall: { name: 'run_command', args: { CommandLine: `cd ${repo}; git add x.txt; git commit -m "step 4"` } } };
-  assert.strictEqual(runHook('plan-boundary.js', payload).decision, 'ask');
+  assert.strictEqual(runHook('plan-boundary.js', payload).decision, 'force_ask');
 });

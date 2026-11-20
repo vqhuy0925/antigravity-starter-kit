@@ -23,7 +23,7 @@ test('Blocks direct push to origin main', () => {
 
 test('Prompts on git reset --hard', () => {
   const res = runHook('git-guardrail.js', cmd('git reset --hard HEAD~1'));
-  assert.strictEqual(res.decision, 'ask');
+  assert.strictEqual(res.decision, 'force_ask');
   assert.match(res.reason, /discard all uncommitted work/);
 });
 

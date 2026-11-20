@@ -200,7 +200,7 @@ function main() {
     if (!planPath) {
       // The no-plan prompt is opt-in per repo: only repos that keep a docs/plans/ directory get it.
       if (!isDir(path.join(repoRoot, 'docs', 'plans'))) return outputDecision('allow');
-      return outputDecision('ask', `No approved plan found (expected docs/plans/${branch ? planSlug(branch) : '<detached>'}.md). Proceed with this commit?`);
+      return outputDecision('force_ask', `No approved plan found (expected docs/plans/${branch ? planSlug(branch) : '<detached>'}.md). Proceed with this commit?`);
     }
     const stagedFiles = lines(git(['diff', '--cached', '--name-only'], cwd));
     let candidates = stagedFiles.slice();
@@ -228,7 +228,7 @@ function main() {
       return !isCovered(f, planPaths, ctx);
     });
     if (uncovered.length) {
-      return outputDecision('ask', `⚠️ Scope Creep Detected by Antigravity Guardrail: Files not mentioned in the approved plan (${path.basename(planPath)}): [${uncovered.join(', ')}]. Do you want to proceed with this commit?`);
+      return outputDecision('force_ask', `⚠️ Scope Creep Detected by Antigravity Guardrail: Files not mentioned in the approved plan (${path.basename(planPath)}): [${uncovered.join(', ')}]. Do you want to proceed with this commit?`);
     }
     return outputDecision('allow');
   } catch (err) {

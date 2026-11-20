@@ -4,7 +4,7 @@
 const { readInput, outputDecision, getCommand, getCwd, currentBranch, splitCommands, tokenize, normalizeHead, shellInner, parseGit, fallbackTokens, quotesBalanced, DELETES, gitDir, segmentsWithDirs } = require('./lib');
 
 const PROTECTED = ['main', 'master'];
-const SEVERITY = { allow: 0, ask: 1, deny: 2 };
+const SEVERITY = { allow: 0, ask: 1, force_ask: 1, deny: 2 };
 
 const DENY_FORCE = '🚨 BLOCKED by Antigravity Guardrail: Force push (--force / -f) destroys remote commit history.';
 const DENY_PROTECTED = '🚨 BLOCKED by Antigravity Guardrail: Direct git push to main/master is strictly protected. Please create a feature branch and pull request.';
@@ -106,7 +106,7 @@ function checkSegment(rawTokens, branch, fallback = true) {
   if (!g) return null;
   const [sub, args] = g;
   if (sub === 'push') return checkPush(args, branch);
-  if (sub === 'reset' && args.includes('--hard')) return { decision: 'ask', reason: ASK_RESET };
+  if (sub === 'reset' && args.includes('--hard')) return { decision: 'force_ask', reason: ASK_RESET };
   return null;
 }
 
