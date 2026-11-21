@@ -16,7 +16,7 @@ description: Run automated tests, linters, type checks, and audit code against Q
 - **Reject on Missing QA Coverage:** If any QA test scenario is skipped, mocked away superficially, or failing, REJECT the review and require dev fixes.
 
 ## 3. Clean Code & Security Audit
-- Run the `code-reviewer` subagent on the diff (`invoke_subagent`, definition `agents/code-reviewer.md`) and include its verdict.
+- Run the `code-reviewer` subagent on the diff (`invoke_subagent` with `TypeName: 'code-reviewer'`, definition `agents/code-reviewer.md`) and include its verdict.
 
 ## 4. Walkthrough Documentation
 - Create or update `walkthrough.md` with a summary of changes, verified behaviors, QA test case coverage matrix, and test execution evidence.

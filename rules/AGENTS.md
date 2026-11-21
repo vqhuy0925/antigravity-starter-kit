@@ -12,7 +12,7 @@
   - **Stage 6 (Maintain)**: Incident diagnosis $\rightarrow$ `bug_report.md` with RCA and fix plan. Close the loop by adding permanent regression tests.
 - **QA Independence Rule (No Dev Bias)**:
   - QA Agent and Dev MUST NOT share context during test case definition.
-  - QA evaluates requirements purely from `intent.md`, `spec.md`, or the ticket/issue report in a dedicated subagent invocation (`invoke_subagent` with `Role: 'QA Engineer'`).
+  - QA evaluates requirements purely from `intent.md`, `spec.md`, or the ticket/issue report in a dedicated subagent invocation (`invoke_subagent` with `TypeName: 'self'`, `Role: 'QA Engineer'`).
   - QA tests must enforce the **Cross-Layer Rule**: assert at every layer the change touches; for a typical web app that is data, API, and UI. The layers a project has are listed in `docs/project_profile.md` (`## Layers`). This prevents DB default value traps, where a column default silently overwrites a computed value.
 - **Task Complexity Tiers & Auto-Detection**:
   - **Tier 1 (Trivial / Fast-Track)**: Minor text/label updates, typo fixes, icon changes, minor CSS/styling adjustments, simple constant values without schema or business logic impact.
@@ -22,7 +22,7 @@
 - **Institutional Memory (2-Mistake Rule)**:
   - Whenever an AI assistant repeats a mistake twice, immediately update `AGENTS.md` or the corresponding project rule files with the corrective instruction.
 - **Plan Phase (Tier 2)**:
-  - Always research the codebase using grep and targeted view tools before writing code.
+  - Always research the codebase before writing code.
   - Write the plan to `docs/plans/<branch>.md` (branch `/` → `-`) and commit it with the work; optionally mirror it to the conversation's `implementation_plan.md`. Keep `task.md` under the conversation artifacts directory.
   - Get plan approval per §2 before implementing.
 - **Implement Phase**:

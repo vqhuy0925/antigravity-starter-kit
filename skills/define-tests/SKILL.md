@@ -13,7 +13,7 @@ Define how a story, feature, or bugfix will be proven complete **before writing 
 
 ### Principle 1: Context Isolation (Zero Dev Bias)
 Developers inherently suffer from confirmation bias—writing tests that validate how their code was written rather than how the system should actually behave.
-- **Independent Agent Execution:** The QA Agent MUST execute in an isolated context (e.g., via `invoke_subagent` with `Role: 'QA Engineer'` or a standalone prompt).
+- **Independent Agent Execution:** The QA Agent MUST execute in an isolated context (e.g., via `invoke_subagent` with `TypeName: 'self'`, `Role: 'QA Engineer'` or a standalone prompt).
 - **Clean Requirements Source:** QA evaluates requirements strictly from `intent.md`, `spec.md`, user problem statements, or bug reports. QA does NOT consult dev implementation plans, in-progress code, or temporary mock shortcuts.
 
 ### Principle 2: Cross-Layer Verification

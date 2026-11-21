@@ -53,3 +53,8 @@ Operations that trigger irreversible external actions:
 - **Email Dispatch:** [Service / template location]
 - **External Webhooks / Notifications:** [List surfaces]
 - **Export / Reporting Jobs:** [Scheduled cron or batch tasks]
+
+---
+
+## Work Tracking
+- **Tracker:** [e.g. GitHub Issues / Jira / Linear / local markdown under .scratch/]

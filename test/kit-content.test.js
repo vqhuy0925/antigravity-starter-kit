@@ -83,7 +83,8 @@ test('no dangling skill references; slice order stated in implement', () => {
 });
 
 test('removed grilling aliases are not referenced', () => {
-  for (const f of kitFiles()) assert.doesNotMatch(read(f), /grill-me|grill-with-docs/, f);
+  // Exempt README's npm-upgrade note, which names them so users can delete the old folders.
+  for (const f of kitFiles()) assert.doesNotMatch(read(f).split('\n').filter(l => !l.startsWith('Upgrading through the npm package')).join('\n'), /grill-me|grill-with-docs/, f);
   assert.match(read('skills/grilling/SKILL.md'), /^## With docs/m);
   assert.match(read('skills/grilling/SKILL.md'), /skills\/domain-modeling\/SKILL\.md/);
 });
@@ -108,7 +109,9 @@ test('request-only skills say so in their description', () => {
 
 test('tool names match Antigravity; research skill folded into token-optimization', () => {
   for (const f of kitFiles()) {
-    assert.doesNotMatch(read(f), /grep_search|view_file|smart-researcher/, f);
+    // README's npm-upgrade note must name the removed skills so users can delete them.
+    const text = read(f).split('\n').filter(l => !l.startsWith('Upgrading through the npm package')).join('\n');
+    assert.doesNotMatch(text, /grep_search|view_file|smart-researcher/, f);
     assert.doesNotMatch(read(f), /<=\s*100 lines|≤\s*100 lines/, f);
   }
   const t = read('skills/token-optimization/SKILL.md');
@@ -152,4 +155,19 @@ test('start-day routes and plugin suggested prompts name existing skills only', 
   }
   for (const p of JSON.parse(read('plugin.json')).suggestedPrompts.filter(p => p.startsWith('/')))
     assert.ok(known.has(p.split(' ')[0].slice(1)), p);
+});
+
+test('diagnosing-bugs description points bug fixes to fix-bug', () => {
+  const m = read('skills/diagnosing-bugs/SKILL.md').match(/^description:\s*(.*)$/m);
+  assert.match(m[1], /`fix-bug`/);
+});
+
+test('backticked slash commands name existing skills', () => {
+  // Allow-list: `/tmp` is a filesystem path; `/s` is a Windows Remove-Item flag quoted in README (hook docs), not a command.
+  const known = new Set([...fs.readdirSync(path.join(ROOT, 'skills')), 's', 'tmp']);
+  for (const f of kitFiles()) {
+    const text = read(f);
+    for (const m of text.matchAll(/`\/([a-z][a-z0-9-]*)(?:\s[^`]*)?`/g))
+      assert.ok(known.has(m[1]), `${f}: /${m[1]} is not a skill`);
+  }
 });

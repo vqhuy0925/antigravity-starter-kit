@@ -1,11 +1,11 @@
 ---
 name: to-spec
-description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. Use only when the user asks for it by name."
+description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. Use only when the user asks for it by name, or when a route the user confirmed (such as `/start-day`) leads here."
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+Use the tracker named in `docs/project_profile.md` (Tracker line); if none, ask the user which tracker to use (default: local markdown under `.scratch/`).
 
 ## Process
 

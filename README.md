@@ -106,7 +106,7 @@ Antigravity Starter Kit introduces an **Independent QA Subagent Pattern**:
 antigravity-starter-kit/
 ├── bin/
 │   └── cli.js                           # Cross-platform CLI runner (npx / global)
-├── plugin.json                          # Plugin declaration manifest (v1.6.0)
+├── plugin.json                          # Plugin declaration manifest
 ├── hooks.json                           # Active lifecycle hooks manifest
 ├── install.sh                           # One-click installer (macOS / Linux / Bash)
 ├── install.ps1                          # One-click installer (Windows PowerShell native)
@@ -183,6 +183,8 @@ Or install only into the current repository:
 npx antigravity-starter-kit --local
 ```
 A `--local` install writes absolute paths for this machine into `.agents/plugins/antigravity-starter-kit/hooks.json`. If you commit that folder, every other developer must re-link it after clone, pull or move (see [Re-linking hooks](#re-linking-hooks-after-clone-pull-or-move)).
+
+Upgrading through the npm package (copy install) does not delete old files: remove `skills/grill-me`, `skills/grill-with-docs` and `skills/smart-researcher` from the install directory. Git-based installs are cleaned by `git pull`.
 
 ---
 

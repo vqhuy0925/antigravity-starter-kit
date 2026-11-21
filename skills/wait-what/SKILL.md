@@ -1,6 +1,6 @@
 ---
 name: wait-what
-description: "Stop. That last message did not land: re-pitch it. Use only when the user asks for it by name."
+description: "Stop. That last message did not land: re-pitch it. Use only when the user asks for it by name, or when a route the user confirmed (such as `/start-day`) leads here."
 ---
 
 Wait, I don't understand where you've got to here. Re-pitch that: give me a little bit of context, talk in ASD-STE100 Simplified Technical English, and use the ubiquitous language from `GLOSSARY.md` (follow `GLOSSARY-MAP.md` to the right one if the repo has more than one; format: the `domain-modeling` skill).

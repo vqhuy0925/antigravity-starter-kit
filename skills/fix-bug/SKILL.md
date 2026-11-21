@@ -11,7 +11,7 @@ Fix defects with mathematical certainty through Test-Driven Remediation.
 
 ## The 3 Inviolate Rules
 
-1. **Red Before Green:** When a correct seam exists (as defined in Phase 5 of the `diagnosing-bugs` skill), the first code written MUST be an automated test (unit or integration) at that seam that reproduces the bug and is **seen to FAIL** before touching any production source code. When there is no correct seam, do not write a shallow test: record the missing seam as a finding in `bug_report.md`, verify the fix by the reproduction steps instead, and propose the seam as a follow-up task.
+1. **Red Before Green:** When a correct seam exists (as defined in Phase 5 of the `diagnosing-bugs` skill), before changing production behaviour, an automated test (unit or integration) at that seam that reproduces the bug MUST be **seen to FAIL**; diagnostic harnesses and instrumentation from Phase 2 do not count and are removed per the Phase 6 checklist. When there is no correct seam, do not write a shallow test: record the missing seam as a finding in `bug_report.md`, verify the fix by the reproduction steps instead, and propose the seam as a follow-up task.
 2. **Minimal Blast Radius:** Fix the root cause and no more. A desired architectural refactor is a separate follow-up task.
 3. **Permanent Institutional Memory:** Every bug fix leaves a permanent regression test case in the test suite where a correct seam exists, or the documented missing seam in `bug_report.md`, and an updated record in `test_cases.md` and `bug_report.md`.
 

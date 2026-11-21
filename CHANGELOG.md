@@ -27,6 +27,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Migration
 - Typed `/grill-me` or `/grill-with-docs`: use `/grilling` (ask for docs mode for the latter).
 - Typed `/smart-researcher`: use `token-optimization`, or delegate to the built-in `research` subagent.
+- Installed or upgraded through the npm package (copy install): delete `skills/grill-me`, `skills/grill-with-docs` and `skills/smart-researcher` from the install directory (`~/.gemini/config/plugins/antigravity-starter-kit/` or `.agents/plugins/antigravity-starter-kit/`). Git-based installs are cleaned by `git pull`.
 - Local forks that relied on `disable-model-invocation` should put "Use only when the user asks for it by name" in the skill description.
 
 ## [1.7.0] - 2026-11-20

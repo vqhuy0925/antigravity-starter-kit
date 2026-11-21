@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. Use only when the user asks for it by name.
+description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. Use only when the user asks for it by name, or when a route the user confirmed (such as `/start-day`) leads here.
 ---
 
 # Improve Codebase Architecture

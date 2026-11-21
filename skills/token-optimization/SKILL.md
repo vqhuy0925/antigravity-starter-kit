@@ -22,7 +22,7 @@ description: Enforce strict token conservation rules, context budgeting, lean fi
   - **Key Files & Exact Line Numbers**
   - **Data Flow / Call Hierarchy**
   - **Root Causes** (identified bottlenecks or causes)
-- **Immediate Termination**: Execute `manage_subagents` with `Action: 'kill'` immediately after receiving the summary.
+- **Immediate Termination**: Execute `manage_subagents` with `Action: 'kill'` and the subagent's `ConversationIds` immediately after receiving the summary.
 
 ## 4. Prompt & Communication Conciseness
 - Provide direct, code-centric, and structured diffs or explanations.
